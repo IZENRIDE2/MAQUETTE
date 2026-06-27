@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>IZEN RIDE — Carte</title>
+<style>
+:root{--bg:#08090E;--surface:#10121A;--border:#1A1E28;--blue:#4A9CE8;--green:#5DCAA5;--txt:#F2F4F8;--muted:#8A91A3}
+*{margin:0;box-sizing:border-box}
+html,body{width:390px;height:844px;overflow:hidden}
+body{position:relative;background:#0B0E15;color:var(--txt);font-family:-apple-system,'SF Pro Display','SF Pro Text',Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+.mapbg{position:absolute;inset:0}
+.mapbg svg{width:100%;height:100%}
+.road1{stroke:#1A2030;stroke-width:14;fill:none;stroke-linecap:round}
+.road2{stroke:#161C29;stroke-width:8;fill:none;stroke-linecap:round}
+.myroute{stroke:var(--blue);stroke-width:5;fill:none;stroke-linecap:round;filter:drop-shadow(0 0 6px rgba(74,156,232,.7))}
+.status{position:relative;z-index:3;display:flex;justify-content:space-between;align-items:center;padding:16px 26px 6px;font-size:14px;font-weight:600}
+.status .right{display:flex;gap:6px;align-items:center;font-size:12px;color:var(--muted)}
+.batt{width:22px;height:11px;border:1px solid var(--muted);border-radius:3px;position:relative}
+.batt::after{content:"";position:absolute;top:2px;bottom:2px;left:2px;right:5px;background:var(--green);border-radius:1px}
+.search{position:relative;z-index:3;margin:10px 20px;height:48px;border-radius:99px;background:rgba(16,18,26,.92);border:1px solid var(--border);display:flex;align-items:center;gap:10px;padding:0 18px;color:var(--muted);font-size:14px;backdrop-filter:blur(8px)}
+.search svg{width:17px;height:17px;stroke:var(--muted);fill:none;stroke-width:2;stroke-linecap:round}
+.rider{position:absolute;z-index:2;width:16px;height:16px;border-radius:50%;background:var(--blue);border:2.5px solid #0B0E15;box-shadow:0 0 0 4px rgba(74,156,232,.22),0 0 14px rgba(74,156,232,.8)}
+.rider.green{background:var(--green);box-shadow:0 0 0 4px rgba(93,202,165,.22),0 0 14px rgba(93,202,165,.8)}
+.me{position:absolute;z-index:2;left:178px;top:430px;width:22px;height:22px;border-radius:50%;background:var(--txt);border:4px solid var(--blue);box-shadow:0 0 0 8px rgba(74,156,232,.18)}
+.me::before{content:"";position:absolute;left:50%;bottom:100%;width:0;height:0;transform:translateX(-50%);
+  border-left:26px solid transparent;border-right:26px solid transparent;border-bottom:70px solid rgba(74,156,232,.16)}
+.cross{position:absolute;z-index:3;left:206px;top:316px;background:rgba(93,202,165,.14);border:1px solid rgba(93,202,165,.5);color:var(--green);font-size:11.5px;font-weight:600;padding:6px 11px;border-radius:99px;backdrop-filter:blur(6px);white-space:nowrap}
+.sheet{position:absolute;z-index:4;left:0;right:0;bottom:82px;background:rgba(13,15,21,.96);border-top:1px solid var(--border);border-radius:24px 24px 0 0;padding:10px 22px 18px;backdrop-filter:blur(12px)}
+.handle{width:42px;height:4px;border-radius:99px;background:var(--border);margin:0 auto 14px}
+.sheet h2{font-size:17px;font-weight:700}
+.sheet p{font-size:12.5px;color:var(--muted);margin-top:2px}
+.rows{display:flex;gap:10px;margin-top:14px}
+.chiprow{flex:1;display:flex;align-items:center;gap:9px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:10px}
+.dot{width:34px;height:34px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#08090E}
+.d1{background:linear-gradient(135deg,#4A9CE8,#5DCAA5)}.d2{background:linear-gradient(135deg,#FAC775,#E24B4A)}.d3{background:linear-gradient(135deg,#7F77DD,#4A9CE8)}
+.chiprow b{display:block;font-size:12.5px}
+.chiprow span{font-size:10.5px;color:var(--muted)}
+.tabbar{position:absolute;z-index:5;bottom:0;left:0;right:0;height:82px;background:rgba(12,14,20,.96);border-top:1px solid var(--border);display:flex;padding:10px 8px 0;backdrop-filter:blur(10px)}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;font-size:10px;font-weight:500;color:var(--muted)}
+.tab svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.tab.active{color:var(--blue)}
+</style>
+</head>
+<body>
+<div class="mapbg">
+  <svg viewBox="0 0 390 844" preserveAspectRatio="none" aria-hidden="true">
+    <path class="road1" d="M-20 180 C 90 150, 180 240, 300 200 S 420 120, 430 110"/>
+    <path class="road1" d="M60 -20 C 40 180, 140 320, 120 520 S 60 760, 90 870"/>
+    <path class="road2" d="M-20 560 C 120 540, 220 620, 410 580"/>
+    <path class="road2" d="M300 -20 C 320 160, 250 300, 310 470 S 380 700, 340 870"/>
+    <path class="road2" d="M-20 400 C 80 380, 160 430, 240 400"/>
+    <path class="myroute" d="M189 441 C 200 380, 230 350, 250 300 S 280 220, 310 195"/>
+  </svg>
+</div>
+<span class="rider" style="left:306px;top:188px"></span>
+<span class="rider green" style="left:96px;top:548px"></span>
+<span class="rider" style="left:252px;top:600px"></span>
+<span class="rider green" style="left:130px;top:250px"></span>
+<div class="me"></div>
+<div class="cross">⚡ Croisement · il y a 8 min</div>
+<div class="status"><span>21:47</span><span class="right">5G <span class="batt"></span></span></div>
+<div class="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.5-4.5"/></svg>Chercher un col, une route, un rider…</div>
+<div class="sheet">
+  <div class="handle"></div>
+  <h2>3 motards croisés aujourd'hui</h2>
+  <p>Localisation propriétaire · précision &lt; 5 m</p>
+  <div class="rows">
+    <div class="chiprow"><span class="dot d1">L</span><span><b>Léa M.</b><span>Col de la Madone</span></span></div>
+    <div class="chiprow"><span class="dot d2">M</span><span><b>Marc R.</b><span>D2204 · 21:12</span></span></div>
+    <div class="chiprow"><span class="dot d3">S</span><span><b>Sam K.</b><span>Corniche · 19:40</span></span></div>
+  </div>
+</div>
+<nav class="tabbar">
+  <div class="tab active"><svg viewBox="0 0 24 24"><path d="M9 4 3.5 6v14L9 18l6 2 5.5-2V4L15 6 9 4zM9 4v14M15 6v14"/></svg>Carte</div>
+  <div class="tab"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19.5c0-3 2.5-5.2 5.5-5.2s5.5 2.2 5.5 5.2"/><circle cx="17" cy="9" r="2.4"/><path d="M16 14.6c2.6.4 4.5 2.4 4.5 4.9"/></svg>Riders</div>
+  <div class="tab"><svg viewBox="0 0 24 24"><path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v8a2.5 2.5 0 0 1-2.5 2.5H9l-5 4z"/></svg>Messages</div>
+  <div class="tab"><svg viewBox="0 0 24 24"><rect x="4" y="5.5" width="16" height="15" rx="2.5"/><path d="M4 10h16M8.5 3.5v4M15.5 3.5v4"/></svg>Events</div>
+  <div class="tab"><svg viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="3.5"/><path d="M5 20c0-3.6 3.1-6 7-6s7 2.4 7 6"/></svg>Profil</div>
+</nav>
+</body>
+</html>

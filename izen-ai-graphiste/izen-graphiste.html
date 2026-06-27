@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>IzenCustom — Agent IA Graphiste (prototype)</title>
+<style>
+  :root{
+    --bg:#0d0f14; --panel:#161a22; --panel2:#1d222c; --line:#2a3140;
+    --txt:#e7ebf0; --muted:#9aa4b2; --accent:#ff6a2b; --accent2:#2b8cff;
+    --ok:#36d39a; --radius:14px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--txt);line-height:1.5}
+  header{padding:18px 24px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .logo{font-weight:800;font-size:20px;letter-spacing:.5px}
+  .logo span{color:var(--accent)}
+  .tag{font-size:12px;color:var(--muted);border:1px solid var(--line);padding:3px 9px;border-radius:999px}
+  .mode{margin-left:auto;font-size:13px;display:flex;align-items:center;gap:8px}
+  .dot{width:9px;height:9px;border-radius:50%;background:var(--muted)}
+  .dot.live{background:var(--ok);box-shadow:0 0 8px var(--ok)}
+  .wrap{max-width:1080px;margin:0 auto;padding:24px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  @media(max-width:880px){.grid{grid-template-columns:1fr}}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px}
+  h2{margin:0 0 4px;font-size:16px}
+  .sub{color:var(--muted);font-size:13px;margin:0 0 14px}
+  label{display:block;font-size:12px;color:var(--muted);margin:10px 0 4px}
+  select,input,textarea{width:100%;background:var(--panel2);border:1px solid var(--line);color:var(--txt);
+    padding:10px 12px;border-radius:10px;font-size:14px;font-family:inherit}
+  textarea{resize:vertical;min-height:64px}
+  .row{display:flex;gap:10px}.row>*{flex:1}
+  button{cursor:pointer;border:none;border-radius:10px;padding:11px 16px;font-size:14px;font-weight:600;font-family:inherit}
+  .btn{background:var(--accent);color:#10141b}
+  .btn:hover{filter:brightness(1.08)}
+  .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--txt)}
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+  .drop{border:1.5px dashed var(--line);border-radius:12px;padding:18px;text-align:center;color:var(--muted);
+    font-size:13px;cursor:pointer;transition:.15s}
+  .drop:hover{border-color:var(--accent);color:var(--txt)}
+  .drop img{max-width:100%;max-height:170px;border-radius:8px;margin-top:8px}
+  .chat{height:300px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding:4px;margin-bottom:12px}
+  .msg{max-width:85%;padding:10px 13px;border-radius:13px;font-size:14px;white-space:pre-wrap}
+  .msg.bot{background:var(--panel2);align-self:flex-start;border-top-left-radius:4px}
+  .msg.user{background:var(--accent2);color:#06101f;align-self:flex-end;border-top-right-radius:4px}
+  .msg.sys{align-self:center;background:transparent;color:var(--muted);font-size:12px;font-style:italic}
+  .concepts{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px;margin-top:8px}
+  .concept{background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden;display:flex;flex-direction:column}
+  .concept .imgbox{aspect-ratio:4/3;background:var(--panel2);display:flex;align-items:center;justify-content:center;position:relative}
+  .concept .imgbox img{width:100%;height:100%;object-fit:cover}
+  .concept .loading{font-size:12px;color:var(--muted)}
+  .concept .body{padding:12px}
+  .concept h3{margin:0 0 4px;font-size:14px}
+  .concept p{margin:0 0 10px;font-size:12px;color:var(--muted)}
+  .palette{display:flex;gap:5px;margin-bottom:10px}
+  .sw{width:22px;height:22px;border-radius:6px;border:1px solid rgba(255,255,255,.15)}
+  .concept .acts{display:flex;gap:8px}
+  .concept .acts button{flex:1;padding:8px;font-size:12px}
+  .spinner{width:26px;height:26px;border:3px solid var(--line);border-top-color:var(--accent);border-radius:50%;animation:sp 1s linear infinite}
+  @keyframes sp{to{transform:rotate(360deg)}}
+  details.settings{margin-bottom:18px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:6px 14px}
+  details.settings summary{cursor:pointer;font-size:13px;color:var(--muted);padding:8px 0}
+  .hint{font-size:12px;color:var(--muted);margin-top:6px}
+  .warn{background:#2a1d12;border:1px solid #4a3115;color:#f0b37e;font-size:12px;padding:10px 12px;border-radius:10px;margin-top:10px}
+  .steplabel{display:inline-block;background:var(--accent);color:#10141b;font-size:11px;font-weight:700;
+    border-radius:999px;padding:2px 9px;margin-bottom:8px}
+  a{color:var(--accent2)}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">Izen<span>Custom</span></div>
+  <div class="tag">Agent IA · Graphiste covering &amp; kits déco</div>
+  <div class="mode"><span id="modeDot" class="dot"></span><span id="modeTxt">Mode démo</span></div>
+</header>
+
+<div class="wrap">
+
+  <details class="settings">
+    <summary>⚙️ Configuration (clés API — laisser vide pour le mode démo)</summary>
+    <label>Clé API Claude (Anthropic) — pilote le brief</label>
+    <input id="anthropicKey" type="password" placeholder="sk-ant-..." />
+    <label>Clé API Google Gemini — génère le rendu sur la photo</label>
+    <input id="geminiKey" type="password" placeholder="AIza..." />
+    <div class="row">
+      <div><label>Modèle Claude</label><input id="claudeModel" value="claude-sonnet-4-6" /></div>
+      <div><label>Modèle image Gemini</label><input id="geminiModel" value="gemini-2.5-flash-image" /></div>
+    </div>
+    <label style="display:flex;align-items:center;gap:8px;margin-top:12px;cursor:pointer">
+      <input type="checkbox" id="hiFi" style="width:auto" checked />
+      <span style="color:var(--txt)">Mode haute fidélité — l'agent révise son prompt avant le rendu (+1 appel Claude)</span>
+    </label>
+    <div class="warn">⚠️ Prototype local : les clés restent dans votre navigateur (localStorage) et les appels partent
+      directement du navigateur. <b>Ne jamais faire ça en production</b> — dans Base44, ces appels passeront par des
+      backend functions qui gardent les clés côté serveur. Voir le README.</div>
+    <button class="btn ghost" style="margin-top:10px" onclick="saveKeys()">Enregistrer les clés</button>
+  </details>
+
+  <div class="grid">
+    <!-- COLONNE GAUCHE : véhicule + brief -->
+    <div>
+      <div class="card">
+        <span class="steplabel">ÉTAPE 1</span>
+        <h2>Le véhicule du client</h2>
+        <p class="sub">Le client identifie sa machine et (idéal) ajoute une photo pour un rendu réaliste.</p>
+        <div class="row">
+          <div>
+            <label>Type</label>
+            <select id="vType">
+              <option>Moto</option><option>Voiture</option><option>Quad</option>
+              <option>Scooter</option><option>Jet-ski</option><option>Autre</option>
+            </select>
+          </div>
+          <div><label>Marque</label><input id="vBrand" placeholder="ex. Yamaha" /></div>
+        </div>
+        <div class="row">
+          <div><label>Modèle</label><input id="vModel" placeholder="ex. MT-07" /></div>
+          <div><label>Année</label><input id="vYear" placeholder="ex. 2023" /></div>
+        </div>
+        <label>Photo du véhicule (pour le rendu sur photo)</label>
+        <div class="drop" id="drop">
+          <div id="dropTxt">📷 Photo de profil, fond neutre, bonne lumière (meilleur rendu)</div>
+          <input id="file" type="file" accept="image/*" hidden />
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:20px">
+        <span class="steplabel">ÉTAPE 2</span>
+        <h2>Le brief avec le graphiste IA</h2>
+        <p class="sub">Décrivez le projet en quelques mots. L'agent affine puis propose plusieurs concepts.</p>
+        <div class="chat" id="chat"></div>
+        <div class="row">
+          <textarea id="userMsg" placeholder="ex. Je veux un style enduro agressif, noir mat et orange, avec mon numéro 46"></textarea>
+        </div>
+        <div class="row" style="margin-top:10px">
+          <button class="btn" id="sendBtn" onclick="sendMsg()">Envoyer au graphiste</button>
+          <button class="btn ghost" onclick="resetAll()">Réinitialiser</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- COLONNE DROITE : concepts -->
+    <div class="card">
+      <span class="steplabel">ÉTAPE 3</span>
+      <h2>Les projets proposés</h2>
+      <p class="sub">Plusieurs concepts visualisés sur le modèle. Le client choisit, affine, puis commande.</p>
+      <div id="conceptsWrap">
+        <p class="hint">Les concepts apparaîtront ici une fois le brief lancé.</p>
+      </div>
+      <div class="concepts" id="concepts"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================ ÉTAT ============================ */
+const state = {
+  photo: null,            // {dataUrl, base64, mime}
+  history: [],            // messages pour Claude [{role, content}]
+  turn: 0,
+};
+
+/* ============================ CLÉS / MODE ============================ */
+function keys(){
+  return {
+    anthropic: localStorage.getItem('izen_anthropic') || '',
+    gemini:    localStorage.getItem('izen_gemini') || '',
+    claudeModel: localStorage.getItem('izen_claudeModel') || 'claude-sonnet-4-6',
+    geminiModel: localStorage.getItem('izen_geminiModel') || 'gemini-2.5-flash-image',
+  };
+}
+function loadKeys(){
+  const k = keys();
+  anthropicKey.value=k.anthropic; geminiKey.value=k.gemini;
+  claudeModel.value=k.claudeModel; geminiModel.value=k.geminiModel;
+  updateMode();
+}
+function saveKeys(){
+  localStorage.setItem('izen_anthropic', anthropicKey.value.trim());
+  localStorage.setItem('izen_gemini', geminiKey.value.trim());
+  localStorage.setItem('izen_claudeModel', claudeModel.value.trim()||'claude-sonnet-4-6');
+  localStorage.setItem('izen_geminiModel', geminiModel.value.trim()||'gemini-2.5-flash-image');
+  updateMode();
+  sysMsg('Clés enregistrées.');
+}
+function updateMode(){
+  const k = keys();
+  const live = k.anthropic && k.gemini;
+  modeDot.className = 'dot' + (live?' live':'');
+  modeTxt.textContent = live ? 'Mode réel (Claude + Gemini)'
+                       : (k.anthropic||k.gemini) ? 'Mode partiel' : 'Mode démo';
+}
+
+/* ============================ UI HELPERS ============================ */
+function botMsg(t){ addMsg('bot', t); }
+function userMsgUI(t){ addMsg('user', t); }
+function sysMsg(t){ addMsg('sys', t); }
+function addMsg(cls, t){
+  const d=document.createElement('div'); d.className='msg '+cls; d.textContent=t;
+  chat.appendChild(d); chat.scrollTop=chat.scrollHeight;
+}
+
+/* ============================ PHOTO ============================ */
+drop.onclick=()=>file.click();
+drop.ondragover=e=>{e.preventDefault();drop.style.borderColor='var(--accent)';};
+drop.ondragleave=()=>drop.style.borderColor='';
+drop.ondrop=e=>{e.preventDefault();drop.style.borderColor='';if(e.dataTransfer.files[0])readPhoto(e.dataTransfer.files[0]);};
+file.onchange=e=>{if(e.target.files[0])readPhoto(e.target.files[0]);};
+function readPhoto(f){
+  const r=new FileReader();
+  r.onload=()=>{
+    const dataUrl=r.result;
+    state.photo={dataUrl, base64:dataUrl.split(',')[1], mime:f.type};
+    dropTxt.innerHTML='✅ Photo chargée<br><img src="'+dataUrl+'">';
+  };
+  r.readAsDataURL(f);
+}
+
+/* ============================ CONVERSATION ============================ */
+async function sendMsg(){
+  const text=userMsg.value.trim();
+  if(!text) return;
+  const v=`${vType.value} ${vBrand.value} ${vModel.value} ${vYear.value}`.trim();
+  userMsgUI(text); userMsg.value='';
+  sendBtn.disabled=true;
+
+  // Au 1er message, on injecte le contexte véhicule
+  const fullText = state.turn===0 ? `[Véhicule: ${v||'non précisé'}]\n${text}` : text;
+  state.history.push({role:'user', content:fullText});
+  state.turn++;
+
+  sysMsg('Le graphiste réfléchit…');
+  try{
+    const res = keys().anthropic ? await callClaude(state.history) : mockBrief(state.turn, text, v);
+    // retire le "réfléchit…"
+    [...chat.querySelectorAll('.msg.sys')].pop()?.remove();
+    state.history.push({role:'assistant', content:JSON.stringify(res)});
+    botMsg(res.reply);
+    if(res.phase==='concepts' && res.concepts?.length){
+      let cs=res.concepts;
+      if(hiFi.checked && keys().anthropic){
+        sysMsg('Révision haute fidélité des concepts…');
+        try{ cs = await refineAll(v, cs); }catch(e){ /* on garde les prompts d'origine */ }
+        [...chat.querySelectorAll('.msg.sys')].pop()?.remove();
+      }
+      renderConcepts(cs);
+    }
+  }catch(err){
+    [...chat.querySelectorAll('.msg.sys')].pop()?.remove();
+    botMsg('⚠️ Erreur: '+err.message);
+  }
+  sendBtn.disabled=false;
+}
+
+/* ---- Appel réel Claude (Anthropic Messages API, depuis le navigateur) ---- */
+const SYSTEM_PROMPT = `Tu es le GRAPHISTE EXPERT d'IzenCustom, spécialiste du covering (total covering, kits déco)
+auto/moto. Tu mènes un brief client court, en français, ton chaleureux et pro, et tu produis des concepts
+RÉALISTES et FABRICABLES (jamais des illustrations fantaisistes).
+
+MÉTHODE:
+- Pose AU MAXIMUM 1 à 2 questions de clarification, et SEULEMENT si nécessaire (univers/style, couleurs
+  précises, finition, usage route ou piste, éléments perso: numéro, nom, sponsor). Si le client est déjà
+  précis, passe directement aux concepts.
+- Propose 3 concepts DISTINCTS et complémentaires (ex: un sobre/élégant, un racing/agressif, un audacieux/graphique).
+- Raisonne PAR ZONES de carrosserie réelles : moto = tête de fourche/carénage avant, flancs de carénage,
+  réservoir, coque arrière, garde-boue, sabot ; voiture = capot, ailes, portières, toit, pare-chocs, hayon.
+  Décris le design zone par zone.
+- Couleurs = teintes de vinyle réalistes (hex plausibles). Précise toujours la finition.
+- MARQUES DÉPOSÉES : si le client cite une marque protégée (Red Bull, Monster, équipe officielle...),
+  propose par DÉFAUT une version "inspirée" (couleurs/esprit, sans logos ni éléments déposés) et signale-le
+  poliment dans "reply". Ne reproduis un logo déposé que si le client confirme en détenir les droits.
+
+Tu réponds TOUJOURS en JSON strict, sans texte autour:
+{
+  "phase": "question" | "concepts",
+  "reply": "<message à afficher au client>",
+  "concepts": [
+    {
+      "id": "c1",
+      "title": "<nom court et vendeur>",
+      "finish": "<brillant | satiné | mat | métallisé | carbone>",
+      "description": "<2-3 phrases: style, ambiance, zones clés>",
+      "palette": ["#RRGGBB","#RRGGBB","#RRGGBB"],
+      "renderPrompt": "<voir RÈGLES renderPrompt>"
+    }
+  ]
+}
+
+RÈGLES renderPrompt (EN ANGLAIS — c'est LE facteur n°1 du réalisme) :
+Rédige une instruction d'ÉDITION PHOTO (retouche), surtout PAS la génération d'une nouvelle image, sur ce modèle :
+"Photorealistic retouch of this photograph of a {véhicule}. Preserve EXACTLY the vehicle geometry, camera
+angle, perspective, framing, background, ground, lighting direction, reflections and cast shadows of the
+original photo. Keep 100% unchanged: wheels, tires, brakes, suspension/forks, engine, exhaust, mirrors,
+seat, lights, license plate and all existing badges. Reskin ONLY the painted bodywork panels ({zones})
+with a printed vinyl wrap: {design détaillé zone par zone, couleurs hex, motifs, placement des graphismes
+et éléments perso}. The wrap must conform realistically to each panel's curvature, follow the real panel
+gaps and body lines, and show believable specular highlights and environment reflections consistent with
+the scene's lighting. Finish: {finition}. High detail, sharp focus, correct perspective, photographic
+quality. Do NOT add any text, logo, watermark or graphic that is not explicitly described. Do NOT change
+the vehicle's shape, proportions or background."
+
+En phase "question", "concepts" doit être absent ou vide.`;
+
+async function callClaude(history){
+  const k=keys();
+  const r=await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{
+      'content-type':'application/json',
+      'x-api-key':k.anthropic,
+      'anthropic-version':'2023-06-01',
+      'anthropic-dangerous-direct-browser-access':'true'
+    },
+    body:JSON.stringify({
+      model:k.claudeModel,
+      max_tokens:1500,
+      system:SYSTEM_PROMPT,
+      messages:history.map(m=>({role:m.role, content:m.content}))
+    })
+  });
+  if(!r.ok) throw new Error('Claude '+r.status+' '+(await r.text()).slice(0,200));
+  const data=await r.json();
+  const raw=data.content?.[0]?.text || '';
+  return parseJson(raw);
+}
+function parseJson(raw){
+  let s=raw.trim().replace(/^```json\s*/i,'').replace(/^```\s*/,'').replace(/```$/,'').trim();
+  try{ return JSON.parse(s); }
+  catch(e){ return {phase:'question', reply:raw}; }
+}
+
+/* ---- Passe d'auto-révision : l'agent réécrit ses renderPrompt pour le photoréalisme ---- */
+const REVISE_SYSTEM = `Tu es directeur artistique ET retoucheur photo automobile expert.
+On te donne un véhicule et des concepts de covering avec leur renderPrompt. Réécris CHAQUE renderPrompt
+EN ANGLAIS pour MAXIMISER le photoréalisme et la fidélité au véhicule réel :
+- garde tout le contenu créatif d'origine (couleurs, style, finition, éléments perso) ;
+- formule une RETOUCHE PHOTO qui préserve géométrie, angle, perspective, cadrage, fond, lumière,
+  reflets, ombres portées, et 100% des pièces (roues, freins, fourche, moteur, échappement, rétros,
+  selle, feux, plaque, écussons) ;
+- détaille le design ZONE PAR ZONE de la carrosserie réelle (carénage avant, flancs, réservoir, coque,
+  garde-boue, sabot) ;
+- précise que le vinyle imprimé épouse les courbes, suit les jonctions de panneaux, avec reflets
+  spéculaires cohérents avec la scène ;
+- interdit explicitement l'ajout de texte/logo non demandé et toute déformation du véhicule.
+Réponds en JSON STRICT, sans texte autour : {"concepts":[{"id":"c1","renderPrompt":"..."}]}`;
+
+async function refineAll(vehicle, concepts){
+  const k=keys();
+  const payload={ vehicle, concepts: concepts.map(c=>({id:c.id, title:c.title, finish:c.finish, renderPrompt:c.renderPrompt})) };
+  const r=await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'content-type':'application/json','x-api-key':k.anthropic,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+    body:JSON.stringify({model:k.claudeModel, max_tokens:2000, system:REVISE_SYSTEM, messages:[{role:'user', content:JSON.stringify(payload)}]})
+  });
+  if(!r.ok) throw new Error('refine '+r.status);
+  const data=parseJson((await r.json()).content?.[0]?.text||'');
+  const map={}; (data.concepts||[]).forEach(x=>{ if(x.id&&x.renderPrompt) map[x.id]=x.renderPrompt; });
+  return concepts.map(c=> map[c.id] ? {...c, renderPrompt:map[c.id]} : c);
+}
+
+/* ---- Mode démo (sans clé) ---- */
+function mockBrief(turn, text, vehicle){
+  if(turn===1){
+    return {phase:'question',
+      reply:`Super projet pour votre ${vehicle||'véhicule'} ! Juste pour cadrer : c'est plutôt pour un usage route au quotidien, ou un look piste/compétition ? Et une couleur dominante en tête ?\n\n(💡 Mode démo : ajoutez vos clés API dans ⚙️ Configuration pour des vrais rendus.)`};
+  }
+  const t=text.toLowerCase();
+  const racing = /racing|piste|agress|sport|comp/.test(t);
+  return {phase:'concepts',
+    reply:`Voici 3 directions que je vous propose pour votre ${vehicle||'machine'}. Dites-moi laquelle vous parle et on l'affine !`,
+    concepts:[
+      {id:'c1',title:'Shadow Mat',description:"Noir mat profond, lignes orange acidulé en biais. Sobre mais agressif.",
+       palette:['#111111','#ff6a2b','#3a3a3a'],
+       renderPrompt:'matte black wrap with diagonal acid-orange accent stripes, keep the bike photo intact'},
+      {id:'c2',title:racing?'Race Replica':'Carbon Storm',description:racing?"Inspiration paddock : blanc, rouge, touches de bleu, dossards.":"Effet carbone et dégradé anthracite, finition technique.",
+       palette:racing?['#f5f5f5','#e1271d','#2b8cff']:['#1c1f24','#444b55','#8a929c'],
+       renderPrompt:'racing replica livery white red and blue with race number plates, keep the bike photo intact'},
+      {id:'c3',title:'Neon Split',description:"Graphique audacieux, dégradé violet→cyan, éclats géométriques.",
+       palette:['#7b2bff','#00e5ff','#0d0f14'],
+       renderPrompt:'bold geometric wrap purple to cyan gradient with sharp shards, keep the bike photo intact'},
+    ]};
+}
+
+/* ============================ RENDU DES CONCEPTS ============================ */
+function renderConcepts(concepts){
+  conceptsWrap.innerHTML='';
+  const box=document.getElementById('concepts'); box.innerHTML='';
+  concepts.forEach(c=>{
+    const el=document.createElement('div'); el.className='concept';
+    el.innerHTML=`
+      <div class="imgbox"><div class="spinner"></div></div>
+      <div class="body">
+        <h3>${esc(c.title)}</h3>
+        <div class="palette">${(c.palette||[]).map(p=>`<div class="sw" style="background:${esc(p)}"></div>`).join('')}</div>
+        <p>${esc(c.description||'')}</p>
+        <div class="acts">
+          <button class="btn ghost" onclick="refine('${esc(c.title)}')">Affiner</button>
+          <button class="btn" onclick="order('${esc(c.title)}')">Commander</button>
+        </div>
+      </div>`;
+    box.appendChild(el);
+    const imgbox=el.querySelector('.imgbox');
+    renderConcept(c).then(url=>{
+      imgbox.innerHTML=`<img src="${url}" alt="${esc(c.title)}">`;
+    }).catch(e=>{ imgbox.innerHTML=`<div class="loading">Rendu indisponible<br>${esc(e.message)}</div>`; });
+  });
+}
+
+async function renderConcept(c){
+  const k=keys();
+  if(k.gemini && state.photo){
+    return await callGemini(c.renderPrompt);
+  }
+  return mockRender(c);
+}
+
+/* ---- Appel réel Gemini image (édition à partir de la photo) ---- */
+async function callGemini(prompt){
+  const k=keys();
+  const url=`https://generativelanguage.googleapis.com/v1beta/models/${k.geminiModel}:generateContent?key=${encodeURIComponent(k.gemini)}`;
+  const r=await fetch(url,{
+    method:'POST',headers:{'content-type':'application/json'},
+    body:JSON.stringify({contents:[{parts:[
+      {inlineData:{mimeType:state.photo.mime, data:state.photo.base64}},
+      {text:`Photorealistic retouch of this photograph of a vehicle. This is a PHOTO EDIT, not a new image. Preserve EXACTLY the vehicle geometry, camera angle, perspective, framing, background, ground, lighting direction, reflections and cast shadows of the original photo. Keep 100% unchanged: wheels, tires, brakes, suspension, engine, exhaust, mirrors, seat, lights, license plate and existing badges. Reskin ONLY the painted bodywork panels with a printed vinyl wrap that conforms to each panel's curvature, follows the real panel gaps and shows realistic highlights and reflections. Maintain the original resolution and framing. Do NOT add any text, logo or watermark that is not described, and do NOT alter the vehicle shape or background. Design to apply: ${prompt}. High detail, sharp focus, photographic quality.`}
+    ]}]})
+  });
+  if(!r.ok) throw new Error('Gemini '+r.status+' '+(await r.text()).slice(0,160));
+  const data=await r.json();
+  const parts=data.candidates?.[0]?.content?.parts||[];
+  const img=parts.find(p=>p.inline_data||p.inlineData);
+  const inline=img?.inline_data||img?.inlineData;
+  if(!inline) throw new Error('pas d\'image renvoyée');
+  return `data:${inline.mime_type||inline.mimeType||'image/png'};base64,${inline.data}`;
+}
+
+/* ---- Rendu démo : composite la photo + palette via canvas (ou mockup SVG) ---- */
+function mockRender(c){
+  return new Promise(resolve=>{
+    const W=480,H=360, cv=document.createElement('canvas'); cv.width=W;cv.height=H;
+    const ctx=cv.getContext('2d');
+    const pal=c.palette||['#222','#ff6a2b','#888'];
+    const draw=()=>{
+      // dégradé de fond avec la palette
+      const g=ctx.createLinearGradient(0,0,W,H);
+      g.addColorStop(0,pal[0]); g.addColorStop(.6,pal[2]||pal[0]); g.addColorStop(1,pal[1]);
+      ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+      if(state.photo){ // si photo : on la superpose et on teinte
+        const im=new Image();
+        im.onload=()=>{
+          const r=Math.min(W/im.width,H/im.height), w=im.width*r,h=im.height*r;
+          ctx.globalAlpha=1; ctx.drawImage(im,(W-w)/2,(H-h)/2,w,h);
+          ctx.globalAlpha=.34; ctx.fillStyle=g; ctx.fillRect(0,0,W,H); ctx.globalAlpha=1;
+          overlay(); resolve(cv.toDataURL());
+        };
+        im.src=state.photo.dataUrl;
+      } else { stripes(); overlay(); resolve(cv.toDataURL()); }
+    };
+    const stripes=()=>{ ctx.fillStyle=pal[1]; for(let i=-H;i<W;i+=60){ctx.save();ctx.translate(i,0);ctx.rotate(.4);ctx.fillRect(0,0,22,H*2);ctx.restore();} };
+    const overlay=()=>{
+      ctx.fillStyle='rgba(0,0,0,.55)'; ctx.fillRect(0,H-46,W,46);
+      ctx.fillStyle='#fff'; ctx.font='bold 18px Segoe UI'; ctx.fillText(c.title,14,H-18);
+      ctx.fillStyle='rgba(255,255,255,.6)'; ctx.font='11px Segoe UI'; ctx.fillText('APERÇU DÉMO — ajoutez vos clés API pour un rendu réaliste',14,H-50+8);
+    };
+    draw();
+  });
+}
+
+/* ============================ ACTIONS CONCEPT ============================ */
+function refine(title){
+  userMsg.value=`J'aime "${title}", peux-tu me proposer une variante ?`;
+  userMsg.focus();
+}
+function order(title){
+  sysMsg(`🛒 [Maquette] "${title}" envoyé au configurateur / panier IzenCustom. (À brancher sur votre flux Base44.)`);
+}
+
+/* ============================ DIVERS ============================ */
+function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
+function resetAll(){ state.history=[];state.turn=0;state.photo=null;
+  chat.innerHTML='';document.getElementById('concepts').innerHTML='';
+  conceptsWrap.innerHTML='<p class="hint">Les concepts apparaîtront ici une fois le brief lancé.</p>';
+  dropTxt.textContent='📷 Photo de profil, fond neutre, bonne lumière (meilleur rendu)';
+  greet();
+}
+function greet(){ botMsg("Bonjour 👋 Je suis votre graphiste IzenCustom. Renseignez votre véhicule à gauche, puis décrivez le projet de covering ou kit déco que vous imaginez. Je vous proposerai plusieurs concepts !"); }
+
+/* init */
+loadKeys(); greet();
+userMsg.addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){sendMsg();}});
+</script>
+</body>
+</html>

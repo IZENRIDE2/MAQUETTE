@@ -1,0 +1,1925 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>IzenRide — GPS Live</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e15;
+    --bg-2: #0f141d;
+    --ink: #ffffff;
+    --ink-dim: #a8b0c0;
+    --ink-mute: #5e6478;
+    --izen: #4D6284;
+    --izen-bright: #7a92b8;
+    --izen-light: #b8c5dd;
+    --izen-deep: #2c3a52;
+    --neon: #4d8fff;
+    --neon-bright: #7eb0ff;
+    --line: rgba(255, 255, 255, 0.08);
+    --line-strong: rgba(255, 255, 255, 0.16);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    width: 100%; height: 100%;
+    overflow: hidden;
+    background: #000;
+  }
+  body {
+    font-family: 'Geist', -apple-system, sans-serif;
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+    letter-spacing: -0.01em;
+    display: grid;
+    place-items: center;
+    /* showroom background — soft ambient */
+    background:
+      radial-gradient(ellipse at 50% 30%, rgba(77, 143, 255, 0.15), transparent 60%),
+      radial-gradient(ellipse at 50% 90%, rgba(77, 98, 132, 0.2), transparent 50%),
+      #07090f;
+  }
+
+  /* device frame — fits the viewport on mobile, scales nicely on desktop */
+  .device {
+    position: relative;
+    width: min(420px, 100vw);
+    height: min(900px, 100vh);
+    aspect-ratio: 9 / 19.5;
+    background: linear-gradient(180deg, #1a1f2a, #0a0e15);
+    border-radius: 56px;
+    border: 10px solid #20252f;
+    box-shadow:
+      0 80px 160px -30px rgba(77, 143, 255, 0.4),
+      0 40px 80px -20px rgba(0, 0, 0, 0.7),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+      0 0 0 1px rgba(255, 255, 255, 0.08);
+    overflow: hidden;
+  }
+  /* Dynamic island (notch) */
+  .device::before {
+    content: "";
+    position: absolute;
+    top: 12px; left: 50%;
+    transform: translateX(-50%);
+    width: 120px; height: 32px;
+    background: #0a0e15;
+    border-radius: 100px;
+    z-index: 100;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+  }
+  /* small camera dot inside notch */
+  .device::after {
+    content: "";
+    position: absolute;
+    top: 22px; left: calc(50% + 32px);
+    width: 9px; height: 9px;
+    background: #1a1f2a;
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 1px rgba(122, 146, 184, 0.4);
+    z-index: 101;
+  }
+
+  .screen {
+    position: relative;
+    width: 100%; height: 100%;
+    overflow: hidden;
+    background: var(--bg);
+  }
+
+  /* Mobile fullscreen mode (no device frame on small screens) */
+  @media (max-width: 480px) {
+    body { padding: 0; }
+    .device {
+      width: 100vw;
+      height: 100vh;
+      max-height: 100vh;
+      border-radius: 0;
+      border: none;
+      box-shadow: none;
+    }
+    .device::before {
+      width: 110px; height: 28px;
+      top: 10px;
+    }
+    .device::after {
+      top: 18px;
+      left: calc(50% + 28px);
+    }
+  }
+
+  /* ╔═══════════════════════════════════════════════════════════╗
+     ║                  STATUS BAR                               ║
+     ╚═══════════════════════════════════════════════════════════╝ */
+  .status-bar {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 56px;
+    padding: 18px 36px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+    z-index: 50;
+    pointer-events: none;
+  }
+  .status-bar .right { display: flex; gap: 6px; align-items: center; font-size: 12px; }
+  .status-bar svg { width: 16px; height: 16px; }
+
+  /* ╔═══════════════════════════════════════════════════════════╗
+     ║                  MAP BACKGROUND                           ║
+     ╚═══════════════════════════════════════════════════════════╝ */
+  .map-bg {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 30% 30%, rgba(77, 143, 255, 0.18), transparent 50%),
+      radial-gradient(circle at 70% 80%, rgba(77, 98, 132, 0.2), transparent 50%),
+      linear-gradient(180deg, #0a1428 0%, #0a0e15 100%);
+  }
+  .map-bg svg { width: 100%; height: 100%; position: absolute; inset: 0; }
+
+  /* ╔═══════════════════════════════════════════════════════════╗
+     ║                  ROUTE (animated)                         ║
+     ╚═══════════════════════════════════════════════════════════╝ */
+  .route-layer {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+  .route-layer svg { width: 100%; height: 100%; }
+  .route-line {
+    stroke: var(--neon);
+    stroke-width: 7;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 14 18;
+    filter: drop-shadow(0 0 12px var(--neon)) drop-shadow(0 0 4px var(--neon));
+    animation: dashFlow 1.4s linear infinite;
+  }
+  .route-line-glow {
+    stroke: rgba(77, 143, 255, 0.25);
+    stroke-width: 14;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    filter: blur(4px);
+  }
+  @keyframes dashFlow {
+    to { stroke-dashoffset: -32; }
+  }
+
+  /* ╔═══════════════════════════════════════════════════════════╗
+     ║                  RIDERS (other motards)                   ║
+     ╚═══════════════════════════════════════════════════════════╝ */
+  .rider {
+    position: absolute;
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--izen-light), var(--izen));
+    border: 3px solid #fff;
+    box-shadow:
+      0 6px 16px rgba(0, 0, 0, 0.5),
+      0 0 18px rgba(122, 146, 184, 0.6);
+    z-index: 8;
+    cursor: pointer;
+  }
+  .rider::after {
+    content: "";
+    position: absolute;
+    inset: 3px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #dde5f4, #4D6284);
+  }
+  /* Helmet glyph inside the rider dot */
+  .rider svg {
+    position: absolute;
+    width: 16px; height: 16px;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+    opacity: 0.85;
+  }
+  .rider.r1 { top: 22%; left: 18%; animation: rMove1 22s ease-in-out infinite; }
+  .rider.r2 { top: 64%; right: 14%; animation: rMove2 26s ease-in-out infinite; }
+  .rider.r3 { top: 38%; left: 78%; animation: rMove3 20s ease-in-out infinite; }
+  .rider.r4 { top: 75%; left: 22%; animation: rMove4 24s ease-in-out infinite; }
+  .rider.r5 { top: 30%; left: 52%; animation: rMove5 18s ease-in-out infinite; }
+
+  @keyframes rMove1 {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(28px, -22px); }
+  }
+  @keyframes rMove2 {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(-32px, 18px); }
+  }
+  @keyframes rMove3 {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(-22px, 28px); }
+  }
+  @keyframes rMove4 {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(26px, -16px); }
+  }
+  @keyframes rMove5 {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(-18px, 22px); }
+  }
+
+  /* ╔═══════════════════════════════════════════════════════════╗
+     ║                  MY POSITION (GPS pulse)                  ║
+     ╚═══════════════════════════════════════════════════════════╝ */
+  .me-pin {
+    position: absolute;
+    width: 36px; height: 36px;
+    left: 50%; top: 58%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+  }
+  .me-pin .pulse {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: var(--neon);
+    animation: gpsPulse 2s ease-out infinite;
+    opacity: 0.6;
+  }
+  .me-pin .pulse-2 {
+    animation-delay: 0.7s;
+    opacity: 0.4;
+  }
+  .me-pin .core {
+    position: absolute;
+    inset: 9px;
+    border-radius: 50%;
+    background: var(--neon);
+    box-shadow:
+      0 0 24px var(--neon),
+      0 0 8px var(--neon),
+      inset 0 0 0 3px #fff;
+    z-index: 2;
+  }
+  /* Direction arrow inside core */
+  .me-pin .core::after {
+    content: "";
+    position: absolute;
+    top: 4px; left: 50%;
+    transform: translateX(-50%);
+    width: 0; height: 0;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-bottom: 6px solid #fff;
+  }
+  @keyframes gpsPulse {
+    0% { transform: scale(0.4); opacity: 0.7; }
+    100% { transform: scale(2.8); opacity: 0; }
+  }
+
+  /* ╔═══════════════════════════════════════════════════════════╗
+     ║                  TOP NAVIGATION PANEL                     ║
+     ╚═══════════════════════════════════════════════════════════╝ */
+  .nav-panel {
+    position: absolute;
+    top: 70px; left: 18px; right: 18px;
+    background: rgba(15, 26, 46, 0.92);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(77, 143, 255, 0.28);
+    border-radius: 24px;
+    padding: 18px 20px;
+    z-index: 30;
+    box-shadow:
+      0 20px 60px -10px rgba(0, 0, 0, 0.7),
+      0 0 0 1px rgba(255, 255, 255, 0.04);
+  }
+  .nav-panel .top-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 14px;
+  }
+  .nav-panel .arrow-square {
+    width: 56px; height: 56px;
+    background: linear-gradient(135deg, var(--neon), #2563eb);
+    border-radius: 16px;
+    display: grid; place-items: center;
+    box-shadow:
+      0 0 24px rgba(77, 143, 255, 0.6),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    flex-shrink: 0;
+  }
+  .nav-panel .arrow-square svg { width: 30px; height: 30px; color: #fff; }
+  .nav-panel .turn-info { flex: 1; min-width: 0; }
+  .nav-panel .turn-info .label {
+    font-size: 11px;
+    color: var(--ink-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: 2px;
+  }
+  .nav-panel .turn-info .distance {
+    font-size: 30px;
+    font-weight: 700;
+    line-height: 1;
+    font-family: 'Geist Mono', monospace;
+    letter-spacing: -0.02em;
+    margin-bottom: 4px;
+  }
+  .nav-panel .turn-info .road-name {
+    font-size: 13px;
+    color: var(--ink);
+    line-height: 1.3;
+  }
+  .nav-panel .speed-pill {
+    background: rgba(77, 143, 255, 0.15);
+    border: 1px solid var(--neon);
+    border-radius: 10px;
+    padding: 8px 12px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+  .nav-panel .speed-pill .num {
+    font-family: 'Geist Mono', monospace;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--neon-bright);
+    line-height: 1;
+  }
+  .nav-panel .speed-pill .lbl {
+    font-size: 9px;
+    color: var(--neon-bright);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-top: 2px;
+  }
+  /* community count strip */
+  .nav-panel .community {
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding-top: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+  }
+  .nav-panel .community .left {
+    display: flex; align-items: center; gap: 8px;
+    color: var(--ink-dim);
+  }
+  .nav-panel .community .live-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #4ade80;
+    box-shadow: 0 0 8px #4ade80;
+    animation: liveBlink 1.5s ease-in-out infinite;
+  }
+  @keyframes liveBlink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+  .nav-panel .community .count {
+    font-family: 'Geist Mono', monospace;
+    color: var(--neon-bright);
+    font-weight: 700;
+  }
+
+  /* ╔═══════════════════════════════════════════════════════════╗
+     ║                  CONTROL ALERT (floating)                 ║
+     ╚═══════════════════════════════════════════════════════════╝ */
+  .alert-toast {
+    position: absolute;
+    top: 250px; left: 18px; right: 18px;
+    background: rgba(40, 16, 16, 0.92);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 100, 100, 0.4);
+    border-radius: 18px;
+    padding: 12px 16px;
+    z-index: 30;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 10px 30px -5px rgba(255, 60, 60, 0.3);
+    animation: alertPulse 2.5s ease-in-out infinite;
+  }
+  @keyframes alertPulse {
+    0%, 100% { box-shadow: 0 10px 30px -5px rgba(255, 60, 60, 0.3); border-color: rgba(255, 100, 100, 0.4); }
+    50% { box-shadow: 0 10px 40px -5px rgba(255, 60, 60, 0.6); border-color: rgba(255, 100, 100, 0.7); }
+  }
+  .alert-toast .icon {
+    width: 36px; height: 36px;
+    flex-shrink: 0;
+    display: grid; place-items: center;
+  }
+  .alert-toast .icon svg { width: 30px; height: 30px; }
+  .alert-toast .text { flex: 1; }
+  .alert-toast .text .ttl {
+    font-size: 12px;
+    font-weight: 700;
+    color: #ff8b8b;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    line-height: 1;
+    margin-bottom: 3px;
+  }
+  .alert-toast .text .desc {
+    font-size: 12px;
+    color: var(--ink);
+    line-height: 1.3;
+  }
+  .alert-toast .dist {
+    font-family: 'Geist Mono', monospace;
+    font-weight: 700;
+    color: #ff8b8b;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+
+  /* ╔═══════════════════════════════════════════════════════════╗
+     ║                  TOGGLE BUTTONS STATES                    ║
+     ╚═══════════════════════════════════════════════════════════╝ */
+  /* Gas toggle — active state (green) */
+  .toggle-btn.gas-toggle {
+    transition: all 0.25s ease;
+  }
+  .toggle-btn.gas-toggle.active {
+    border-color: rgba(74, 222, 128, 0.5);
+    background: rgba(15, 30, 24, 0.85);
+  }
+  .toggle-btn.gas-toggle.active svg { stroke: #6ef095; }
+  /* Inactive state — neutral with strikethrough */
+  .toggle-btn.gas-toggle:not(.active) {
+    border-color: var(--line-strong);
+    background: rgba(15, 26, 46, 0.85);
+  }
+  .toggle-btn.gas-toggle:not(.active) svg {
+    stroke: var(--ink-mute);
+    opacity: 0.5;
+  }
+  .toggle-btn.gas-toggle:not(.active)::after {
+    content: "";
+    position: absolute;
+    top: 50%; left: 6px; right: 6px;
+    height: 2px;
+    background: var(--ink-mute);
+    transform: rotate(-25deg);
+    border-radius: 2px;
+    opacity: 0.7;
+  }
+
+  /* Crossings toggle — active state (purple) */
+  .toggle-btn.crossings-toggle {
+    transition: all 0.25s ease;
+  }
+  .toggle-btn.crossings-toggle.active {
+    border-color: rgba(184, 132, 230, 0.5);
+    background: rgba(28, 18, 38, 0.85);
+  }
+  .toggle-btn.crossings-toggle.active svg { stroke: rgb(212, 179, 236); }
+  .toggle-btn.crossings-toggle:not(.active) {
+    border-color: var(--line-strong);
+    background: rgba(15, 26, 46, 0.85);
+  }
+  .toggle-btn.crossings-toggle:not(.active) svg {
+    stroke: var(--ink-mute);
+    opacity: 0.5;
+  }
+  .toggle-btn.crossings-toggle:not(.active)::after {
+    content: "";
+    position: absolute;
+    top: 50%; left: 6px; right: 6px;
+    height: 2px;
+    background: var(--ink-mute);
+    transform: rotate(-25deg);
+    border-radius: 2px;
+    opacity: 0.7;
+  }
+
+  /* When parent has class hide-gas, hide all gas stations */
+  .screen.hide-gas .gas-station {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.4);
+    pointer-events: none;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+  .screen .gas-station {
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+
+  /* When parent has class hide-crossings, hide crossings AND the panel */
+  .screen.hide-crossings .crossing {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.4);
+    pointer-events: none;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+  .screen .crossing {
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+  .screen.hide-crossings .crossings-panel {
+    opacity: 0;
+    transform: translateX(-20px);
+    pointer-events: none;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+  .screen .crossings-panel {
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 25;
+  }
+
+  /* ╔═══════════════════════════════════════════════════════════╗
+     ║                  GAS STATIONS ON MAP                       ║
+     ╚═══════════════════════════════════════════════════════════╝ */
+  .gas-station {
+    position: absolute;
+    z-index: 17;
+    transform: translate(-50%, -50%);
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+  .gas-station:hover {
+    transform: translate(-50%, -50%) scale(1.08);
+    z-index: 22;
+  }
+  .gas-station .gas-icon {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #4ade80, #16a34a);
+    border: 2px solid #0a0e15;
+    display: grid;
+    place-items: center;
+    box-shadow:
+      0 4px 12px rgba(74, 222, 128, 0.5),
+      0 0 0 1px rgba(74, 222, 128, 0.3);
+    color: #fff;
+    position: relative;
+  }
+  .gas-station .gas-icon svg {
+    width: 16px; height: 16px;
+  }
+  /* Cheaper gas (best price) */
+  .gas-station.best .gas-icon {
+    background: linear-gradient(135deg, #22d3ee, #0891b2);
+    box-shadow:
+      0 4px 12px rgba(34, 211, 238, 0.6),
+      0 0 0 1px rgba(34, 211, 238, 0.4),
+      0 0 20px rgba(34, 211, 238, 0.3);
+    animation: gasGlow 2.5s ease-in-out infinite;
+  }
+  @keyframes gasGlow {
+    0%, 100% { box-shadow: 0 4px 12px rgba(34, 211, 238, 0.6), 0 0 0 1px rgba(34, 211, 238, 0.4), 0 0 20px rgba(34, 211, 238, 0.3); }
+    50% { box-shadow: 0 4px 16px rgba(34, 211, 238, 0.9), 0 0 0 2px rgba(34, 211, 238, 0.6), 0 0 28px rgba(34, 211, 238, 0.5); }
+  }
+  /* Best price crown */
+  .gas-station.best .gas-icon::after {
+    content: "★";
+    position: absolute;
+    top: -8px; right: -6px;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: #fbbf24;
+    color: #000;
+    font-size: 10px;
+    font-weight: 700;
+    display: grid; place-items: center;
+    border: 1.5px solid #0a0e15;
+  }
+  .gas-station .gas-price {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-top: 4px;
+    background: rgba(15, 26, 46, 0.92);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(74, 222, 128, 0.3);
+    border-radius: 100px;
+    padding: 3px 8px;
+    font-family: 'Geist Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    color: #6ef095;
+    white-space: nowrap;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  }
+  .gas-station.best .gas-price {
+    color: #67e8f9;
+    border-color: rgba(34, 211, 238, 0.4);
+  }
+  .gas-station .gas-price::before {
+    content: "";
+    position: absolute;
+    top: -3px;
+    left: 50%;
+    transform: translateX(-50%) rotate(45deg);
+    width: 6px; height: 6px;
+    background: rgba(15, 26, 46, 0.92);
+    border-left: 1px solid rgba(74, 222, 128, 0.3);
+    border-top: 1px solid rgba(74, 222, 128, 0.3);
+  }
+  .gas-station.best .gas-price::before {
+    border-color: rgba(34, 211, 238, 0.4);
+  }
+
+  /* ╔═══════════════════════════════════════════════════════════╗
+     ║                  CROSSINGS (PAST RIDERS)                  ║
+     ╚═══════════════════════════════════════════════════════════╝ */
+  /* Crossings = riders that crossed paths in the past */
+  .crossing {
+    position: absolute;
+    z-index: 16;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+  .crossing .cr-icon {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: rgba(184, 132, 230, 0.85);
+    border: 1.5px dashed rgba(255, 255, 255, 0.6);
+    display: grid;
+    place-items: center;
+    color: #fff;
+    box-shadow: 0 0 12px rgba(184, 132, 230, 0.5);
+    opacity: 0.85;
+  }
+  .crossing .cr-icon svg {
+    width: 12px; height: 12px;
+  }
+  /* Trail line behind crossing showing past path */
+  .crossing::before {
+    content: "";
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 50px; height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(184, 132, 230, 0.5));
+    transform: translate(0, -50%);
+    z-index: -1;
+  }
+  /* Time badge on crossing */
+  .crossing .cr-time {
+    position: absolute;
+    top: -7px; right: -10px;
+    background: rgba(184, 132, 230, 0.9);
+    color: #fff;
+    font-family: 'Geist Mono', monospace;
+    font-size: 8px;
+    font-weight: 700;
+    padding: 1px 4px;
+    border-radius: 100px;
+    border: 1.5px solid #0a0e15;
+    line-height: 1;
+  }
+
+  /* ╔═══════════════════════════════════════════════════════════╗
+     ║              CROSSINGS PANEL (left side)                  ║
+     ╚═══════════════════════════════════════════════════════════╝ */
+  .crossings-panel {
+    position: absolute;
+    left: 14px;
+    bottom: 244px;
+    width: 180px;
+    background: rgba(15, 26, 46, 0.88);
+    backdrop-filter: blur(14px);
+    border: 1px solid rgba(184, 132, 230, 0.25);
+    border-radius: 16px;
+    padding: 10px 12px;
+    z-index: 26;
+    box-shadow: 0 10px 30px -8px rgba(0, 0, 0, 0.6);
+  }
+  .crossings-panel .cp-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .crossings-panel .cp-icon {
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: rgba(184, 132, 230, 0.25);
+    border: 1px dashed rgba(184, 132, 230, 0.6);
+    display: grid; place-items: center;
+    color: rgb(184, 132, 230);
+    flex-shrink: 0;
+  }
+  .crossings-panel .cp-icon svg { width: 9px; height: 9px; }
+  .crossings-panel .cp-title {
+    font-family: 'Geist Mono', monospace;
+    font-size: 9px;
+    color: rgb(184, 132, 230);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 700;
+    flex: 1;
+  }
+  .crossings-panel .cp-count {
+    background: rgba(184, 132, 230, 0.2);
+    color: #d4b3ec;
+    font-family: 'Geist Mono', monospace;
+    font-size: 9px;
+    padding: 1px 5px;
+    border-radius: 100px;
+    font-weight: 700;
+  }
+  .crossings-panel .cp-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .crossings-panel .cp-item {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .crossings-panel .cp-avatar {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--izen-bright), var(--izen-deep));
+    display: grid;
+    place-items: center;
+    color: #fff;
+    flex-shrink: 0;
+    border: 1px solid rgba(184, 132, 230, 0.4);
+  }
+  .crossings-panel .cp-avatar svg { width: 11px; height: 11px; }
+  .crossings-panel .cp-info {
+    flex: 1;
+    min-width: 0;
+  }
+  .crossings-panel .cp-info .name {
+    font-size: 11px;
+    color: var(--ink);
+    font-weight: 600;
+    line-height: 1.2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .crossings-panel .cp-info .meta {
+    font-size: 9px;
+    color: var(--ink-dim);
+    font-family: 'Geist Mono', monospace;
+    line-height: 1.2;
+  }
+  .crossings-panel .cp-link {
+    margin-top: 8px;
+    text-align: center;
+    font-size: 10px;
+    color: rgb(184, 132, 230);
+    font-weight: 600;
+    cursor: pointer;
+    padding-top: 6px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  /* ╔═══════════════════════════════════════════════════════════╗
+     ║                  LAYERS PANEL                              ║
+     ╚═══════════════════════════════════════════════════════════╝ */
+  .layers-btn.open {
+    border-color: var(--neon);
+    background: rgba(28, 38, 60, 0.95);
+  }
+  .layers-btn.open svg { stroke: var(--neon-bright); }
+
+  .layers-panel {
+    position: absolute;
+    right: 70px;
+    top: 50%;
+    transform: translateY(-50%) translateX(20px) scale(0.92);
+    width: 218px;
+    background: rgba(15, 26, 46, 0.94);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(77, 143, 255, 0.25);
+    border-radius: 18px;
+    padding: 14px;
+    z-index: 35;
+    box-shadow:
+      0 20px 50px -10px rgba(0, 0, 0, 0.7),
+      inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .layers-panel.open {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(-50%) translateX(0) scale(1);
+  }
+  .lp-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+  .lp-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+  }
+  .lp-close {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--line);
+    display: grid; place-items: center;
+    color: var(--ink-dim);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .lp-close:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: var(--ink);
+  }
+  .lp-close svg { width: 11px; height: 11px; }
+
+  .lp-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .lp-option {
+    position: relative;
+    padding: 6px;
+    border-radius: 12px;
+    border: 1.5px solid var(--line-strong);
+    background: rgba(255, 255, 255, 0.02);
+    cursor: pointer;
+    transition: all 0.2s;
+    overflow: hidden;
+  }
+  .lp-option:hover {
+    border-color: rgba(122, 146, 184, 0.5);
+    transform: translateY(-1px);
+  }
+  .lp-option.active {
+    border-color: var(--neon);
+    background: rgba(77, 143, 255, 0.08);
+    box-shadow: 0 4px 14px rgba(77, 143, 255, 0.25);
+  }
+  .lp-thumb {
+    width: 100%;
+    aspect-ratio: 60/40;
+    border-radius: 7px;
+    overflow: hidden;
+    margin-bottom: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+  .lp-thumb svg {
+    width: 100%; height: 100%;
+    display: block;
+  }
+  .lp-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--ink);
+    text-align: center;
+    padding-bottom: 2px;
+  }
+  .lp-option.active .lp-label {
+    color: var(--neon-bright);
+  }
+  .lp-check {
+    position: absolute;
+    top: 4px; right: 4px;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: var(--neon);
+    display: grid; place-items: center;
+    color: #fff;
+    opacity: 0;
+    transform: scale(0.5);
+    transition: opacity 0.2s, transform 0.2s;
+    box-shadow: 0 2px 6px rgba(77, 143, 255, 0.5);
+  }
+  .lp-option.active .lp-check {
+    opacity: 1;
+    transform: scale(1);
+  }
+  .lp-check svg { width: 9px; height: 9px; }
+
+  .lp-divider {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.08);
+    margin: 12px 0 10px;
+  }
+
+  .lp-section-title {
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--ink-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: 8px;
+    margin-left: 2px;
+    font-family: 'Geist Mono', monospace;
+  }
+
+  .lp-toggle-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 4px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .lp-toggle-row:hover {
+    background: rgba(255, 255, 255, 0.03);
+  }
+  .lp-toggle-icon {
+    width: 22px; height: 22px;
+    display: grid; place-items: center;
+    flex-shrink: 0;
+  }
+  .lp-toggle-icon svg { width: 16px; height: 16px; }
+  .lp-toggle-text {
+    flex: 1;
+    font-size: 12px;
+    color: var(--ink);
+    font-weight: 500;
+  }
+  .lp-switch {
+    width: 32px; height: 18px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 100px;
+    position: relative;
+    flex-shrink: 0;
+    transition: background 0.25s;
+  }
+  .lp-switch::after {
+    content: "";
+    position: absolute;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: #fff;
+    top: 2px; left: 2px;
+    transition: transform 0.25s;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  }
+  .lp-switch.active {
+    background: var(--neon);
+    box-shadow: 0 0 8px rgba(77, 143, 255, 0.4);
+  }
+  .lp-switch.active::after {
+    transform: translateX(14px);
+  }
+
+  /* ╔═══════════════════════════════════════════════════════════╗
+     ║                  RIGHT SIDE QUICK ACTIONS                 ║
+     ╚═══════════════════════════════════════════════════════════╝ */
+  .side-actions {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 25;
+  }
+  .side-btn {
+    width: 46px; height: 46px;
+    border-radius: 14px;
+    background: rgba(15, 26, 46, 0.85);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(77, 143, 255, 0.2);
+    display: grid; place-items: center;
+    color: var(--ink);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
+    cursor: pointer;
+    transition: transform 0.2s, border-color 0.2s;
+    position: relative;
+  }
+  .side-btn:hover {
+    border-color: var(--neon);
+    transform: scale(1.05);
+  }
+  .side-btn svg { width: 20px; height: 20px; }
+  .side-btn .badge-dot {
+    position: absolute;
+    top: -2px; right: -2px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 9px;
+    background: var(--neon);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    font-family: 'Geist Mono', monospace;
+    display: grid; place-items: center;
+    border: 2px solid #0a0e15;
+  }
+
+  /* ╔═══════════════════════════════════════════════════════════╗
+     ║                  BOTTOM TRIP PANEL                        ║
+     ╚═══════════════════════════════════════════════════════════╝ */
+  .trip-panel {
+    position: absolute;
+    bottom: 90px; left: 18px; right: 18px;
+    background: transparent;
+    border: 1px solid rgba(77, 143, 255, 0.22);
+    border-radius: 28px;
+    padding: 16px 18px;
+    z-index: 30;
+  }
+  .trip-panel .destination {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .trip-panel .destination .pin-mini {
+    width: 28px; height: 28px;
+    border-radius: 8px;
+    background: rgba(77, 143, 255, 0.15);
+    border: 1px solid rgba(77, 143, 255, 0.3);
+    display: grid; place-items: center;
+    flex-shrink: 0;
+  }
+  .trip-panel .destination .pin-mini svg { width: 14px; height: 14px; color: var(--neon-bright); }
+  .trip-panel .destination .info { flex: 1; min-width: 0; }
+  .trip-panel .destination .info .name {
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.2;
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .trip-panel .destination .info .sub {
+    font-size: 11px;
+    color: var(--ink-dim);
+  }
+
+  .trip-panel .stats-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .trip-panel .stat {
+    flex: 1;
+    text-align: left;
+  }
+  .trip-panel .stat .num {
+    font-family: 'Geist Mono', monospace;
+    font-size: 22px;
+    font-weight: 800;
+    line-height: 1;
+    margin-bottom: 6px;
+    color: #fff;
+    letter-spacing: -0.02em;
+    -webkit-text-stroke: 1.2px #000;
+    paint-order: stroke fill;
+    text-shadow:
+      -1.5px -1.5px 0 #000,
+      1.5px -1.5px 0 #000,
+      -1.5px 1.5px 0 #000,
+      1.5px 1.5px 0 #000,
+      0 0 8px rgba(0, 0, 0, 0.85),
+      0 2px 4px rgba(0, 0, 0, 0.6);
+  }
+  .trip-panel .stat .num.eta {
+    color: #6ef095;
+    text-shadow:
+      -1.5px -1.5px 0 #000,
+      1.5px -1.5px 0 #000,
+      -1.5px 1.5px 0 #000,
+      1.5px 1.5px 0 #000,
+      0 0 12px rgba(74, 222, 128, 0.5),
+      0 0 8px rgba(0, 0, 0, 0.85);
+  }
+  .trip-panel .stat .lbl {
+    font-size: 11px;
+    color: #d8dde6;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-weight: 600;
+    -webkit-text-stroke: 0.7px #000;
+    paint-order: stroke fill;
+    text-shadow:
+      -1px -1px 0 #000,
+      1px -1px 0 #000,
+      -1px 1px 0 #000,
+      1px 1px 0 #000,
+      0 0 4px rgba(0, 0, 0, 0.7);
+  }
+  .trip-panel .divider {
+    width: 1px;
+    height: 30px;
+    background: rgba(255, 255, 255, 0.08);
+  }
+  .trip-panel .stop-btn {
+    width: 50px; height: 50px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff5c7a, #e63955);
+    display: grid; place-items: center;
+    box-shadow:
+      0 0 24px rgba(255, 92, 122, 0.5),
+      inset 0 1px 0 rgba(255, 255, 255, 0.25);
+    flex-shrink: 0;
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+  .trip-panel .stop-btn:hover { transform: scale(1.05); }
+  .trip-panel .stop-btn::after {
+    content: "";
+    width: 14px; height: 14px;
+    background: #fff;
+    border-radius: 3px;
+  }
+
+  /* ╔═══════════════════════════════════════════════════════════╗
+     ║                  LOGO WATERMARK (top-left)                ║
+     ╚═══════════════════════════════════════════════════════════╝ */
+  .izen-mark {
+    position: absolute;
+    top: 70px; left: 18px;
+    z-index: 31;
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    background: var(--izen);
+    display: grid; place-items: center;
+    box-shadow: 0 0 16px rgba(122, 146, 184, 0.5);
+    opacity: 0;
+    pointer-events: none;
+  }
+  .izen-mark svg { width: 22px; height: 22px; }
+
+  /* ╔═══════════════════════════════════════════════════════════╗
+     ║                    TAB BAR (bottom nav)                   ║
+     ╚═══════════════════════════════════════════════════════════╝ */
+  .tab-bar {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 64px;
+    background: rgba(10, 14, 21, 0.92);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding: 0 6px;
+    z-index: 40;
+  }
+  .tab-item {
+    flex: 1;
+    position: relative;
+    background: transparent;
+    border: none;
+    padding: 6px 2px 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    cursor: pointer;
+    color: var(--ink-mute);
+    font-family: inherit;
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    transition: color 0.2s ease;
+  }
+  .tab-item svg {
+    width: 22px; height: 22px;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    fill: none;
+    transition: stroke 0.2s ease;
+  }
+  .tab-item span {
+    white-space: nowrap;
+  }
+  .tab-item.active {
+    color: var(--neon);
+  }
+  .tab-item.active::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 22px;
+    height: 2px;
+    background: var(--neon);
+    border-radius: 0 0 2px 2px;
+    box-shadow: 0 0 8px rgba(77, 143, 255, 0.6);
+  }
+  .tab-item .badge {
+    position: absolute;
+    top: 2px;
+    right: calc(50% - 18px);
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    background: var(--neon);
+    color: #fff;
+    border-radius: 100px;
+    font-size: 9px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 0 2px rgba(10, 14, 21, 0.92);
+  }
+  .tab-item:hover:not(.active) {
+    color: var(--ink-dim);
+  }
+
+  /* Home indicator — moved into the tab-bar zone */
+  .home-bar {
+    position: absolute;
+    bottom: 4px; left: 50%;
+    transform: translateX(-50%);
+    width: 134px; height: 5px;
+    background: rgba(255, 255, 255, 0.4);
+    border-radius: 100px;
+    z-index: 50;
+  }
+
+  /* ─────────────────────────────────────────────────────────────
+     OVERRIDES — intégration dans le mockup téléphone du site IZENRIDE.
+     Le cadre/notch/ombre sont fournis par le site : on neutralise
+     ceux de cet écran et on cale le contenu en 390 × 844 plein cadre.
+     ───────────────────────────────────────────────────────────── */
+  html, body {
+    width: 390px;
+    height: 844px;
+    overflow: hidden;
+    background: var(--bg);
+  }
+  body {
+    display: block;          /* annule le centrage "showroom" */
+    background: var(--bg);   /* supprime le fond ambiant showroom */
+  }
+  .device {
+    width: 390px !important;
+    height: 844px !important;
+    min-width: 0;
+    max-height: none;
+    aspect-ratio: auto;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    background: var(--bg);
+  }
+  .device::before,           /* notch  — fourni par .phone-island du site */
+  .device::after {           /* caméra */
+    display: none !important;
+  }
+</style>
+</head>
+<body>
+
+<div class="device">
+  <div class="screen">
+
+    <!-- Status bar -->
+    <div class="status-bar">
+      <span>9:41</span>
+      <div class="right">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M2 22h20v-2H2zM4 18h2v-4H4zm4 0h2V8H8zm4 0h2V4h-2zm4 0h2v-8h-2z"/></svg>
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9z"/></svg>
+        <span>92%</span>
+      </div>
+    </div>
+
+    <!-- Map background : grid + roads -->
+    <div class="map-bg">
+      <svg viewBox="0 0 400 800" preserveAspectRatio="xMidYMid slice">
+        <defs>
+          <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+            <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(77,143,255,0.06)" stroke-width="1"/>
+          </pattern>
+          <linearGradient id="roadGlow" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="rgba(184,197,221,0.5)"/>
+            <stop offset="100%" stop-color="rgba(122,146,184,0.3)"/>
+          </linearGradient>
+        </defs>
+        <rect width="400" height="800" fill="url(#grid)"/>
+
+        <!-- Major horizontal road -->
+        <path d="M 0 280 Q 100 300, 200 280 T 400 310" stroke="rgba(122,146,184,0.28)" stroke-width="20" fill="none"/>
+        <path d="M 0 280 Q 100 300, 200 280 T 400 310" stroke="url(#roadGlow)" stroke-width="1.5" fill="none"/>
+
+        <!-- Major vertical road -->
+        <path d="M 200 0 Q 220 200, 200 400 T 250 800" stroke="rgba(122,146,184,0.28)" stroke-width="20" fill="none"/>
+        <path d="M 200 0 Q 220 200, 200 400 T 250 800" stroke="url(#roadGlow)" stroke-width="1.5" fill="none"/>
+
+        <!-- Side streets -->
+        <path d="M 0 120 L 250 130" stroke="rgba(122,146,184,0.18)" stroke-width="10" fill="none"/>
+        <path d="M 100 0 L 95 200" stroke="rgba(122,146,184,0.16)" stroke-width="9" fill="none"/>
+        <path d="M 0 580 L 400 570" stroke="rgba(122,146,184,0.22)" stroke-width="13" fill="none"/>
+        <path d="M 320 380 L 400 390" stroke="rgba(122,146,184,0.18)" stroke-width="9" fill="none"/>
+        <path d="M 0 700 L 200 690" stroke="rgba(122,146,184,0.16)" stroke-width="8" fill="none"/>
+        <path d="M 280 420 Q 320 500, 400 540" stroke="rgba(122,146,184,0.16)" stroke-width="8" fill="none"/>
+
+        <!-- Small POIs (buildings as faint dots) -->
+        <g opacity="0.3">
+          <rect x="50" y="200" width="40" height="50" rx="4" fill="rgba(122,146,184,0.2)"/>
+          <rect x="320" y="180" width="50" height="40" rx="4" fill="rgba(122,146,184,0.2)"/>
+          <rect x="40" y="380" width="40" height="60" rx="4" fill="rgba(122,146,184,0.2)"/>
+          <rect x="290" y="620" width="60" height="50" rx="4" fill="rgba(122,146,184,0.2)"/>
+          <rect x="60" y="660" width="50" height="40" rx="4" fill="rgba(122,146,184,0.2)"/>
+          <rect x="280" y="100" width="40" height="40" rx="4" fill="rgba(122,146,184,0.18)"/>
+        </g>
+
+        <!-- District labels (very subtle) -->
+        <text x="80" y="160" fill="rgba(168,176,192,0.3)" font-family="Geist" font-size="11" letter-spacing="2">CROIX-ROUSSE</text>
+        <text x="240" y="500" fill="rgba(168,176,192,0.3)" font-family="Geist" font-size="11" letter-spacing="2">PRESQU'ÎLE</text>
+        <text x="40" y="740" fill="rgba(168,176,192,0.3)" font-family="Geist" font-size="11" letter-spacing="2">GERLAND</text>
+      </svg>
+    </div>
+
+    <!-- Animated route -->
+    <div class="route-layer">
+      <svg viewBox="0 0 400 800" preserveAspectRatio="xMidYMid slice">
+        <!-- Glow underlay -->
+        <path class="route-line-glow" d="M 200 470 Q 210 380, 200 300 Q 195 230, 220 160 Q 240 100, 280 60"/>
+        <!-- Main animated line -->
+        <path class="route-line" d="M 200 470 Q 210 380, 200 300 Q 195 230, 220 160 Q 240 100, 280 60"/>
+
+        <!-- Destination marker (top right) -->
+        <g transform="translate(280 60)">
+          <circle r="12" fill="rgba(74, 222, 128, 0.25)"/>
+          <circle r="8" fill="#4ade80"/>
+          <circle r="3" fill="#0a0e15"/>
+        </g>
+
+        <!-- Turn points (small dots along route) -->
+        <circle cx="220" cy="160" r="4" fill="#fff" opacity="0.6"/>
+        <circle cx="200" cy="300" r="4" fill="#fff" opacity="0.6"/>
+      </svg>
+    </div>
+
+    <!-- IzenRide logo watermark (subtle) -->
+    <div class="izen-mark">
+      <svg viewBox="0 0 32 32" fill="none">
+        <g stroke="#ffffff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" fill="none">
+          <path d="M 11 5 L 11 16"/>
+          <path d="M 16 4 L 16 16"/>
+          <path d="M 8 13 Q 8 10, 11 10"/>
+          <path d="M 19 13 Q 19 10, 16 10"/>
+          <path d="M 8 16 Q 6 17, 7 19"/>
+          <path d="M 7 16 Q 7 23, 12 24 L 18 24 Q 23 23, 23 16 Q 23 14, 21 14 L 18 14"/>
+        </g>
+      </svg>
+    </div>
+
+    <!-- ━━━━━━━━━━━━━━━━━━━━ TOP NAV PANEL ━━━━━━━━━━━━━━━━━━━━ -->
+    <div class="nav-panel">
+      <div class="top-row">
+        <div class="arrow-square">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 5l7 7-7 7"/>
+            <path d="M2 12h14"/>
+          </svg>
+        </div>
+        <div class="turn-info">
+          <div class="label">Tournez à droite dans</div>
+          <div class="distance">320 m</div>
+          <div class="road-name">D952 — Col du Galibier</div>
+        </div>
+        <div class="speed-pill">
+          <div class="num">98</div>
+          <div class="lbl">km/h</div>
+        </div>
+      </div>
+      <div class="community">
+        <div class="left">
+          <span class="live-dot"></span>
+          <span>5 motards autour de vous</span>
+        </div>
+        <div class="count">+ 12 sur la route</div>
+      </div>
+    </div>
+
+    <!-- ━━━━━━━━━━━━━━━━━━━━ ALERT TOAST ━━━━━━━━━━━━━━━━━━━━ -->
+    <div class="alert-toast">
+      <div class="icon">
+        <svg viewBox="0 0 30 30" fill="none">
+          <path d="M 15 3 L 27 25 L 3 25 Z" fill="rgba(255,100,100,0.18)" stroke="#ff6b6b" stroke-width="2" stroke-linejoin="round"/>
+          <line x1="15" y1="11" x2="15" y2="18" stroke="#ff6b6b" stroke-width="2.5" stroke-linecap="round"/>
+          <circle cx="15" cy="22" r="1.5" fill="#ff6b6b"/>
+        </svg>
+      </div>
+      <div class="text">
+        <div class="ttl">Zone de contrôle</div>
+        <div class="desc">Sur votre route — A7 sud · 110 km/h</div>
+      </div>
+      <div class="dist">2,4 km</div>
+    </div>
+
+    <!-- ━━━━━━━━━━━━━━━━━━━━ RIDERS ON MAP ━━━━━━━━━━━━━━━━━━━━ -->
+    <div class="rider r1">
+      <svg viewBox="0 0 24 24" fill="#fff"><path d="M12 4a3 3 0 110 6 3 3 0 010-6zm6 14H6v-1c0-2 4-3 6-3s6 1 6 3v1z"/></svg>
+    </div>
+    <div class="rider r2">
+      <svg viewBox="0 0 24 24" fill="#fff"><path d="M12 4a3 3 0 110 6 3 3 0 010-6zm6 14H6v-1c0-2 4-3 6-3s6 1 6 3v1z"/></svg>
+    </div>
+    <div class="rider r3">
+      <svg viewBox="0 0 24 24" fill="#fff"><path d="M12 4a3 3 0 110 6 3 3 0 010-6zm6 14H6v-1c0-2 4-3 6-3s6 1 6 3v1z"/></svg>
+    </div>
+    <div class="rider r4">
+      <svg viewBox="0 0 24 24" fill="#fff"><path d="M12 4a3 3 0 110 6 3 3 0 010-6zm6 14H6v-1c0-2 4-3 6-3s6 1 6 3v1z"/></svg>
+    </div>
+    <div class="rider r5">
+      <svg viewBox="0 0 24 24" fill="#fff"><path d="M12 4a3 3 0 110 6 3 3 0 010-6zm6 14H6v-1c0-2 4-3 6-3s6 1 6 3v1z"/></svg>
+    </div>
+
+    <!-- ━━━━━━━━━━━━━━━━━━━━ GAS STATIONS ━━━━━━━━━━━━━━━━━━━━ -->
+    <!-- Best price (highlighted with cyan + star) -->
+    <div class="gas-station best" style="left: 18%; top: 28%;">
+      <div class="gas-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="22" x2="15" y2="22"/>
+          <line x1="4" y1="9" x2="14" y2="9"/>
+          <path d="M14 22V4a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v18"/>
+          <path d="M18 8h1a2 2 0 0 1 2 2v8a2 2 0 0 1-4 0V5l-3-3"/>
+        </svg>
+      </div>
+      <div class="gas-price">1,72 €</div>
+    </div>
+
+    <!-- Other stations -->
+    <div class="gas-station" style="left: 78%; top: 38%;">
+      <div class="gas-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="22" x2="15" y2="22"/>
+          <line x1="4" y1="9" x2="14" y2="9"/>
+          <path d="M14 22V4a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v18"/>
+          <path d="M18 8h1a2 2 0 0 1 2 2v8a2 2 0 0 1-4 0V5l-3-3"/>
+        </svg>
+      </div>
+      <div class="gas-price">1,84 €</div>
+    </div>
+
+    <div class="gas-station" style="left: 12%; top: 58%;">
+      <div class="gas-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="22" x2="15" y2="22"/>
+          <line x1="4" y1="9" x2="14" y2="9"/>
+          <path d="M14 22V4a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v18"/>
+          <path d="M18 8h1a2 2 0 0 1 2 2v8a2 2 0 0 1-4 0V5l-3-3"/>
+        </svg>
+      </div>
+      <div class="gas-price">1,89 €</div>
+    </div>
+
+    <div class="gas-station" style="left: 88%; top: 16%;">
+      <div class="gas-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="22" x2="15" y2="22"/>
+          <line x1="4" y1="9" x2="14" y2="9"/>
+          <path d="M14 22V4a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v18"/>
+          <path d="M18 8h1a2 2 0 0 1 2 2v8a2 2 0 0 1-4 0V5l-3-3"/>
+        </svg>
+      </div>
+      <div class="gas-price">1,79 €</div>
+    </div>
+
+    <!-- ━━━━━━━━━━━━━━━━━━━━ CROSSINGS (RECENT PAST RIDERS) ━━━━━━━━━━━━━━━━━━━━ -->
+    <!-- Riders that crossed paths recently — purple dashed marker -->
+    <div class="crossing" style="left: 30%; top: 18%;">
+      <div class="cr-icon">
+        <svg viewBox="0 0 24 24" fill="#fff"><path d="M12 4a3 3 0 110 6 3 3 0 010-6zm6 14H6v-1c0-2 4-3 6-3s6 1 6 3v1z"/></svg>
+      </div>
+      <div class="cr-time">2J</div>
+    </div>
+    <div class="crossing" style="left: 65%; top: 22%;">
+      <div class="cr-icon">
+        <svg viewBox="0 0 24 24" fill="#fff"><path d="M12 4a3 3 0 110 6 3 3 0 010-6zm6 14H6v-1c0-2 4-3 6-3s6 1 6 3v1z"/></svg>
+      </div>
+      <div class="cr-time">5H</div>
+    </div>
+    <div class="crossing" style="left: 22%; top: 48%;">
+      <div class="cr-icon">
+        <svg viewBox="0 0 24 24" fill="#fff"><path d="M12 4a3 3 0 110 6 3 3 0 010-6zm6 14H6v-1c0-2 4-3 6-3s6 1 6 3v1z"/></svg>
+      </div>
+      <div class="cr-time">1S</div>
+    </div>
+    <div class="crossing" style="left: 72%; top: 52%;">
+      <div class="cr-icon">
+        <svg viewBox="0 0 24 24" fill="#fff"><path d="M12 4a3 3 0 110 6 3 3 0 010-6zm6 14H6v-1c0-2 4-3 6-3s6 1 6 3v1z"/></svg>
+      </div>
+      <div class="cr-time">3J</div>
+    </div>
+
+    <!-- ━━━━━━━━━━━━━━━━━━━━ MY POSITION ━━━━━━━━━━━━━━━━━━━━ -->
+    <div class="me-pin">
+      <div class="pulse"></div>
+      <div class="pulse pulse-2"></div>
+      <div class="core"></div>
+    </div>
+
+    <!-- ━━━━━━━━━━━━━━━━━━━━ SIDE QUICK ACTIONS ━━━━━━━━━━━━━━━━━━━━ -->
+    <div class="side-actions">
+      <!-- Layers / map style (interactive, opens picker) -->
+      <div class="side-btn layers-btn" id="layersBtn" title="Couches de la carte">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="12 2 2 7 12 12 22 7 12 2"/>
+          <polyline points="2 17 12 22 22 17"/>
+          <polyline points="2 12 12 17 22 12"/>
+        </svg>
+      </div>
+      <!-- Gas stations toggle (active - green accent) -->
+      <div class="side-btn toggle-btn gas-toggle active" id="gasToggle" title="Stations-service">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="22" x2="15" y2="22"/>
+          <line x1="4" y1="9" x2="14" y2="9"/>
+          <path d="M14 22V4a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v18"/>
+          <path d="M18 8h1a2 2 0 0 1 2 2v8a2 2 0 0 1-4 0V5l-3-3"/>
+        </svg>
+      </div>
+      <!-- Crossings toggle (active - purple accent) -->
+      <div class="side-btn toggle-btn crossings-toggle active" id="crossingsToggle" title="Croisements">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <polyline points="12 6 12 12 16 14"/>
+        </svg>
+      </div>
+      <!-- Center / locate -->
+      <div class="side-btn" title="Recentrer">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/>
+          <line x1="12" y1="2" x2="12" y2="5"/>
+          <line x1="12" y1="19" x2="12" y2="22"/>
+          <line x1="2" y1="12" x2="5" y2="12"/>
+          <line x1="19" y1="12" x2="22" y2="12"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- ━━━━━━━━━━━━━━━━━━━━ LAYERS PICKER ━━━━━━━━━━━━━━━━━━━━ -->
+    <div class="layers-panel" id="layersPanel">
+      <div class="lp-header">
+        <div class="lp-title">Style de carte</div>
+        <div class="lp-close" id="layersClose">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </div>
+      </div>
+      <div class="lp-options">
+        <div class="lp-option active" data-style="night">
+          <div class="lp-thumb thumb-night">
+            <svg viewBox="0 0 60 40" preserveAspectRatio="none">
+              <rect width="60" height="40" fill="#0a1428"/>
+              <path d="M 0 25 Q 20 15, 35 22 T 60 18" stroke="#4d8fff" stroke-width="2" fill="none" opacity="0.8"/>
+              <path d="M 10 38 L 30 30 L 50 35" stroke="rgba(122,146,184,0.5)" stroke-width="1" fill="none"/>
+              <circle cx="45" cy="12" r="1.5" fill="#7eb0ff"/>
+              <circle cx="20" cy="18" r="1" fill="#7eb0ff" opacity="0.7"/>
+            </svg>
+          </div>
+          <div class="lp-label">Nuit</div>
+          <div class="lp-check">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="lp-option" data-style="day">
+          <div class="lp-thumb thumb-day">
+            <svg viewBox="0 0 60 40" preserveAspectRatio="none">
+              <rect width="60" height="40" fill="#e8eef5"/>
+              <path d="M 0 25 Q 20 15, 35 22 T 60 18" stroke="#3b82f6" stroke-width="2" fill="none"/>
+              <path d="M 10 38 L 30 30 L 50 35" stroke="#94a3b8" stroke-width="1" fill="none"/>
+              <rect x="20" y="20" width="6" height="6" fill="#cbd5e1"/>
+              <rect x="38" y="22" width="5" height="5" fill="#cbd5e1"/>
+            </svg>
+          </div>
+          <div class="lp-label">Jour</div>
+          <div class="lp-check">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="lp-option" data-style="satellite">
+          <div class="lp-thumb thumb-satellite">
+            <svg viewBox="0 0 60 40" preserveAspectRatio="none">
+              <rect width="60" height="40" fill="#1a2418"/>
+              <path d="M 0 0 Q 15 10, 30 5 T 60 8 L 60 40 L 0 40 Z" fill="#3a4a32" opacity="0.6"/>
+              <path d="M 0 25 Q 20 18, 35 22 T 60 20" fill="#5a7548" opacity="0.5"/>
+              <path d="M 0 30 Q 20 28, 40 32 T 60 30" stroke="#d4d068" stroke-width="1.5" fill="none" opacity="0.6"/>
+              <circle cx="20" cy="20" r="2" fill="#5d7042" opacity="0.7"/>
+            </svg>
+          </div>
+          <div class="lp-label">Satellite</div>
+          <div class="lp-check">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="lp-option" data-style="terrain">
+          <div class="lp-thumb thumb-terrain">
+            <svg viewBox="0 0 60 40" preserveAspectRatio="none">
+              <rect width="60" height="40" fill="#2a2418"/>
+              <polygon points="0,40 12,18 22,28 35,12 48,22 60,15 60,40" fill="#6b5a3e"/>
+              <polygon points="0,40 12,18 22,28 35,12 48,22 60,15 60,40" fill="url(#terrainGrad)" opacity="0.5"/>
+              <defs>
+                <linearGradient id="terrainGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="#a89576"/>
+                  <stop offset="100%" stop-color="transparent"/>
+                </linearGradient>
+              </defs>
+              <path d="M 0 32 Q 15 28, 30 32 T 60 30" stroke="#d4a574" stroke-width="1" fill="none" opacity="0.8"/>
+            </svg>
+          </div>
+          <div class="lp-label">Relief</div>
+          <div class="lp-check">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="lp-divider"></div>
+
+      <div class="lp-section-title">Affichage</div>
+      <div class="lp-toggle-row" id="trafficToggle">
+        <div class="lp-toggle-icon" style="color: #ff8b8b;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+        </div>
+        <div class="lp-toggle-text">Trafic en temps réel</div>
+        <div class="lp-switch active"></div>
+      </div>
+      <div class="lp-toggle-row" id="speedZonesToggle">
+        <div class="lp-toggle-icon" style="color: #fbbf24;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="6" x2="12" y2="12"/>
+            <line x1="16" y1="14" x2="12" y2="12"/>
+          </svg>
+        </div>
+        <div class="lp-toggle-text">Zones de contrôle</div>
+        <div class="lp-switch active"></div>
+      </div>
+      <div class="lp-toggle-row" id="ridersToggle">
+        <div class="lp-toggle-icon" style="color: var(--neon-bright);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="8" r="4"/>
+            <path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/>
+          </svg>
+        </div>
+        <div class="lp-toggle-text">Motards en direct</div>
+        <div class="lp-switch active"></div>
+      </div>
+    </div>
+
+    <!-- ━━━━━━━━━━━━━━━━━━━━ CROSSINGS PANEL ━━━━━━━━━━━━━━━━━━━━ -->
+    <div class="crossings-panel">
+      <div class="cp-header">
+        <div class="cp-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+          </svg>
+        </div>
+        <div class="cp-title">Croisements récents</div>
+        <div class="cp-count">12</div>
+      </div>
+      <div class="cp-list">
+        <div class="cp-item">
+          <div class="cp-avatar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M 6 16 Q 6 6, 16 6 Q 26 6, 26 16 L 26 22 Q 24 25, 21 25 L 11 25 Q 8 25, 6 22 Z" fill="currentColor" opacity="0.3"/>
+              <path d="M 6 16 Q 6 6, 16 6 Q 26 6, 26 16 L 26 22 Q 24 25, 21 25 L 11 25 Q 8 25, 6 22 Z"/>
+            </svg>
+          </div>
+          <div class="cp-info">
+            <div class="name">Léa, 28</div>
+            <div class="meta">D906 · il y a 5h</div>
+          </div>
+        </div>
+        <div class="cp-item">
+          <div class="cp-avatar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M 6 16 Q 6 6, 16 6 Q 26 6, 26 16 L 26 22 Q 24 25, 21 25 L 11 25 Q 8 25, 6 22 Z" fill="currentColor" opacity="0.3"/>
+              <path d="M 6 16 Q 6 6, 16 6 Q 26 6, 26 16 L 26 22 Q 24 25, 21 25 L 11 25 Q 8 25, 6 22 Z"/>
+            </svg>
+          </div>
+          <div class="cp-info">
+            <div class="name">Marc K.</div>
+            <div class="meta">A7 · il y a 2 j</div>
+          </div>
+        </div>
+        <div class="cp-item">
+          <div class="cp-avatar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M 6 16 Q 6 6, 16 6 Q 26 6, 26 16 L 26 22 Q 24 25, 21 25 L 11 25 Q 8 25, 6 22 Z" fill="currentColor" opacity="0.3"/>
+              <path d="M 6 16 Q 6 6, 16 6 Q 26 6, 26 16 L 26 22 Q 24 25, 21 25 L 11 25 Q 8 25, 6 22 Z"/>
+            </svg>
+          </div>
+          <div class="cp-info">
+            <div class="name">Sarah B.</div>
+            <div class="meta">D952 · il y a 3 j</div>
+          </div>
+        </div>
+      </div>
+      <div class="cp-link">Voir tout l'historique →</div>
+    </div>
+
+    <!-- ━━━━━━━━━━━━━━━━━━━━ BOTTOM TRIP PANEL ━━━━━━━━━━━━━━━━━━━━ -->
+    <div class="trip-panel">
+      <div class="stats-row">
+        <div class="stat">
+          <div class="num eta">19:23</div>
+          <div class="lbl">Arrivée</div>
+        </div>
+        <div class="divider"></div>
+        <div class="stat">
+          <div class="num">42 min</div>
+          <div class="lbl">Durée</div>
+        </div>
+        <div class="divider"></div>
+        <div class="stat">
+          <div class="num">68 km</div>
+          <div class="lbl">Restant</div>
+        </div>
+        <div class="stop-btn"></div>
+      </div>
+    </div>
+
+    <!-- ━━━━━━━━━━━━━━ TAB BAR (bottom navigation) ━━━━━━━━━━━━━━ -->
+    <nav class="tab-bar">
+      <button class="tab-item active" data-tab="map">
+        <svg viewBox="0 0 24 24">
+          <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21 3 6"/>
+          <line x1="9" y1="3" x2="9" y2="18"/>
+          <line x1="15" y1="6" x2="15" y2="21"/>
+        </svg>
+        <span>Map</span>
+      </button>
+      <button class="tab-item" data-tab="croisements">
+        <svg viewBox="0 0 24 24">
+          <path d="M7 4v6a3 3 0 0 0 3 3h4a3 3 0 0 1 3 3v4"/>
+          <path d="M17 4v6a3 3 0 0 1-3 3h-4a3 3 0 0 0-3 3v4"/>
+        </svg>
+        <span>Croisements</span>
+      </button>
+      <button class="tab-item" data-tab="messages">
+        <svg viewBox="0 0 24 24">
+          <path d="M21 11.5a8.4 8.4 0 0 1-9 8.5 8.6 8.6 0 0 1-4-1L3 20l1-4a8.5 8.5 0 1 1 17-4.5z"/>
+        </svg>
+        <span>Messages</span>
+        <span class="badge">12</span>
+      </button>
+      <button class="tab-item" data-tab="agenda">
+        <svg viewBox="0 0 24 24">
+          <rect x="3" y="5" width="18" height="16" rx="2"/>
+          <line x1="3" y1="10" x2="21" y2="10"/>
+          <line x1="8" y1="3" x2="8" y2="7"/>
+          <line x1="16" y1="3" x2="16" y2="7"/>
+        </svg>
+        <span>Agenda</span>
+      </button>
+      <button class="tab-item" data-tab="evenements">
+        <svg viewBox="0 0 24 24">
+          <path d="M4 22V4a1 1 0 0 1 1-1h12l-2 4 2 4H5"/>
+        </svg>
+        <span>Événements</span>
+      </button>
+      <button class="tab-item" data-tab="profil">
+        <svg viewBox="0 0 24 24">
+          <circle cx="12" cy="8" r="4"/>
+          <path d="M4 21v-2a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v2"/>
+        </svg>
+        <span>Profil</span>
+      </button>
+      <button class="tab-item" data-tab="shop">
+        <svg viewBox="0 0 24 24">
+          <path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.3 2.3a1 1 0 0 0 .7 1.7H17"/>
+          <circle cx="9" cy="20" r="1.6"/>
+          <circle cx="17" cy="20" r="1.6"/>
+        </svg>
+        <span>Shop</span>
+      </button>
+    </nav>
+
+    <!-- iOS home indicator -->
+    <div class="home-bar"></div>
+
+  </div>
+</div>
+
+<script>
+  (function() {
+    const screen = document.querySelector('.screen');
+    const gasToggle = document.getElementById('gasToggle');
+    const crossingsToggle = document.getElementById('crossingsToggle');
+    const layersBtn = document.getElementById('layersBtn');
+    const layersPanel = document.getElementById('layersPanel');
+    const layersClose = document.getElementById('layersClose');
+
+    // ━━━ Filter toggles (gas / crossings) ━━━
+    function toggle(button, hideClass) {
+      const isActive = button.classList.toggle('active');
+      if (isActive) {
+        screen.classList.remove(hideClass);
+      } else {
+        screen.classList.add(hideClass);
+      }
+    }
+
+    gasToggle.addEventListener('click', function() {
+      toggle(gasToggle, 'hide-gas');
+    });
+
+    crossingsToggle.addEventListener('click', function() {
+      toggle(crossingsToggle, 'hide-crossings');
+    });
+
+    // ━━━ Layers panel open/close ━━━
+    function setLayersOpen(open) {
+      if (open) {
+        layersBtn.classList.add('open');
+        layersPanel.classList.add('open');
+      } else {
+        layersBtn.classList.remove('open');
+        layersPanel.classList.remove('open');
+      }
+    }
+
+    layersBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      const isOpen = layersPanel.classList.contains('open');
+      setLayersOpen(!isOpen);
+    });
+
+    layersClose.addEventListener('click', function(e) {
+      e.stopPropagation();
+      setLayersOpen(false);
+    });
+
+    // Close panel when clicking outside
+    document.addEventListener('click', function(e) {
+      if (!layersPanel.contains(e.target) && !layersBtn.contains(e.target)) {
+        setLayersOpen(false);
+      }
+    });
+
+    // ━━━ Map style selection ━━━
+    const styleOptions = layersPanel.querySelectorAll('.lp-option');
+    styleOptions.forEach(function(opt) {
+      opt.addEventListener('click', function() {
+        styleOptions.forEach(function(o) { o.classList.remove('active'); });
+        opt.classList.add('active');
+      });
+    });
+
+    // ━━━ Display option toggles (traffic, speed zones, riders) ━━━
+    const toggleRows = layersPanel.querySelectorAll('.lp-toggle-row');
+    toggleRows.forEach(function(row) {
+      row.addEventListener('click', function() {
+        const sw = row.querySelector('.lp-switch');
+        sw.classList.toggle('active');
+      });
+    });
+
+    // ━━━ Tab bar — visual switching only ━━━
+    const tabItems = document.querySelectorAll('.tab-item');
+    tabItems.forEach(function(tab) {
+      tab.addEventListener('click', function() {
+        tabItems.forEach(function(t) { t.classList.remove('active'); });
+        tab.classList.add('active');
+      });
+    });
+  })();
+</script>
+
+</body>
+</html>

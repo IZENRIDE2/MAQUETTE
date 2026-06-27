@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>IZEN RIDE — Fiche produit</title>
+<style>
+:root{--bg:#08090E;--surface:#10121A;--border:#1A1E28;--blue:#4A9CE8;--green:#5DCAA5;--amber:#FAC775;--txt:#F2F4F8;--muted:#8A91A3}
+*{margin:0;box-sizing:border-box}
+html,body{width:390px;height:844px;overflow:hidden}
+body{position:relative;background:var(--bg);color:var(--txt);font-family:-apple-system,'SF Pro Display','SF Pro Text',Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased;display:flex;flex-direction:column}
+.media{height:330px;position:relative;background:linear-gradient(150deg,#1C2740 0%,#0D1220 70%),radial-gradient(circle at 35% 35%,rgba(74,156,232,.45),transparent 60%)}
+.media::after{content:"";position:absolute;left:50%;top:52%;transform:translate(-50%,-50%);width:190px;height:190px;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,#2B3A55,#11192B 65%);box-shadow:0 30px 60px rgba(0,0,0,.6),inset 0 2px 14px rgba(255,255,255,.08)}
+.topbar{position:absolute;z-index:2;top:0;left:0;right:0;display:flex;justify-content:space-between;padding:54px 20px 0}
+.rnd{width:40px;height:40px;border-radius:50%;background:rgba(8,9,14,.65);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px)}
+.rnd svg{width:18px;height:18px;stroke:var(--txt);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.status{position:absolute;z-index:3;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:center;padding:16px 26px 0;font-size:14px;font-weight:600}
+.status .right{display:flex;gap:6px;align-items:center;font-size:12px;color:var(--muted)}
+.batt{width:22px;height:11px;border:1px solid var(--muted);border-radius:3px;position:relative}
+.batt::after{content:"";position:absolute;top:2px;bottom:2px;left:2px;right:5px;background:var(--green);border-radius:1px}
+.dots{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);display:flex;gap:6px}
+.dots i{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.25)}
+.dots i:first-child{background:var(--txt)}
+.body{flex:1;padding:20px 22px 0;display:flex;flex-direction:column}
+.rowt{display:flex;justify-content:space-between;align-items:flex-start;gap:14px}
+.rowt h1{font-size:21px;font-weight:800;line-height:1.25}
+.price{font-size:24px;font-weight:800;color:var(--amber);white-space:nowrap}
+.chips{display:flex;gap:8px;margin-top:12px}
+.chip{font-size:11.5px;font-weight:600;padding:6px 12px;border-radius:99px;border:1px solid var(--border);background:var(--surface);color:var(--muted)}
+.chip.g{color:var(--green);border-color:rgba(93,202,165,.45);background:rgba(93,202,165,.08)}
+.seller{display:flex;align-items:center;gap:12px;margin-top:18px;padding:13px 14px;border:1px solid var(--border);border-radius:16px;background:var(--surface)}
+.av{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#FAC775,#E24B4A);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#08090E;flex:none}
+.seller b{display:block;font-size:14.5px}
+.seller small{font-size:12px;color:var(--muted)}
+.seller .v{margin-left:auto;font-size:11px;font-weight:700;color:var(--green);border:1px solid rgba(93,202,165,.45);background:rgba(93,202,165,.08);padding:5px 10px;border-radius:99px}
+.desc{margin-top:16px;font-size:13.5px;line-height:1.55;color:var(--muted)}
+.desc b{color:var(--txt);font-weight:600}
+.ctas{margin-top:auto;padding:16px 0 34px;display:flex;gap:11px}
+.offer{flex:1;height:54px;border-radius:16px;border:1px solid var(--border);background:var(--surface);font-size:14.5px;font-weight:700;color:var(--txt);display:flex;align-items:center;justify-content:center}
+.contact{flex:1.4;height:54px;border-radius:16px;background:var(--blue);color:#06090F;font-size:14.5px;font-weight:800;display:flex;align-items:center;justify-content:center;box-shadow:0 0 28px rgba(74,156,232,.35)}
+</style>
+</head>
+<body>
+<div class="media">
+  <div class="status"><span>21:48</span><span class="right">5G <span class="batt"></span></span></div>
+  <div class="topbar">
+    <div class="rnd"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></div>
+    <div class="rnd"><svg viewBox="0 0 24 24"><path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"/></svg></div>
+  </div>
+  <div class="dots"><i></i><i></i><i></i><i></i></div>
+</div>
+<div class="body">
+  <div class="rowt"><h1>Casque AGV K6 S<br>Taille M</h1><span class="price">240 €</span></div>
+  <div class="chips"><span class="chip g">✓ Annonce vérifiée</span><span class="chip">Très bon état</span><span class="chip">2023</span></div>
+  <div class="seller">
+    <span class="av">M</span>
+    <span><b>Marc R.</b><small>★ 4,9 · 23 ventes · Antibes</small></span>
+    <span class="v">Profil vérifié</span>
+  </div>
+  <p class="desc"><b>Porté une saison</b>, jamais tombé. Écran clair + écran fumé inclus, intérieur lavé. Visière Pinlock neuve. Remise en main propre sur Antibes ou envoi suivi.</p>
+  <div class="ctas">
+    <div class="offer">Faire une offre</div>
+    <div class="contact">Contacter le vendeur</div>
+  </div>
+</div>
+</body>
+</html>

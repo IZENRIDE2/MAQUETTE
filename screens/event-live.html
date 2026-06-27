@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>IZEN RIDE — Suivi live</title>
+<style>
+:root{--bg:#08090E;--surface:#10121A;--border:#1A1E28;--blue:#4A9CE8;--green:#5DCAA5;--amber:#FAC775;--txt:#F2F4F8;--muted:#8A91A3}
+*{margin:0;box-sizing:border-box}
+html,body{width:390px;height:844px;overflow:hidden}
+body{position:relative;background:var(--bg);color:var(--txt);font-family:-apple-system,'SF Pro Display','SF Pro Text',Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased;display:flex;flex-direction:column}
+.status{display:flex;justify-content:space-between;align-items:center;padding:16px 26px 6px;font-size:14px;font-weight:600}
+.status .right{display:flex;gap:6px;align-items:center;font-size:12px;color:var(--muted)}
+.batt{width:22px;height:11px;border:1px solid var(--muted);border-radius:3px;position:relative}
+.batt::after{content:"";position:absolute;top:2px;bottom:2px;left:2px;right:5px;background:var(--green);border-radius:1px}
+header{display:flex;align-items:center;justify-content:space-between;padding:12px 22px}
+header h1{font-size:19px;font-weight:800}
+header p{font-size:12px;color:var(--muted);margin-top:3px}
+.live{background:rgba(93,202,165,.15);border:1px solid rgba(93,202,165,.55);color:var(--green);font-size:11.5px;font-weight:700;padding:7px 13px;border-radius:99px;display:flex;align-items:center;gap:7px}
+.live::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--green);animation:p 1.4s infinite}
+@keyframes p{50%{opacity:.25}}
+.map{margin:4px 20px;height:250px;border-radius:22px;border:1px solid var(--border);position:relative;overflow:hidden;background:#0B0E15}
+.map svg{width:100%;height:100%}
+.road{stroke:#1A2030;stroke-width:11;fill:none;stroke-linecap:round}
+.trace{stroke:var(--blue);stroke-width:5;fill:none;stroke-linecap:round;filter:drop-shadow(0 0 6px rgba(74,156,232,.7))}
+.done{stroke:var(--green);stroke-width:5;fill:none;stroke-linecap:round}
+.pt{position:absolute;width:15px;height:15px;border-radius:50%;border:2.5px solid #0B0E15}
+.p1{background:var(--green);left:60px;top:160px;box-shadow:0 0 12px rgba(93,202,165,.8)}
+.p2{background:var(--blue);left:150px;top:108px;box-shadow:0 0 12px rgba(74,156,232,.8)}
+.p3{background:var(--txt);left:185px;top:92px;border-color:var(--blue);box-shadow:0 0 0 5px rgba(74,156,232,.2)}
+.progress{margin:14px 22px 0}
+.progress .lbl{display:flex;justify-content:space-between;font-size:12.5px;color:var(--muted);margin-bottom:8px}
+.progress .lbl b{color:var(--txt)}
+.bar{height:8px;border-radius:99px;background:var(--surface);border:1px solid var(--border);overflow:hidden}
+.bar i{display:block;height:100%;width:62%;border-radius:99px;background:linear-gradient(90deg,var(--green),var(--blue))}
+.riders{flex:1;margin:16px 20px 0;display:flex;flex-direction:column;gap:10px;overflow:hidden}
+.rider{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:12px 14px}
+.av{width:38px;height:38px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#08090E}
+.a1{background:linear-gradient(135deg,#FAC775,#E24B4A)}.a2{background:linear-gradient(135deg,#4A9CE8,#5DCAA5)}.a3{background:linear-gradient(135deg,#7F77DD,#4A9CE8)}
+.rider b{display:block;font-size:14.5px}
+.rider small{font-size:11.5px;color:var(--muted)}
+.rider .spd{margin-left:auto;text-align:right}
+.rider .spd b{font-size:17px;font-variant-numeric:tabular-nums}
+.rider .spd span{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+.lead{font-size:10px;font-weight:700;color:var(--amber);border:1px solid rgba(250,199,117,.4);background:rgba(250,199,117,.1);padding:3px 8px;border-radius:99px;margin-left:8px}
+.quit{margin:14px 20px 34px;height:52px;border-radius:16px;border:1px solid rgba(226,75,74,.45);background:rgba(226,75,74,.1);color:#E24B4A;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center}
+</style>
+</head>
+<body>
+<div class="status"><span>22:05</span><span class="right">5G <span class="batt"></span></span></div>
+<header>
+  <div><h1>Night Ride — Corniche</h1><p>24 riders · départ 21:30</p></div>
+  <span class="live">LIVE</span>
+</header>
+<div class="map">
+  <svg viewBox="0 0 350 250" preserveAspectRatio="none" aria-hidden="true">
+    <path class="road" d="M-10 200 C 60 190, 120 130, 200 110 S 320 60, 360 50"/>
+    <path class="road" d="M40 -10 C 80 80, 60 160, 100 260"/>
+    <path class="done" d="M-10 200 C 60 190, 100 150, 158 116"/>
+    <path class="trace" d="M158 116 C 190 102, 250 80, 360 50"/>
+  </svg>
+  <span class="pt p1"></span><span class="pt p2"></span><span class="pt p3"></span>
+</div>
+<div class="progress">
+  <div class="lbl"><span><b>74 km</b> / 120 km</span><span>Prochain arrêt · Èze</span></div>
+  <div class="bar"><i></i></div>
+</div>
+<div class="riders">
+  <div class="rider"><span class="av a1">M</span><span><b>Maxime<span class="lead">EN TÊTE</span></b><small>D2204 · km 78</small></span><span class="spd"><b>87</b> <span>km/h</span></span></div>
+  <div class="rider"><span class="av a2">V</span><span><b>Vous</b><small>D2204 · km 74</small></span><span class="spd"><b>85</b> <span>km/h</span></span></div>
+  <div class="rider"><span class="av a3">L</span><span><b>Léa</b><small>D2204 · km 73</small></span><span class="spd"><b>84</b> <span>km/h</span></span></div>
+</div>
+<div class="quit">Quitter le ride</div>
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>IZEN RIDE — Splash</title>
+<style>
+:root{--bg:#08090E;--blue:#4A9CE8;--txt:#F2F4F8;--muted:#8A91A3;--border:#1A1E28}
+*{margin:0;box-sizing:border-box}
+html,body{width:390px;height:844px;overflow:hidden}
+body{background:radial-gradient(circle at 50% 38%,#0C1018 0%,var(--bg) 62%);color:var(--txt);
+  font-family:-apple-system,'SF Pro Display','SF Pro Text',Inter,system-ui,sans-serif;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:52px;
+  -webkit-font-smoothing:antialiased}
+.gauge{position:relative;width:280px;height:280px;filter:drop-shadow(0 0 44px rgba(74,156,232,.22))}
+.gauge svg{width:100%;height:100%;transform:rotate(150deg)}
+.track{fill:none;stroke:#151926;stroke-width:13;stroke-linecap:round}
+.progress{fill:none;stroke:var(--blue);stroke-width:13;stroke-linecap:round;
+  filter:drop-shadow(0 0 9px rgba(74,156,232,.85))}
+.value{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
+.value b{font-size:88px;font-weight:800;letter-spacing:-4px;font-variant-numeric:tabular-nums;line-height:1}
+.value span{font-size:12px;letter-spacing:5px;color:var(--muted);text-transform:uppercase}
+.brand{display:flex;flex-direction:column;align-items:center;text-align:center}
+.brand .logo{width:272px;height:auto;filter:drop-shadow(0 0 28px rgba(255,255,255,.14))}
+.brand p{margin-top:20px;font-size:12px;letter-spacing:4px;color:var(--muted);text-transform:uppercase}
+</style>
+</head>
+<body>
+<div class="gauge">
+  <!-- r=128 → circonférence ≈ 804 ; arc de 240° ≈ 536 -->
+  <svg viewBox="0 0 300 300" aria-hidden="true">
+    <circle class="track" cx="150" cy="150" r="128" stroke-dasharray="536 804"/>
+    <circle class="progress" id="arc" cx="150" cy="150" r="128" stroke-dasharray="536 804" stroke-dashoffset="536"/>
+  </svg>
+  <div class="value"><b id="num">0</b><span>km/h</span></div>
+</div>
+<div class="brand">
+  <!-- Logo officiel IZENRIDE (assets/logo.png à la racine du projet) -->
+  <img class="logo" src="../assets/logo.png" alt="IZENRIDE.">
+  <p>Ride. Croise. Connecte.</p>
+</div>
+<script>
+// Compteur 0 → 100 en boucle : montée 2,2 s (ease-out), palier 0,9 s, redescente rapide.
+(function(){
+  var num=document.getElementById('num'),arc=document.getElementById('arc'),
+      ARC=536,CYCLE=3600,UP=2200,HOLD=900,t0=performance.now();
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches){
+    num.textContent='100';arc.style.strokeDashoffset='0';return;
+  }
+  (function frame(t){
+    var e=(t-t0)%CYCLE,p;
+    if(e<UP){var x=e/UP;p=1-Math.pow(1-x,3);}
+    else if(e<UP+HOLD){p=1;}
+    else{p=1-(e-UP-HOLD)/(CYCLE-UP-HOLD);}
+    num.textContent=Math.round(p*100);
+    arc.style.strokeDashoffset=ARC*(1-p);
+    requestAnimationFrame(frame);
+  })(t0);
+})();
+</script>
+</body>
+</html>

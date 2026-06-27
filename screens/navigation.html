@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>IZEN RIDE — Navigation GPS</title>
+<style>
+:root{--bg:#08090E;--surface:#10121A;--border:#1A1E28;--blue:#4A9CE8;--green:#5DCAA5;--txt:#F2F4F8;--muted:#8A91A3}
+*{margin:0;box-sizing:border-box}
+html,body{width:390px;height:844px;overflow:hidden}
+body{position:relative;background:#0B0E15;color:var(--txt);font-family:-apple-system,'SF Pro Display','SF Pro Text',Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+.mapbg{position:absolute;inset:0}
+.mapbg svg{width:100%;height:100%}
+.road1{stroke:#1A2030;stroke-width:16;fill:none;stroke-linecap:round}
+.road2{stroke:#161C29;stroke-width:9;fill:none;stroke-linecap:round}
+.route{stroke:var(--blue);stroke-width:9;fill:none;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 0 8px rgba(74,156,232,.65))}
+.routechev{stroke:#CFE4F8;stroke-width:2.5;fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:8 22;animation:flow 1.4s linear infinite}
+@keyframes flow{to{stroke-dashoffset:-30}}
+.status{position:relative;z-index:3;display:flex;justify-content:space-between;align-items:center;padding:16px 26px 6px;font-size:14px;font-weight:600}
+.status .right{display:flex;gap:6px;align-items:center;font-size:12px;color:var(--muted)}
+.batt{width:22px;height:11px;border:1px solid var(--muted);border-radius:3px;position:relative}
+.batt::after{content:"";position:absolute;top:2px;bottom:2px;left:2px;right:5px;background:var(--green);border-radius:1px}
+.instr{position:relative;z-index:3;margin:8px 18px;background:rgba(16,18,26,.95);border:1px solid var(--border);border-radius:20px;padding:18px;display:flex;align-items:center;gap:16px;backdrop-filter:blur(10px)}
+.instr .arrow{width:58px;height:58px;border-radius:16px;background:var(--blue);display:flex;align-items:center;justify-content:center;box-shadow:0 0 24px rgba(74,156,232,.45);flex:none}
+.instr .arrow svg{width:32px;height:32px;stroke:#06090F;fill:none;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.instr b{font-size:26px;font-weight:800;display:block;line-height:1.1}
+.instr span{font-size:14px;color:var(--muted)}
+.zen{position:relative;z-index:3;margin:0 18px;display:inline-flex;align-items:center;gap:8px;background:rgba(93,202,165,.13);border:1px solid rgba(93,202,165,.45);color:var(--green);font-size:12.5px;font-weight:600;padding:8px 14px;border-radius:99px;width:max-content;backdrop-filter:blur(6px)}
+.me{position:absolute;z-index:2;left:178px;top:560px;width:26px;height:26px;border-radius:50%;background:var(--txt);border:5px solid var(--blue);box-shadow:0 0 0 10px rgba(74,156,232,.16)}
+.speed{position:absolute;z-index:3;left:18px;bottom:130px;width:74px;height:74px;border-radius:50%;background:rgba(16,18,26,.95);border:2px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;backdrop-filter:blur(8px)}
+.speed b{font-size:26px;font-weight:800;line-height:1}
+.speed span{font-size:9.5px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-top:2px}
+.eta{position:absolute;z-index:3;left:0;right:0;bottom:0;background:rgba(13,15,21,.96);border-top:1px solid var(--border);padding:18px 22px 34px;display:flex;align-items:center;justify-content:space-between;backdrop-filter:blur(12px)}
+.eta .big b{font-size:24px;font-weight:800;color:var(--green)}
+.eta .big span{display:block;font-size:12.5px;color:var(--muted);margin-top:2px}
+.eta .mid{text-align:center;font-size:14px;color:var(--txt);font-weight:600}
+.eta .mid span{display:block;font-size:11.5px;color:var(--muted);font-weight:400;margin-top:2px}
+.end{width:46px;height:46px;border-radius:50%;background:rgba(226,75,74,.15);border:1px solid rgba(226,75,74,.5);display:flex;align-items:center;justify-content:center}
+.end svg{width:18px;height:18px;stroke:#E24B4A;fill:none;stroke-width:2.2;stroke-linecap:round}
+</style>
+</head>
+<body>
+<div class="mapbg">
+  <svg viewBox="0 0 390 844" preserveAspectRatio="none" aria-hidden="true">
+    <path class="road1" d="M-20 300 C 100 280, 200 350, 410 310"/>
+    <path class="road2" d="M80 -20 C 60 200, 160 420, 110 870"/>
+    <path class="road2" d="M-20 640 C 140 600, 260 680, 410 630"/>
+    <path class="route" d="M191 573 C 200 480, 160 420, 200 360 S 300 320, 320 240"/>
+    <path class="routechev" d="M191 573 C 200 480, 160 420, 200 360 S 300 320, 320 240"/>
+  </svg>
+</div>
+<div class="me"></div>
+<div class="status"><span>21:51</span><span class="right">5G <span class="batt"></span></span></div>
+<div class="instr">
+  <div class="arrow"><svg viewBox="0 0 24 24"><path d="M6 20v-7a4 4 0 0 1 4-4h8M14 5l4 4-4 4"/></svg></div>
+  <div><b>400 m</b><span>Tournez à droite · D2204</span></div>
+</div>
+<div class="zen">🌿 Itinéraire ZEN — taillé pour les virages</div>
+<div class="speed"><b>92</b><span>km/h</span></div>
+<div class="eta">
+  <div class="big"><b>23 min</b><span>Arrivée 22:14</span></div>
+  <div class="mid">31 km<span>restants</span></div>
+  <div class="end"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></div>
+</div>
+</body>
+</html>

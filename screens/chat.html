@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>IZEN RIDE — Messagerie</title>
+<style>
+:root{--bg:#08090E;--surface:#10121A;--border:#1A1E28;--blue:#4A9CE8;--green:#5DCAA5;--txt:#F2F4F8;--muted:#8A91A3}
+*{margin:0;box-sizing:border-box}
+html,body{width:390px;height:844px;overflow:hidden}
+body{position:relative;background:var(--bg);color:var(--txt);font-family:-apple-system,'SF Pro Display','SF Pro Text',Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased;display:flex;flex-direction:column}
+.status{display:flex;justify-content:space-between;align-items:center;padding:16px 26px 6px;font-size:14px;font-weight:600}
+.status .right{display:flex;gap:6px;align-items:center;font-size:12px;color:var(--muted)}
+.batt{width:22px;height:11px;border:1px solid var(--muted);border-radius:3px;position:relative}
+.batt::after{content:"";position:absolute;top:2px;bottom:2px;left:2px;right:5px;background:var(--green);border-radius:1px}
+header{display:flex;align-items:center;gap:12px;padding:12px 20px;border-bottom:1px solid var(--border)}
+.back{width:36px;height:36px;display:flex;align-items:center;justify-content:center}
+.back svg{width:20px;height:20px;stroke:var(--txt);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.avatar{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#4A9CE8,#7F77DD);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#08090E}
+.who{flex:1}
+.who b{display:block;font-size:16px}
+.who span{font-size:12px;color:var(--green);display:flex;align-items:center;gap:5px}
+.who span::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--green)}
+.thread{flex:1;padding:20px;display:flex;flex-direction:column;gap:12px;overflow:hidden}
+.day{align-self:center;font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px}
+.msg{max-width:75%;padding:12px 15px;border-radius:18px;font-size:14.5px;line-height:1.4}
+.them{align-self:flex-start;background:var(--surface);border:1px solid var(--border);border-bottom-left-radius:6px}
+.me{align-self:flex-end;background:var(--blue);color:#06090F;font-weight:500;border-bottom-right-radius:6px}
+.time{font-size:10px;color:var(--muted);margin-top:-6px}
+.time.r{align-self:flex-end}
+.rdv{align-self:flex-start;width:75%;border:1px solid var(--border);border-radius:18px;overflow:hidden;background:var(--surface)}
+.rdv .map{height:96px;position:relative;background:linear-gradient(140deg,#0E1422,#0B0E16)}
+.rdv .map::before{content:"";position:absolute;left:-10%;right:-10%;top:48px;height:3px;background:#22304A;transform:rotate(-9deg)}
+.rdv .map::after{content:"";position:absolute;left:58%;top:38px;width:12px;height:12px;border-radius:50%;background:var(--blue);box-shadow:0 0 0 5px rgba(74,156,232,.25),0 0 16px rgba(74,156,232,.8)}
+.rdv .lbl{padding:11px 14px;font-size:13px}
+.rdv .lbl b{display:block;font-size:13.5px}
+.rdv .lbl span{color:var(--muted);font-size:12px}
+.typing{align-self:flex-start;display:flex;gap:5px;padding:13px 16px;background:var(--surface);border:1px solid var(--border);border-radius:18px;border-bottom-left-radius:6px}
+.typing i{width:7px;height:7px;border-radius:50%;background:var(--muted);animation:b 1.2s infinite}
+.typing i:nth-child(2){animation-delay:.18s}.typing i:nth-child(3){animation-delay:.36s}
+@keyframes b{0%,60%,100%{opacity:.35;transform:translateY(0)}30%{opacity:1;transform:translateY(-4px)}}
+.inputbar{display:flex;gap:10px;align-items:center;padding:14px 18px 32px;border-top:1px solid var(--border);background:rgba(12,14,20,.94)}
+.input{flex:1;height:46px;border-radius:99px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;padding:0 18px;color:var(--muted);font-size:14px}
+.send{width:46px;height:46px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;box-shadow:0 0 20px rgba(74,156,232,.4)}
+.send svg{width:20px;height:20px;stroke:#08090E;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+</style>
+</head>
+<body>
+<div class="status"><span>21:52</span><span class="right">5G <span class="batt"></span></span></div>
+<header>
+  <div class="back"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></div>
+  <div class="avatar">L</div>
+  <div class="who"><b>Léa M.</b><span>En ligne</span></div>
+</header>
+<div class="thread">
+  <span class="day">Ce soir</span>
+  <div class="msg them">Salut ! L'app dit qu'on s'est croisés 3 fois sur la Madone 😄</div>
+  <div class="msg me">La Z900 verte ? C'était donc toi. Joli rythme dans les épingles.</div>
+  <span class="time r">21:48 · Lu</span>
+  <div class="msg them">On remet ça vendredi ? Night ride, départ 21h30.</div>
+  <div class="msg me">Carrément. Je t'envoie le point de RDV.</div>
+  <div class="rdv">
+    <div class="map"></div>
+    <div class="lbl"><b>📍 Col de la Madone</b><span>Point de rendez-vous · vendredi 21:30</span></div>
+  </div>
+  <div class="typing"><i></i><i></i><i></i></div>
+</div>
+<div class="inputbar">
+  <div class="input">Message…</div>
+  <div class="send"><svg viewBox="0 0 24 24"><path d="M5 12h13M13 6l6 6-6 6"/></svg></div>
+</div>
+</body>
+</html>

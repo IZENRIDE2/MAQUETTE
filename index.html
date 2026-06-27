@@ -1,0 +1,461 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IZENRIDE — L'app des motards. Croisez. Roulez. Connectez.</title>
+<meta name="description" content="IZENRIDE, l'application communauté moto : rencontre entre motards, croisements GPS temps réel, night rides, Safety Zone 2 km et marketplace entre passionnés.">
+<meta property="og:title" content="IZENRIDE — La route vous croise. IZENRIDE vous connecte.">
+<meta property="og:description" content="Rencontres, croisements GPS, rides de groupe, sécurité, marketplace. L'app des motards et motardes.">
+<meta property="og:url" content="https://izenride.com">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#08090E">
+<link rel="icon" type="image/png" href="assets/badge.png">
+<!-- Décide AVANT le 1er paint si l'intro doit jouer (1×/session) : évite tout flash -->
+<script>
+(function(){try{
+  var seen = sessionStorage.getItem('izen-intro') === '1';
+  var rm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  document.documentElement.classList.add((seen || rm) ? 'intro-skip' : 'intro-playing');
+}catch(e){}})();
+</script>
+<link rel="preconnect" href="https://api.fontshare.com" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://api.fontshare.com/v2/css?f[]=clash-display@500,600,700&f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"MobileApplication","name":"IZENRIDE",
+ "operatingSystem":"iOS, Android","applicationCategory":"SocialNetworkingApplication",
+ "description":"Application communautaire des motards : rencontres, croisements GPS, événements, sécurité, marketplace.",
+ "offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},
+ "publisher":{"@type":"Organization","name":"IZEN RIDE SAS"}}
+</script>
+</head>
+<body>
+<!-- ============ INTRO — animation d'ouverture (1×/session) ============ -->
+<div class="intro" id="intro" role="presentation">
+  <div class="intro__inner">
+    <div class="intro__gauge">
+      <svg viewBox="0 0 200 200" aria-hidden="true">
+        <circle class="intro__track" cx="100" cy="100" r="86"/>
+        <circle class="intro__arc" id="intro-arc" cx="100" cy="100" r="86"
+                stroke-dasharray="540.35" stroke-dashoffset="540.35"/>
+      </svg>
+      <div class="intro__readout"><b id="intro-num">0</b><span>KM/H</span></div>
+    </div>
+    <img class="intro__logo" src="assets/logo.png" alt="IZENRIDE">
+    <p class="intro__tag mono" id="intro-tag">DÉMARRAGE DU MOTEUR…</p>
+  </div>
+  <span class="intro__edge" aria-hidden="true"></span>
+</div>
+
+<div class="noise" aria-hidden="true"></div>
+<div class="cursor" aria-hidden="true"><div class="cursor__dot"></div><div class="cursor__ring"></div></div>
+
+<!-- ============ NAV ============ -->
+<header class="nav" id="top">
+  <a class="nav__logo" href="#top" aria-label="IZENRIDE — retour en haut">
+    <img src="assets/logo.png" alt="IZENRIDE.">
+  </a>
+  <nav class="nav__links" aria-label="Navigation principale">
+    <a href="#app" data-i18n="nav.app">L'app</a>
+    <a href="#premium" data-i18n="nav.premium">Premium</a>
+    <a href="#tech" data-i18n="nav.tech">Tech</a>
+    <a href="#apropos" data-i18n="nav.about">À propos</a>
+    <a href="#contact" class="nav__contact" data-i18n="nav.download">Télécharger</a>
+    <div class="lang-switch mono" role="group" aria-label="Langue">
+      <button type="button" data-lang="fr">FR</button>
+      <span aria-hidden="true">/</span>
+      <button type="button" data-lang="en">EN</button>
+    </div>
+  </nav>
+  <button class="nav__burger" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="mobile-menu">
+    <span></span><span></span>
+  </button>
+</header>
+
+<div class="mobile-menu" id="mobile-menu" hidden>
+  <nav aria-label="Menu mobile">
+    <a href="#app" data-i18n="nav.app">L'app</a>
+    <a href="#premium" data-i18n="nav.premium">Premium</a>
+    <a href="#tech" data-i18n="nav.tech">Tech</a>
+    <a href="#apropos" data-i18n="nav.about">À propos</a>
+    <a href="#contact" data-i18n="nav.download">Télécharger</a>
+  </nav>
+  <div class="lang-switch lang-switch--menu mono" role="group" aria-label="Langue">
+    <button type="button" data-lang="fr">FR</button>
+    <span aria-hidden="true">/</span>
+    <button type="button" data-lang="en">EN</button>
+  </div>
+  <p class="mobile-menu__meta mono"><span class="status-dot" aria-hidden="true"></span> <span data-i18n="menu.meta">FR — iOS &amp; Android · gratuit</span></p>
+</div>
+
+<main id="main">
+  <!-- ============ HERO ============ -->
+  <section class="hero" id="hero" aria-label="Intro">
+    <canvas class="hero__gl" id="gl" aria-hidden="true"></canvas>
+    <div class="hero__fade" aria-hidden="true"></div>
+
+    <div class="hero__inner">
+      <p class="hero__kicker mono" data-hero="kicker">
+        <span class="status-dot" aria-hidden="true"></span> <span data-i18n="hero.kicker">dispo sur iOS &amp; Android — l'app des motards, made in France</span>
+      </p>
+      <h1 class="hero__title" aria-label="IZENRIDE">
+        <span class="hero__line"><span data-split="chars">IZEN</span></span>
+        <span class="hero__line hero__line--accent"><span data-split="chars">RIDE.</span></span>
+      </h1>
+      <div class="hero__sub" data-hero="sub">
+        <p class="hero__role" data-i18n-html="hero.role">La route vous croise. <em>IZENRIDE</em> vous connecte.</p>
+        <p class="hero__tagline" data-i18n="hero.tagline">Rencontres entre motards, croisements GPS au mètre près, night rides et marketplace — tout dans votre poche, à 21h47, quelque part sur une départementale.</p>
+      </div>
+      <div class="hero__cta" data-hero="cta">
+        <a class="btn btn--solid" href="#contact" data-magnetic><span data-i18n="hero.cta.dl">Télécharger l'app</span> <span aria-hidden="true">↘</span></a>
+        <a class="btn btn--ghost" href="#app" data-magnetic><span data-i18n="hero.cta.features">Voir les features</span></a>
+        <button class="btn btn--play" id="hero-live" data-magnetic>
+          <span class="btn--play__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M13 2L4.5 13.5h6L11 22l8.5-11.5h-6z"/></svg></span>
+          <span data-i18n="hero.cta.live">Ride Live en direct</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="hero__meta mono" data-hero="meta">
+      <span data-i18n="hero.meta.est">EN ROUTE DEPUIS 2024 →</span>
+      <span class="hero__meta-mid">RENCONTRE · GPS · EVENTS · SAFETY · MARKET</span>
+      <span class="hero__scroll" aria-hidden="true">SCROLL <span class="hero__scroll-bar"></span></span>
+    </div>
+  </section>
+
+  <!-- ============ MARQUEE ============ -->
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee__track">
+      <span class="marquee__chunk">48 000 MOTARDS — 3,2M KM CROISÉS — 1 250 RIDES — SAFETY ZONE 2 KM — GPS &lt; 5 M — NIGHT RIDES — MARKETPLACE VÉRIFIÉE — CHIFFRÉ E2E — </span><span class="marquee__chunk">48 000 MOTARDS — 3,2M KM CROISÉS — 1 250 RIDES — SAFETY ZONE 2 KM — GPS &lt; 5 M — NIGHT RIDES — MARKETPLACE VÉRIFIÉE — CHIFFRÉ E2E — </span>
+    </div>
+  </div>
+
+  <!-- ============ L'APP (feature rows) ============ -->
+  <section class="work" id="app" aria-labelledby="app-title">
+    <header class="section-head" data-reveal>
+      <p class="section-head__index mono" data-i18n="app.index">01 / L'APP</p>
+      <h2 class="section-head__title" id="app-title" data-i18n-html="app.title">Croisez, roulez <em>&amp;</em> connectez</h2>
+      <p class="section-head__note" data-i18n="app.note">Cinq features, un seul réflexe — les écrans ci-dessous sont l'app réelle.</p>
+    </header>
+
+    <ul class="work__list">
+      <li class="work__row" data-reveal data-accent="blue">
+        <div class="work__head">
+          <span class="work__num mono">①</span>
+          <h3 class="work__name" data-i18n="row.match.name">Rencontre</h3>
+          <span class="work__arrow" aria-hidden="true">↘</span>
+        </div>
+        <div class="work__body">
+          <div class="work__visual">
+            <div class="work__visual-art">
+              <div class="phone"><div class="phone-frame"><div class="phone-island"></div>
+                <div class="phone-screen"><iframe data-src="screens/match.html" title="Écran de match IZENRIDE"></iframe></div>
+              </div></div>
+              <span class="work__visual-label mono">MATCH — CROISÉE 3× CETTE SEMAINE</span>
+              <span class="work__visual-scan"></span>
+            </div>
+          </div>
+          <div class="work__info">
+            <p class="work__desc" data-i18n="row.match.desc">Vos trajets se croisent déjà — IZENRIDE transforme ces croisements en rencontres. Un match basé sur vos affinités de conduite, une messagerie temps réel pensée pour la route, un prochain ride.</p>
+            <ul class="work__tags mono" aria-label="Capacités">
+              <li>Matching</li><li>Messagerie temps réel</li><li>Croisements</li><li>Affinités de conduite</li>
+            </ul>
+            <p class="work__meta mono" data-i18n="row.match.meta">GRATUIT — iOS &amp; ANDROID · « Croisez des motards, pas des profils »</p>
+          </div>
+        </div>
+      </li>
+
+      <li class="work__row" data-reveal data-accent="green">
+        <div class="work__head">
+          <span class="work__num mono">②</span>
+          <h3 class="work__name" data-i18n="row.map.name">Carte &amp; GPS</h3>
+          <span class="work__arrow" aria-hidden="true">↘</span>
+        </div>
+        <div class="work__body">
+          <div class="work__visual">
+            <div class="work__visual-art">
+              <div class="phone"><div class="phone-frame"><div class="phone-island"></div>
+                <div class="phone-screen"><iframe data-src="screens/gps.html" title="GPS Live IZENRIDE — carte des croisements"></iframe></div>
+              </div></div>
+              <span class="work__visual-label mono">CARTE — LOCALISATION PROPRIÉTAIRE &lt; 5 M</span>
+              <span class="work__visual-scan"></span>
+            </div>
+          </div>
+          <div class="work__info">
+            <p class="work__desc" data-i18n="row.map.desc">Notre système de localisation propriétaire détecte les motards que vous croisez — au mètre près, à la seconde près. Navigation pensée moto et itinéraires ZEN taillés pour les virages.</p>
+            <ul class="work__tags mono" aria-label="Capacités">
+              <li>GPS propriétaire</li><li>Précision &lt; 5 m</li><li>Itinéraires ZEN</li><li>Navigation moto</li>
+            </ul>
+            <p class="work__meta mono" data-i18n="row.map.meta">TEMPS RÉEL — la carte s'illumine là où la communauté roule</p>
+          </div>
+        </div>
+      </li>
+
+      <li class="work__row" data-reveal data-accent="amber">
+        <div class="work__head">
+          <span class="work__num mono">③</span>
+          <h3 class="work__name" data-i18n="row.events.name">Événements</h3>
+          <span class="work__arrow" aria-hidden="true">↘</span>
+        </div>
+        <div class="work__body">
+          <div class="work__visual">
+            <div class="work__visual-art">
+              <div class="phone"><div class="phone-frame"><div class="phone-island"></div>
+                <div class="phone-screen"><iframe data-src="screens/events.html" title="Événements moto IZENRIDE"></iframe></div>
+              </div></div>
+              <span class="work__visual-label mono">EVENTS — NIGHT RIDE · 24 RIDERS · LIVE</span>
+              <span class="work__visual-scan"></span>
+            </div>
+          </div>
+          <div class="work__info">
+            <p class="work__desc" data-i18n="row.events.desc">Créez un ride, fixez le départ, partagez l'itinéraire. Le suivi live garde le groupe soudé du premier au dernier virage — night rides, balades du dimanche, track days.</p>
+            <ul class="work__tags mono" aria-label="Capacités">
+              <li>Night rides</li><li>Suivi live</li><li>Départ groupé</li><li>Track days</li>
+            </ul>
+            <p class="work__meta mono" data-i18n="row.events.meta">1 250 RIDES ORGANISÉS — seul on roule vite, ensemble on roule loin</p>
+          </div>
+        </div>
+      </li>
+
+      <li class="work__row" data-reveal data-accent="red">
+        <div class="work__head">
+          <span class="work__num mono">④</span>
+          <h3 class="work__name" data-i18n="row.safety.name">Sécurité</h3>
+          <span class="work__arrow" aria-hidden="true">↘</span>
+        </div>
+        <div class="work__body">
+          <div class="work__visual">
+            <div class="work__visual-art">
+              <div class="phone"><div class="phone-frame"><div class="phone-island"></div>
+                <div class="phone-screen"><iframe data-src="screens/safety.html" title="Safety Zone 2 km IZENRIDE"></iframe></div>
+              </div></div>
+              <span class="work__visual-label mono">SAFETY ZONE — RAYON 2 KM · SOS APPUI LONG</span>
+              <span class="work__visual-scan"></span>
+            </div>
+          </div>
+          <div class="work__info">
+            <p class="work__desc" data-i18n="row.safety.desc">Une Safety Zone de 2 km vous entoure en permanence. Position partagée en temps réel, chiffrée de bout en bout, jamais revendue. Alerte chute automatique. Roulez libre — vos proches savent.</p>
+            <ul class="work__tags mono" aria-label="Capacités">
+              <li>Safety Zone 2 km</li><li>Chiffré E2E</li><li>Alerte chute</li><li>SOS</li>
+            </ul>
+            <p class="work__meta mono" data-i18n="row.safety.meta">SÉRIEUX — la route veille sur vous</p>
+          </div>
+        </div>
+      </li>
+
+      <li class="work__row" data-reveal data-accent="amber">
+        <div class="work__head">
+          <span class="work__num mono">⑤</span>
+          <h3 class="work__name" data-i18n="row.market.name">Marketplace</h3>
+          <span class="work__arrow" aria-hidden="true">↘</span>
+        </div>
+        <div class="work__body">
+          <div class="work__visual">
+            <div class="work__visual-art">
+              <div class="phone"><div class="phone-frame"><div class="phone-island"></div>
+                <div class="phone-screen"><iframe data-src="screens/marketplace.html" title="Marketplace moto IZENRIDE"></iframe></div>
+              </div></div>
+              <span class="work__visual-label mono">MARKET — ANNONCES VÉRIFIÉES · VENDEURS NOTÉS</span>
+              <span class="work__visual-scan"></span>
+            </div>
+          </div>
+          <div class="work__info">
+            <p class="work__desc" data-i18n="row.market.desc">Casques, cuirs, machines. Achetez et vendez au sein de la communauté — annonces vérifiées avant publication, vendeurs notés, modération humaine. Entre passionnés, rien ne se perd.</p>
+            <ul class="work__tags mono" aria-label="Capacités">
+              <li>Annonces vérifiées</li><li>Vendeurs notés</li><li>Modération humaine</li>
+            </ul>
+            <p class="work__meta mono" data-i18n="row.market.meta">ENTRE RIDERS — remise en main propre ou envoi suivi</p>
+          </div>
+        </div>
+      </li>
+    </ul>
+  </section>
+
+  <!-- ============ PREMIUM ============ -->
+  <section class="premium" id="premium" aria-labelledby="premium-title">
+    <div class="premium__glow" aria-hidden="true"></div>
+    <header class="section-head" data-reveal>
+      <p class="section-head__index mono" data-i18n="premium.index">02 / PREMIUM</p>
+      <h2 class="section-head__title" id="premium-title" data-i18n="premium.title">Passez en pleins phares</h2>
+    </header>
+    <div class="premium__stage" data-reveal>
+      <p class="premium__coming mono" data-i18n="premium.coming">— ABONNEMENT —</p>
+      <h3 class="premium__wordmark" aria-label="Premium"><span data-split="chars">PREMIUM</span></h3>
+      <canvas class="premium__wave" id="premium-wave" aria-hidden="true"></canvas>
+      <p class="premium__pitch" data-i18n-html="premium.pitch">Croisements illimités, mode fantôme, stats de ride avancées.<br>L'expérience complète, <em>sans limites</em>.</p>
+      <p class="premium__hint mono" data-i18n="premium.hint">4,99 € / MOIS · 49,99 € / AN (2 MOIS OFFERTS) · SANS ENGAGEMENT</p>
+      <a class="btn btn--solid btn--violet premium__cta" href="#contact" data-magnetic>
+        <span aria-hidden="true">◉</span> <span data-i18n="premium.cta">Essayer Premium</span>
+      </a>
+      <div class="premium__phone phone" aria-hidden="true">
+        <div class="phone-frame"><div class="phone-island"></div>
+          <div class="phone-screen"><iframe data-src="screens/premium.html" title="Abonnement IZEN Premium"></iframe></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TECH ============ -->
+  <section class="stack" id="tech" aria-labelledby="tech-title">
+    <header class="section-head" data-reveal>
+      <p class="section-head__index mono" data-i18n="tech.index">03 / TECH</p>
+      <h2 class="section-head__title" id="tech-title" data-i18n-html="tech.title">Sous le réservoir, <em>du lourd</em></h2>
+    </header>
+    <ul class="stack__grid">
+      <li class="stack__cell" data-reveal>
+        <h3 class="stack__domain mono">LOCALISATION</h3>
+        <p class="stack__items" data-i18n="tech.loc">Système GPS propriétaire · croisements détectés &lt; 5 m · Safety Zone 2 km · géo-temps réel</p>
+        <span class="stack__vu" aria-hidden="true"></span>
+      </li>
+      <li class="stack__cell" data-reveal>
+        <h3 class="stack__domain mono">TEMPS RÉEL</h3>
+        <p class="stack__items" data-i18n="tech.rt">Messagerie instantanée · suivi live des rides · positions du groupe · WebSockets</p>
+        <span class="stack__vu" aria-hidden="true"></span>
+      </li>
+      <li class="stack__cell" data-reveal>
+        <h3 class="stack__domain mono">CARTO</h3>
+        <p class="stack__items" data-i18n="tech.map">Navigation pensée moto · itinéraires ZEN (virages d'abord) · cartes nuit natives</p>
+        <span class="stack__vu" aria-hidden="true"></span>
+      </li>
+      <li class="stack__cell" data-reveal>
+        <h3 class="stack__domain mono">SÉCURITÉ</h3>
+        <p class="stack__items" data-i18n="tech.sec">Chiffrement de bout en bout · alerte chute (capteurs) · SOS appui long · données jamais revendues</p>
+        <span class="stack__vu" aria-hidden="true"></span>
+      </li>
+      <li class="stack__cell" data-reveal>
+        <h3 class="stack__domain mono">COMMUNAUTÉ</h3>
+        <p class="stack__items" data-i18n="tech.com">Matching par affinités · événements &amp; groupes · modération humaine · profils vérifiés</p>
+        <span class="stack__vu" aria-hidden="true"></span>
+      </li>
+      <li class="stack__cell" data-reveal>
+        <h3 class="stack__domain mono">PLATEFORME</h3>
+        <p class="stack__items" data-i18n="tech.plat">iOS &amp; Android natifs · mode hors-ligne · batterie maîtrisée · FR aujourd'hui, EN demain</p>
+        <span class="stack__vu" aria-hidden="true"></span>
+      </li>
+    </ul>
+  </section>
+
+  <!-- ============ EN ROUTE (process) ============ -->
+  <section class="process" id="process" aria-labelledby="process-title">
+    <header class="section-head" data-reveal>
+      <p class="section-head__index mono" data-i18n="process.index">04 / EN ROUTE</p>
+      <h2 class="section-head__title" id="process-title" data-i18n-html="process.title">De la poche <em>au</em> bitume</h2>
+    </header>
+    <ol class="process__steps">
+      <li class="process__step" data-reveal>
+        <span class="process__num mono">01</span>
+        <h3 class="process__name" data-i18n="process.1.name">Téléchargez</h3>
+        <p class="process__desc" data-i18n="process.1.desc">Gratuit sur iOS et Android. Deux minutes, casque encore sur la tête.</p>
+      </li>
+      <li class="process__step" data-reveal>
+        <span class="process__num mono">02</span>
+        <h3 class="process__name" data-i18n="process.2.name">Votre bécane</h3>
+        <p class="process__desc" data-i18n="process.2.desc">Profil, machine, style de conduite. Roadtrips, twisties ou night rides — dites qui vous êtes.</p>
+      </li>
+      <li class="process__step" data-reveal>
+        <span class="process__num mono">03</span>
+        <h3 class="process__name" data-i18n="process.3.name">Roulez</h3>
+        <p class="process__desc" data-i18n="process.3.desc">Rien à faire de plus. Chaque trajet détecte les motards que vous croisez, au mètre près.</p>
+      </li>
+      <li class="process__step" data-reveal>
+        <span class="process__num mono">04</span>
+        <h3 class="process__name" data-i18n="process.4.name">Matchez</h3>
+        <p class="process__desc" data-i18n="process.4.desc">« Croisée 3× cette semaine. » Un match, un message, un point de rendez-vous.</p>
+      </li>
+      <li class="process__step" data-reveal>
+        <span class="process__num mono">05</span>
+        <h3 class="process__name" data-i18n="process.5.name">Ensemble</h3>
+        <p class="process__desc" data-i18n="process.5.desc">Night ride vendredi 21h30. Le suivi live garde le groupe soudé. La boucle est bouclée.</p>
+      </li>
+    </ol>
+  </section>
+
+  <!-- ============ À PROPOS ============ -->
+  <section class="about" id="apropos" aria-labelledby="about-title">
+    <header class="section-head" data-reveal>
+      <p class="section-head__index mono" data-i18n="about.index">05 / À PROPOS</p>
+      <h2 class="section-head__title" id="about-title" data-i18n="about.title">Nés sur la route</h2>
+    </header>
+    <div class="about__body" data-reveal>
+      <p class="about__text" data-i18n-html="about.p1">IZENRIDE est né d'un constat simple : les motards se <em>croisent</em> tous les jours — un signe de la main à 90 km/h — sans jamais se rencontrer. On a construit l'app qui transforme ce signe en communauté.</p>
+      <p class="about__text" data-i18n-html="about.p2">Tout ce qu'on développe vit au croisement de <strong>la route et du réseau</strong> : la rencontre avec le matching, le territoire avec le GPS propriétaire, le groupe avec les rides, la confiance avec la Safety Zone. Une app qui se sent vivante dès qu'on l'ouvre — comme un moteur qui démarre.</p>
+      <p class="about__sig mono" data-i18n-html="about.sig">— l'équipe IZEN RIDE SAS, quelque part sur la D2204</p>
+    </div>
+  </section>
+
+  <!-- ============ CONTACT ============ -->
+  <section class="contact" id="contact" aria-labelledby="contact-title">
+    <header class="section-head" data-reveal>
+      <p class="section-head__index mono" data-i18n="contact.index">06 / TÉLÉCHARGER</p>
+    </header>
+    <div class="contact__stage" data-reveal>
+      <h2 class="contact__title" id="contact-title">
+        <span class="contact__line" data-i18n="contact.l1">Prêt à croiser</span>
+        <span class="contact__line contact__line--accent" data-i18n-html="contact.l2">la <em>route ?</em></span>
+      </h2>
+      <div class="contact__stores">
+        <a class="btn btn--solid" href="#" data-magnetic><span data-i18n="contact.appstore">App Store</span> <span aria-hidden="true">↗</span></a>
+        <a class="btn btn--ghost" href="#" data-magnetic><span data-i18n="contact.play">Google Play</span> <span aria-hidden="true">↗</span></a>
+      </div>
+      <ul class="contact__socials mono" aria-label="Réseaux sociaux">
+        <li><a href="#" rel="noopener noreferrer">INSTAGRAM<span aria-hidden="true"> ↗</span></a></li>
+        <li><a href="#" rel="noopener noreferrer">TIKTOK<span aria-hidden="true"> ↗</span></a></li>
+        <li><a href="#" rel="noopener noreferrer">YOUTUBE<span aria-hidden="true"> ↗</span></a></li>
+        <li>
+          <button type="button" class="contact__mail" id="mail-copy" title="hello@izenride.com">
+            MAIL — <span id="mail-label">HELLO@IZENRIDE.COM</span><span aria-hidden="true"> ⧉</span>
+          </button>
+        </li>
+      </ul>
+    </div>
+    <footer class="footer mono">
+      <span data-i18n="footer.built">© 2026 IZEN RIDE SAS</span>
+      <span class="footer__mid">GSAP · CANVAS · MADE FOR RIDERS</span>
+      <a href="#top" data-i18n="footer.top">RETOUR EN HAUT ↑</a>
+    </footer>
+  </section>
+</main>
+
+<!-- ============ DOCK RIDE LIVE ============ -->
+<aside class="player" id="player" aria-label="Ride Live">
+  <div class="dock" id="dock">
+    <button class="dock__play" id="dock-toggle" aria-label="Ride Live" aria-pressed="false">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2L4.5 13.5h6L11 22l8.5-11.5h-6z"/></svg>
+    </button>
+    <div class="dock__mid">
+      <p class="dock__track mono"><span class="status-dot" aria-hidden="true"></span> RIDE LIVE — <span id="dock-riders">1 248</span> <span data-i18n="dock.online">riders en ligne</span></p>
+      <canvas class="dock__bars" id="dock-bars" aria-hidden="true"></canvas>
+    </div>
+    <button class="dock__expand" id="dock-expand" aria-label="Ouvrir le panneau live" aria-expanded="false" aria-controls="panel">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 15l6-6 6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  </div>
+
+  <div class="panel" id="panel" role="dialog" aria-label="Ride Live en direct" hidden>
+    <button class="panel__close" id="panel-close" aria-label="Réduire le panneau">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <p class="panel__head mono" data-i18n="panel.head">EN DIRECT DE LA COMMUNAUTÉ</p>
+    <p class="panel__big"><span id="panel-riders">1 248</span> <span class="panel__big-label" data-i18n="panel.online">riders en ligne</span></p>
+    <ul class="panel__feed" id="panel-feed" aria-label="Derniers croisements">
+      <li class="mono"><span class="feed-dot feed-dot--blue"></span>LÉA × MARC — COL DE LA MADONE — <em>il y a 2 min</em></li>
+      <li class="mono"><span class="feed-dot feed-dot--green"></span>SAM × INÈS — CORNICHE D'OR — <em>il y a 8 min</em></li>
+      <li class="mono"><span class="feed-dot feed-dot--blue"></span>THÉO × ALEX — D2204 — <em>il y a 11 min</em></li>
+    </ul>
+    <div class="panel__next">
+      <p class="mono" data-i18n="panel.next">PROCHAIN RIDE — NIGHT RIDE CORNICHE</p>
+      <p class="panel__count mono" id="panel-count">VEN 21:30 — J-2 · 14 H · 03 MIN</p>
+    </div>
+  </div>
+</aside>
+
+<!-- GSAP + ScrollTrigger (CDN) -->
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js" defer></script>
+<script src="js/main.js" defer></script>
+</body>
+</html>

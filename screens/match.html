@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>IZEN RIDE — Match</title>
+<style>
+:root{--bg:#08090E;--surface:#10121A;--border:#1A1E28;--blue:#4A9CE8;--green:#5DCAA5;--amber:#FAC775;--txt:#F2F4F8;--muted:#8A91A3}
+*{margin:0;box-sizing:border-box}
+html,body{width:390px;height:844px;overflow:hidden}
+body{position:relative;background:var(--bg);color:var(--txt);font-family:-apple-system,'SF Pro Display','SF Pro Text',Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+.status{display:flex;justify-content:space-between;align-items:center;padding:16px 26px 6px;font-size:14px;font-weight:600}
+.status .right{display:flex;gap:6px;align-items:center;font-size:12px;color:var(--muted)}
+.batt{width:22px;height:11px;border:1px solid var(--muted);border-radius:3px;position:relative}
+.batt::after{content:"";position:absolute;top:2px;bottom:2px;left:2px;right:5px;background:var(--green);border-radius:1px}
+header{display:flex;justify-content:space-between;align-items:center;padding:14px 24px 10px}
+header h1{font-size:26px;font-weight:800;letter-spacing:-.5px}
+.filter{width:40px;height:40px;border:1px solid var(--border);border-radius:13px;background:var(--surface);display:flex;align-items:center;justify-content:center}
+.filter svg{width:18px;height:18px;stroke:var(--muted);fill:none;stroke-width:1.8;stroke-linecap:round}
+.card{margin:6px 20px 0;height:498px;border-radius:26px;overflow:hidden;position:relative;border:1px solid var(--border);
+  background:linear-gradient(160deg,#1B2434 0%,#0E1320 55%,#0A0C13 100%)}
+.card::before{content:"";position:absolute;width:280px;height:280px;left:-60px;top:-80px;border-radius:50%;
+  background:radial-gradient(circle,rgba(74,156,232,.30),transparent 70%)}
+.card::after{content:"";position:absolute;left:-20%;right:-20%;bottom:120px;height:3px;
+  background:repeating-linear-gradient(90deg,rgba(242,244,248,.25) 0 34px,transparent 34px 78px);transform:rotate(-7deg)}
+.cross-badge{position:absolute;top:18px;left:18px;background:rgba(74,156,232,.16);border:1px solid rgba(74,156,232,.45);
+  color:var(--blue);font-size:12px;font-weight:600;padding:7px 12px;border-radius:99px;backdrop-filter:blur(6px)}
+.card-info{position:absolute;left:0;right:0;bottom:0;padding:22px;background:linear-gradient(transparent,rgba(8,9,14,.94) 55%)}
+.card-info h2{font-size:28px;font-weight:800}
+.card-info .bike{margin-top:4px;font-size:15px;color:var(--blue);font-weight:600}
+.card-info .dist{margin-top:4px;font-size:13px;color:var(--muted)}
+.tags{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.tag{font-size:12px;font-weight:500;color:var(--txt);background:rgba(255,255,255,.06);border:1px solid var(--border);padding:6px 12px;border-radius:99px}
+.actions{display:flex;justify-content:center;gap:26px;margin-top:22px}
+.act{width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);background:var(--surface)}
+.act svg{width:26px;height:26px;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.act.pass svg{stroke:var(--muted)}
+.act.go{background:var(--blue);border-color:var(--blue);box-shadow:0 0 28px rgba(74,156,232,.45)}
+.act.go svg{stroke:#08090E;fill:#08090E}
+.tabbar{position:absolute;bottom:0;left:0;right:0;height:82px;background:rgba(12,14,20,.94);border-top:1px solid var(--border);display:flex;padding:10px 8px 0;backdrop-filter:blur(10px)}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;font-size:10px;font-weight:500;color:var(--muted)}
+.tab svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.tab.active{color:var(--blue)}
+</style>
+</head>
+<body>
+<div class="status"><span>21:47</span><span class="right">5G <span class="batt"></span></span></div>
+<header>
+  <h1>Découvrir</h1>
+  <div class="filter"><svg viewBox="0 0 24 24"><path d="M4 7h16M7 12h10M10 17h4"/></svg></div>
+</header>
+<div class="card">
+  <span class="cross-badge">⚡ Croisée 3× cette semaine</span>
+  <div class="card-info">
+    <h2>Léa, 29</h2>
+    <div class="bike">Kawasaki Z900</div>
+    <div class="dist">À 2,4 km · Nice</div>
+    <div class="tags"><span class="tag">Roadtrips</span><span class="tag">Twisties</span><span class="tag">Night rides</span></div>
+  </div>
+</div>
+<div class="actions">
+  <div class="act pass"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></div>
+  <div class="act go"><svg viewBox="0 0 24 24"><path d="M13 2L4.5 13.5h6L11 22l8.5-11.5h-6z"/></svg></div>
+</div>
+<nav class="tabbar">
+  <div class="tab"><svg viewBox="0 0 24 24"><path d="M9 4 3.5 6v14L9 18l6 2 5.5-2V4L15 6 9 4zM9 4v14M15 6v14"/></svg>Carte</div>
+  <div class="tab active"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19.5c0-3 2.5-5.2 5.5-5.2s5.5 2.2 5.5 5.2"/><circle cx="17" cy="9" r="2.4"/><path d="M16 14.6c2.6.4 4.5 2.4 4.5 4.9"/></svg>Riders</div>
+  <div class="tab"><svg viewBox="0 0 24 24"><path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v8a2.5 2.5 0 0 1-2.5 2.5H9l-5 4z"/></svg>Messages</div>
+  <div class="tab"><svg viewBox="0 0 24 24"><rect x="4" y="5.5" width="16" height="15" rx="2.5"/><path d="M4 10h16M8.5 3.5v4M15.5 3.5v4"/></svg>Events</div>
+  <div class="tab"><svg viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="3.5"/><path d="M5 20c0-3.6 3.1-6 7-6s7 2.4 7 6"/></svg>Profil</div>
+</nav>
+</body>
+</html>

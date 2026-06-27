@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>IZEN RIDE — Marketplace</title>
+<style>
+:root{--bg:#08090E;--surface:#10121A;--border:#1A1E28;--blue:#4A9CE8;--green:#5DCAA5;--amber:#FAC775;--violet:#7F77DD;--txt:#F2F4F8;--muted:#8A91A3}
+*{margin:0;box-sizing:border-box}
+html,body{width:390px;height:844px;overflow:hidden}
+body{position:relative;background:var(--bg);color:var(--txt);font-family:-apple-system,'SF Pro Display','SF Pro Text',Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+.status{display:flex;justify-content:space-between;align-items:center;padding:16px 26px 6px;font-size:14px;font-weight:600}
+.status .right{display:flex;gap:6px;align-items:center;font-size:12px;color:var(--muted)}
+.batt{width:22px;height:11px;border:1px solid var(--muted);border-radius:3px;position:relative}
+.batt::after{content:"";position:absolute;top:2px;bottom:2px;left:2px;right:5px;background:var(--green);border-radius:1px}
+header{padding:14px 24px 0}
+header h1{font-size:26px;font-weight:800;letter-spacing:-.5px}
+.search{margin:14px 20px 0;height:46px;border-radius:99px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;gap:10px;padding:0 18px;color:var(--muted);font-size:14px}
+.search svg{width:16px;height:16px;stroke:var(--muted);fill:none;stroke-width:2;stroke-linecap:round}
+.cats{display:flex;gap:8px;padding:14px 20px 4px;overflow:hidden}
+.cat{font-size:12.5px;font-weight:600;padding:8px 15px;border-radius:99px;border:1px solid var(--border);background:var(--surface);color:var(--muted);white-space:nowrap}
+.cat.on{background:rgba(250,199,117,.12);border-color:rgba(250,199,117,.5);color:var(--amber)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:12px 20px}
+.item{border:1px solid var(--border);border-radius:18px;overflow:hidden;background:var(--surface)}
+.item.wide{grid-column:1/-1}
+.ph{height:110px;position:relative}
+.item.wide .ph{height:128px}
+.ph::after{content:"";position:absolute;inset:0;background:linear-gradient(transparent 60%,rgba(8,9,14,.55))}
+.ph1{background:linear-gradient(135deg,#1C2740,#0D1220),radial-gradient(circle at 30% 30%,rgba(74,156,232,.4),transparent 65%)}
+.ph2{background:linear-gradient(135deg,#33271A,#15100C),radial-gradient(circle at 70% 30%,rgba(250,199,117,.35),transparent 65%)}
+.ph3{background:linear-gradient(135deg,#15301F,#0A140E),radial-gradient(circle at 50% 20%,rgba(93,202,165,.35),transparent 65%)}
+.verif{position:absolute;z-index:1;top:9px;left:9px;background:rgba(93,202,165,.16);border:1px solid rgba(93,202,165,.5);color:var(--green);font-size:10px;font-weight:700;padding:4px 9px;border-radius:99px;backdrop-filter:blur(5px)}
+.info{padding:11px 13px 13px}
+.info h2{font-size:13.5px;font-weight:600;line-height:1.3}
+.info .pr{margin-top:6px;font-size:16px;font-weight:800;color:var(--amber)}
+.info small{display:block;margin-top:4px;font-size:11px;color:var(--muted)}
+.tabbar{position:absolute;bottom:0;left:0;right:0;height:82px;background:rgba(12,14,20,.94);border-top:1px solid var(--border);display:flex;padding:10px 8px 0;backdrop-filter:blur(10px)}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;font-size:10px;font-weight:500;color:var(--muted)}
+.tab svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.tab.active{color:var(--amber)}
+</style>
+</head>
+<body>
+<div class="status"><span>21:47</span><span class="right">5G <span class="batt"></span></span></div>
+<header><h1>Marketplace</h1></header>
+<div class="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.5-4.5"/></svg>Casque, blouson, moto…</div>
+<div class="cats"><span class="cat on">Tout</span><span class="cat">Casques</span><span class="cat">Équipement</span><span class="cat">Motos</span><span class="cat">Pièces</span></div>
+<div class="grid">
+  <div class="item wide">
+    <div class="ph ph3"><span class="verif">✓ Annonce vérifiée</span></div>
+    <div class="info"><h2>Kawasaki Z900 — 2021 · 14 200 km</h2><div class="pr">7 400 €</div><small>Nice · Sam K. ★ 4,8</small></div>
+  </div>
+  <div class="item">
+    <div class="ph ph1"><span class="verif">✓ Vérifiée</span></div>
+    <div class="info"><h2>Casque AGV K6 S · M</h2><div class="pr">240 €</div><small>Antibes · Marc R. ★ 4,9</small></div>
+  </div>
+  <div class="item">
+    <div class="ph ph2"></div>
+    <div class="info"><h2>Blouson Dainese cuir</h2><div class="pr">310 €</div><small>Cannes · Inès B. ★ 5,0</small></div>
+  </div>
+</div>
+<nav class="tabbar">
+  <div class="tab"><svg viewBox="0 0 24 24"><path d="M9 4 3.5 6v14L9 18l6 2 5.5-2V4L15 6 9 4zM9 4v14M15 6v14"/></svg>Carte</div>
+  <div class="tab"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19.5c0-3 2.5-5.2 5.5-5.2s5.5 2.2 5.5 5.2"/><circle cx="17" cy="9" r="2.4"/><path d="M16 14.6c2.6.4 4.5 2.4 4.5 4.9"/></svg>Riders</div>
+  <div class="tab active"><svg viewBox="0 0 24 24"><path d="M4.5 9.5 6 4.5h12l1.5 5M4.5 9.5h15M4.5 9.5V19a1.5 1.5 0 0 0 1.5 1.5h12A1.5 1.5 0 0 0 19.5 19V9.5M10 20.5v-5h4v5"/></svg>Market</div>
+  <div class="tab"><svg viewBox="0 0 24 24"><rect x="4" y="5.5" width="16" height="15" rx="2.5"/><path d="M4 10h16M8.5 3.5v4M15.5 3.5v4"/></svg>Events</div>
+  <div class="tab"><svg viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="3.5"/><path d="M5 20c0-3.6 3.1-6 7-6s7 2.4 7 6"/></svg>Profil</div>
+</nav>
+</body>
+</html>

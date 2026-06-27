@@ -1,0 +1,33 @@
+{
+  "expo": {
+    "name": "IzenRide",
+    "slug": "izenride",
+    "version": "1.0.0",
+    "scheme": "izenride",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "newArchEnabled": true,
+    "splash": {
+      "backgroundColor": "#0a0e15",
+      "resizeMode": "contain"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "fr.izenride.app"
+    },
+    "android": {
+      "package": "fr.izenride.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#0a0e15"
+      }
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "single"
+    },
+    "plugins": ["expo-router", "expo-font"],
+    "experiments": {
+      "typedRoutes": false
+    }
+  }
+}

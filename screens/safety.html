@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>IZEN RIDE — Safety Zone</title>
+<style>
+:root{--bg:#08090E;--surface:#10121A;--border:#1A1E28;--blue:#4A9CE8;--green:#5DCAA5;--amber:#FAC775;--red:#E24B4A;--txt:#F2F4F8;--muted:#8A91A3}
+*{margin:0;box-sizing:border-box}
+html,body{width:390px;height:844px;overflow:hidden}
+body{position:relative;background:var(--bg);color:var(--txt);font-family:-apple-system,'SF Pro Display','SF Pro Text',Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased;display:flex;flex-direction:column}
+.status{display:flex;justify-content:space-between;align-items:center;padding:16px 26px 6px;font-size:14px;font-weight:600}
+.status .right{display:flex;gap:6px;align-items:center;font-size:12px;color:var(--muted)}
+.batt{width:22px;height:11px;border:1px solid var(--muted);border-radius:3px;position:relative}
+.batt::after{content:"";position:absolute;top:2px;bottom:2px;left:2px;right:5px;background:var(--green);border-radius:1px}
+header{padding:14px 24px 0;display:flex;align-items:center;justify-content:space-between}
+header h1{font-size:24px;font-weight:800;letter-spacing:-.5px}
+.toggle{width:54px;height:31px;border-radius:99px;background:var(--amber);position:relative;box-shadow:0 0 18px rgba(250,199,117,.4)}
+.toggle::after{content:"";position:absolute;top:3px;right:3px;width:25px;height:25px;border-radius:50%;background:#08090E}
+.sub{padding:6px 24px 0;font-size:13px;color:var(--amber);font-weight:600}
+.radar{position:relative;width:300px;height:300px;margin:18px auto 0;flex:none}
+.ring{position:absolute;border-radius:50%;border:1px solid rgba(250,199,117,.22)}
+.r1{inset:0}.r2{inset:50px}.r3{inset:100px}
+.sweep{position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 0deg,rgba(250,199,117,.28),transparent 80deg);animation:sw 3.6s linear infinite}
+@keyframes sw{to{transform:rotate(360deg)}}
+.core{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:18px;height:18px;border-radius:50%;background:var(--amber);box-shadow:0 0 0 7px rgba(250,199,117,.18),0 0 24px rgba(250,199,117,.8)}
+.km{position:absolute;left:50%;top:9px;transform:translateX(-50%);font-size:11px;color:var(--muted);letter-spacing:1px}
+.blip{position:absolute;width:11px;height:11px;border-radius:50%;background:var(--blue);box-shadow:0 0 12px rgba(74,156,232,.8)}
+.b1{left:208px;top:84px}.b2{left:84px;top:196px}
+.cards{margin:16px 20px 0;display:flex;flex-direction:column;gap:10px}
+.c{display:flex;align-items:center;gap:13px;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:14px 15px}
+.ic{width:40px;height:40px;border-radius:13px;flex:none;display:flex;align-items:center;justify-content:center}
+.ic svg{width:20px;height:20px;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.ic.am{background:rgba(250,199,117,.12)}.ic.am svg{stroke:var(--amber)}
+.ic.rd{background:rgba(226,75,74,.12)}.ic.rd svg{stroke:var(--red)}
+.c b{display:block;font-size:14.5px}
+.c small{font-size:12px;color:var(--muted)}
+.state{margin-left:auto;font-size:11.5px;font-weight:700;color:var(--green)}
+.sos{margin:auto 20px 34px;height:62px;border-radius:18px;background:rgba(226,75,74,.13);border:1.5px solid rgba(226,75,74,.55);color:var(--red);font-size:16px;font-weight:800;letter-spacing:2px;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 0 26px rgba(226,75,74,.18)}
+.sos small{font-size:10.5px;font-weight:500;letter-spacing:.5px;color:rgba(226,75,74,.75)}
+</style>
+</head>
+<body>
+<div class="status"><span>22:10</span><span class="right">5G <span class="batt"></span></span></div>
+<header><h1>Safety Zone</h1><div class="toggle"></div></header>
+<div class="sub">Activée · rayon de 2 km</div>
+<div class="radar">
+  <div class="ring r1"><span class="km">2 km</span></div>
+  <div class="ring r2"><span class="km">1 km</span></div>
+  <div class="ring r3"></div>
+  <div class="sweep"></div>
+  <span class="blip b1"></span><span class="blip b2"></span>
+  <div class="core"></div>
+</div>
+<div class="cards">
+  <div class="c">
+    <span class="ic am"><svg viewBox="0 0 24 24"><path d="M12 3.5 19 6v5.5c0 4.6-3 7.6-7 9-4-1.4-7-4.4-7-9V6z"/><path d="M9 12l2 2 4-4.5"/></svg></span>
+    <span><b>Partage de position</b><small>2 contacts suivent votre trajet</small></span>
+    <span class="state">ACTIF</span>
+  </div>
+  <div class="c">
+    <span class="ic rd"><svg viewBox="0 0 24 24"><path d="M12 4 3 19h18z"/><path d="M12 10v4M12 16.5v.5"/></svg></span>
+    <span><b>Alerte chute</b><small>Détection automatique · capteurs armés</small></span>
+    <span class="state">ARMÉE</span>
+  </div>
+</div>
+<div class="sos">SOS <small>· appui long 3 s</small></div>
+</body>
+</html>

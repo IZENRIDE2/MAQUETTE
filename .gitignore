@@ -1,0 +1,32 @@
+# Dépendances
+node_modules/
+
+# Expo / React Native
+.expo/
+*.expo/
+web-build/
+ios/
+android/
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# Logs & divers
+*.log
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Réglages locaux Claude Code (perso, non versionnés)
+.claude/settings.local.json
+
+# Fichiers temporaires
+*.tmp
+scratchpad/

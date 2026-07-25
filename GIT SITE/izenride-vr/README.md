@@ -18,7 +18,7 @@ aussi, mais le serveur évite les soucis de cache pendant l'itération.)
 powershell -ExecutionPolicy Bypass -File izenride-vr/build-standalone.ps1
 ```
 
-Produit `GIT SITE/izenride-immersif.html` (~1 Mo) : **un seul fichier**, CSS,
+Produit `GIT SITE/SITEWEB OFFICIEL.html` (~1 Mo) : **un seul fichier**, CSS,
 JS, les dix captures et les deux documents légaux intégrés. S'ouvre d'un
 double-clic, sans serveur, et s'envoie tel quel.
 

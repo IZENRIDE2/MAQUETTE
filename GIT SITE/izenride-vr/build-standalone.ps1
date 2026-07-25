@@ -17,7 +17,7 @@
 #    selon le fragment d'URL. Leurs identifiants sont préfixés : #beta et
 #    #litiges existent des deux côtés, et des id en double casseraient la
 #    navigation par ancre.
-param([string]$Out = "$PSScriptRoot\..\izenride-immersif.html")
+param([string]$Out = "$PSScriptRoot\..\SITEWEB OFFICIEL.html")
 
 $src  = $PSScriptRoot
 $utf8 = New-Object System.Text.UTF8Encoding($false)

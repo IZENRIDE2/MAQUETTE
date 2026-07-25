@@ -122,6 +122,17 @@
   padding-top:26px; border-top:1px solid var(--line);
 }
 
+/* ── Version autonome (fichier unique) ──
+   Les documents sont embarqués dans la page et prennent la place du site
+   selon le fragment d'URL. Ces règles ne servent qu'au fichier généré :
+   sur le site multi-pages, aucun .doc-embed n'existe. */
+.doc-embed{ display:none; }
+body.is-doc > main,
+body.is-doc > .foot,
+body.is-doc > .rail,
+body.is-doc .fx-scan,
+body.is-doc .motion-toggle{ display:none; }
+
 @media (max-width:640px){
   .doc-page{ padding-top:92px; }
   .toc ol{ columns:1; }

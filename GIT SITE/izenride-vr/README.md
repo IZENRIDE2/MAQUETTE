@@ -18,14 +18,21 @@ aussi, mais le serveur évite les soucis de cache pendant l'itération.)
 powershell -ExecutionPolicy Bypass -File izenride-vr/build-standalone.ps1
 ```
 
-Produit trois fichiers dans `GIT SITE/` : `izenride-immersif.html` (~984 ko,
-CSS + JS + les dix captures intégrés) et `izenride-cgu.html` /
-`izenride-cgv.html` (~50 ko chacun). Ils s'ouvrent d'un double-clic, sans
-serveur. Les trois voyagent ensemble : envoyer le premier seul laisserait
-les liens CGU/CGV dans le vide.
+Produit `GIT SITE/izenride-immersif.html` (~1 Mo) : **un seul fichier**, CSS,
+JS, les dix captures et les deux documents légaux intégrés. S'ouvre d'un
+double-clic, sans serveur, et s'envoie tel quel.
 
-Ce sont des fichiers **générés** — les régénérer après toute modification
-du site, sinon ils divergent en silence.
+Les CGU/CGV y sont embarquées et s'affichent à la place du site selon le
+fragment d'URL (`#cgu`, `#cgv`, ou une ancre interne comme
+`#cgu-marketplace`). Leurs identifiants sont préfixés à la fabrication :
+`#beta` et `#litiges` existent des deux côtés, et des id en double
+casseraient la navigation par ancre.
+
+Le script échoue s'il reste une ressource externe, un identifiant en
+double ou une ancre morte.
+
+C'est un fichier **généré** — le régénérer après toute modification du
+site, sinon il diverge en silence.
 
 ### Liens directs
 

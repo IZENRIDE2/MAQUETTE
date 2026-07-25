@@ -12,6 +12,12 @@ powershell -ExecutionPolicy Bypass -File izenride-vr/serve.ps1 -Port 4180
 Puis <http://localhost:4180>. (Ouvrir `index.html` en `file://` fonctionne
 aussi, mais le serveur évite les soucis de cache pendant l'itération.)
 
+### Liens directs
+
+`?go=1` saute l'écran de contact. Une ancre le saute aussi, et amène
+directement à la section — `/#radars`, `/?go=1#cockpit`. Pratique pour
+partager un point précis ou capturer la page.
+
 ## Le parcours
 
 Le scroll fait office d'accélérateur : la page se lit comme un trajet, avec
@@ -38,6 +44,7 @@ assets/js/road-gl.js        shader WebGL du hero
 assets/js/scenes.js         les trois scènes canvas
 assets/js/app.js            orchestration : un seul RAF pour tout
 assets/screens/*.jpg        captures officielles recadrées
+docs/apercu/*.png           aperçu du rendu, section par section
 serve.ps1                   serveur statique local
 ```
 

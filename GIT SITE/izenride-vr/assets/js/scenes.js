@@ -29,7 +29,9 @@
      ───────────────────────────────────────────────────────── */
   function CrossScene(ctx, host) {
     var out = host.querySelector('#crossCount');
-    var count = 0, shown = 0;
+    // shown = -1 : la première frame écrit le total de départ, sinon le
+    // compteur reste à « 0 » tant qu'aucun croisement n'a eu lieu.
+    var count = 0, shown = -1;
     var A, B, prevGap, ripples;
 
     function reset() {

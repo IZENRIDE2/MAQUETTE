@@ -364,7 +364,9 @@ body.is-live .tele, body.is-live .scrollcue{ opacity:1; }
 .tele__grid b.ok{ color:var(--ok); font-size:11.5px; }
 
 /* ══════════════════════════════ SECTIONS ══════════════════════════════ */
-.sec{ position:relative; padding:clamp(90px,13vh,150px) 0; }
+/* scroll-margin : la barre de nav fixe ne doit pas recouvrir le titre
+   quand on arrive sur une ancre */
+.sec{ position:relative; padding:clamp(90px,13vh,150px) 0; scroll-margin-top:72px; }
 .sec--alt{ background:linear-gradient(180deg,transparent,rgba(15,22,40,.42),transparent); }
 
 .kicker{

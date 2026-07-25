@@ -395,9 +395,40 @@
     setFx(!reduced);
   });
 
+  /** Rejoue la navigation par fragment, sans animation. */
+  function gotoFragment() {
+    if (location.hash.length < 2) return;
+    var frag = document.querySelector(location.hash);
+    if (!frag) return;
+    var root = document.documentElement;
+    var prev = root.style.scrollBehavior;
+    root.style.scrollBehavior = 'auto';
+    frag.scrollIntoView();
+    root.style.scrollBehavior = prev;
+    readScroll();
+  }
+
   /* ══════════════════════════ GO ══════════════════════════ */
   runBoot();
   requestAnimationFrame(loop);
+
+  // Entrée directe : `?go=1`, ou un lien profond vers une section, saute
+  // l'écran de contact. Sert aux liens partagés et aux captures de la page.
+  var direct = /(?:^|[?&])go=1(?:&|$)/.test(location.search) ||
+               (location.hash.length > 1 && location.hash !== '#hero');
+  if (direct) {
+    boot.classList.add('is-ready');
+    launch();
+
+    // Le verrou de scroll de l'écran de contact (`body.is-booting`) absorbe
+    // la navigation par fragment du navigateur : on arrive sur le hero au
+    // lieu de la section demandée. On la rejoue une fois le verrou levé —
+    // en synchrone (pas de rAF : il ne tourne pas dans un onglet masqué),
+    // puis à nouveau après `load`, car les images chargées décalent la mise
+    // en page au-dessus de la cible.
+    gotoFragment();
+    window.addEventListener('load', gotoFragment);
+  }
 
   // Les visiteurs qui arrivent déjà scrollés (ancre, rechargement)
   // n'ont pas à repasser par l'écran de contact.

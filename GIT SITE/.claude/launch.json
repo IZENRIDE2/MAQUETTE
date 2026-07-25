@@ -1,0 +1,15 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "izenride-vr",
+      "runtimeExecutable": "powershell",
+      "runtimeArgs": [
+        "-ExecutionPolicy", "Bypass",
+        "-File", "izenride-vr/serve.ps1",
+        "-Port", "4180"
+      ],
+      "port": 4180
+    }
+  ]
+}

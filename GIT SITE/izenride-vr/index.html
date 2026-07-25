@@ -1,0 +1,487 @@
+﻿<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>IzenRide — Le cockpit du motard</title>
+<meta name="description" content="IzenRide : navigation pensée pour les motards, radars signalés par la communauté, Safety Zone. Entrez dans l'expérience.">
+<meta name="theme-color" content="#08090E">
+<meta property="og:title" content="IzenRide — Le cockpit du motard">
+<meta property="og:description" content="Né de la route. Bâti pour ceux qui la connaissent.">
+<meta property="og:type" content="website">
+<link rel="stylesheet" href="assets/css/main.css">
+<noscript><style>
+  .boot,.fx-scan,.fx-grain,.motion-toggle{display:none!important}
+  .hero__copy>*,.tele,.scrollcue,.reveal{opacity:1!important;transform:none!important}
+</style></noscript>
+</head>
+<body>
+
+<!-- ══════════════════════════════ IGNITION ══════════════════════════════ -->
+<div id="boot" class="boot">
+  <div class="boot__inner">
+    <div class="boot__mark" aria-hidden="true">
+      <svg viewBox="0 0 40 40" class="mark mark--xl">
+        <rect x="1.6" y="1.6" width="36.8" height="36.8" rx="11.5" class="mark__box"/>
+        <path d="M8.5 32.5 L17.6 8.4" class="mark__edge"/>
+        <path d="M31.5 32.5 L22.4 8.4" class="mark__edge"/>
+        <rect x="19.1" y="10.6" width="1.8" height="3.6" rx=".9" class="mark__dash"/>
+        <rect x="19.05" y="17.4" width="1.9" height="4.6" rx=".95" class="mark__dash"/>
+        <rect x="19" y="25.4" width="2" height="5.8" rx="1" class="mark__dash"/>
+      </svg>
+    </div>
+    <p class="boot__eyebrow">IzenRide · Immersion</p>
+    <h1 class="boot__title">Mettez le contact.</h1>
+    <p class="boot__sub">Cette page se pilote au scroll. Casque conseillé.</p>
+
+    <div class="boot__gauge" aria-hidden="true">
+      <div class="boot__gauge-fill" id="bootFill"></div>
+    </div>
+    <p class="boot__status" id="bootStatus">Initialisation du cockpit…</p>
+
+    <button class="starter" id="starter" type="button">
+      <span class="starter__ring"></span>
+      <span class="starter__label">Démarrer</span>
+    </button>
+    <button class="boot__skip" id="bootSkip" type="button">Entrer sans immersion</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════ OVERLAYS ══════════════════════════════ -->
+<div class="fx-grain" aria-hidden="true"></div>
+<div class="fx-scan" aria-hidden="true"></div>
+<div class="fx-frame" aria-hidden="true">
+  <span class="fx-frame__c fx-frame__c--tl"></span>
+  <span class="fx-frame__c fx-frame__c--tr"></span>
+  <span class="fx-frame__c fx-frame__c--bl"></span>
+  <span class="fx-frame__c fx-frame__c--br"></span>
+</div>
+
+<!-- ══════════════════════════════ NAV ══════════════════════════════ -->
+<header class="nav" id="nav">
+  <a class="nav__brand" href="#hero">
+    <svg viewBox="0 0 40 40" class="mark" aria-hidden="true">
+      <rect x="1.6" y="1.6" width="36.8" height="36.8" rx="11.5" class="mark__box"/>
+      <path d="M8.5 32.5 L17.6 8.4" class="mark__edge"/>
+      <path d="M31.5 32.5 L22.4 8.4" class="mark__edge"/>
+      <rect x="19.1" y="10.6" width="1.8" height="3.6" rx=".9" class="mark__dash"/>
+      <rect x="19.05" y="17.4" width="1.9" height="4.6" rx=".95" class="mark__dash"/>
+      <rect x="19" y="25.4" width="2" height="5.8" rx="1" class="mark__dash"/>
+    </svg>
+    <span class="nav__word">Izen<b>Ride</b></span>
+  </a>
+  <nav class="nav__links" aria-label="Navigation principale">
+    <a href="#croisement">Croisement</a>
+    <a href="#radars">Radars</a>
+    <a href="#safety">Safety Zone</a>
+    <a href="#cockpit">Les écrans</a>
+  </nav>
+  <a href="#beta" class="btn btn--sm btn--primary">Rejoindre la bêta</a>
+</header>
+
+<!-- ══════════════════════════════ TRIP RAIL ══════════════════════════════ -->
+<aside class="rail" id="rail" aria-hidden="true">
+  <div class="rail__odo"><span id="odoVal">0.0</span><small>km</small></div>
+  <div class="rail__track">
+    <div class="rail__fill" id="railFill"></div>
+    <span class="rail__dot" style="--p:0"></span>
+    <span class="rail__dot" style="--p:.20"></span>
+    <span class="rail__dot" style="--p:.38"></span>
+    <span class="rail__dot" style="--p:.56"></span>
+    <span class="rail__dot" style="--p:.74"></span>
+    <span class="rail__dot" style="--p:1"></span>
+  </div>
+  <div class="rail__leg" id="railLeg">Départ</div>
+</aside>
+
+<main>
+
+<!-- ══════════════════════════════ HERO ══════════════════════════════ -->
+<section class="hero" id="hero">
+  <canvas id="gl" class="hero__gl"></canvas>
+  <div class="hero__veil"></div>
+
+  <!-- cockpit telemetry -->
+  <div class="tele" id="tele" aria-hidden="true">
+    <div class="tele__speed">
+      <b id="teleSpeed">0</b><span>km/h</span>
+    </div>
+    <div class="tele__grid">
+      <div><i>CAP</i><b id="teleCap">N 002°</b></div>
+      <div><i>ANGLE</i><b id="teleLean">0°</b></div>
+      <div><i>EXT.</i><b>14°C</b></div>
+      <div><i>RÉSEAU</i><b class="ok">1 284 en ligne</b></div>
+    </div>
+  </div>
+
+  <div class="hero__copy">
+    <p class="eyebrow"><span class="pip"></span>Bêta — inscriptions ouvertes</p>
+    <h1 class="hero__title">
+      <span class="line">Né de la route.</span>
+      <span class="line line--accent">Bâti pour ceux</span>
+      <span class="line line--accent">qui la connaissent.</span>
+    </h1>
+    <p class="hero__lede">
+      IzenRide n'est pas une app de plus. C'est le cockpit du motard :
+      une navigation pensée pour vos gants, des dangers signalés par ceux
+      qui roulent devant vous, et un filet de sécurité qui veille
+      quand la route tourne mal.
+    </p>
+    <div class="hero__cta">
+      <a href="#beta" class="btn btn--primary">Rejoindre la bêta</a>
+      <a href="#manifeste" class="btn btn--ghost">Lancer l'immersion</a>
+    </div>
+  </div>
+
+  <div class="scrollcue" aria-hidden="true">
+    <span>Scrollez pour rouler</span>
+    <div class="scrollcue__bar"><i></i></div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════ MANIFESTE ══════════════════════════════ -->
+<section class="sec sec--manifeste" id="manifeste" data-leg="Manifeste">
+  <div class="wrap">
+    <p class="kicker reveal">Manifeste</p>
+    <h2 class="big reveal">
+      Rouler à deux roues,<br>
+      c'est <em>une autre discipline</em>.<br>
+      Un autre rapport à la route.
+    </h2>
+    <p class="lede reveal">
+      Une industrie entière nous voit comme des cas particuliers de l'automobile.
+      Nous avons construit l'inverse : un outil qui part de la posture, des gants,
+      de la vitesse — et du danger.
+    </p>
+
+    <div class="pillars">
+      <article class="pillar reveal">
+        <span class="pillar__n">01</span>
+        <h3>La culture, d'abord</h3>
+        <p>Le croisement n'est pas un gimmick. C'est un signe de reconnaissance. On ne réinvente pas la culture motard : on l'amplifie.</p>
+      </article>
+      <article class="pillar reveal">
+        <span class="pillar__n">02</span>
+        <h3>La sécurité, sans relâche</h3>
+        <p>Une plaque mouillée invisible, un freinage tardif, un radar planqué. L'information utile circule en temps réel, anonymisée.</p>
+      </article>
+      <article class="pillar reveal">
+        <span class="pillar__n">03</span>
+        <h3>La communauté, en premier</h3>
+        <p>Pas de pub. Pas de monétisation de votre trajectoire. Ce que vous voyez vient des motards, et reste aux motards.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════ CROISEMENT ══════════════════════════════ -->
+<section class="sec sec--split" id="croisement" data-leg="Le croisement">
+  <div class="wrap split">
+    <div class="split__text">
+      <p class="kicker reveal">Signature</p>
+      <h2 class="h2 reveal">Le croisement</h2>
+      <p class="lede reveal">
+        Deux mains qui se lèvent à 90 km/h. Un dixième de seconde.
+        « Je te vois, on est du même côté. »
+      </p>
+      <p class="body reveal">
+        IzenRide détecte les trajectoires qui se croisent et transforme
+        le rituel en mémoire : qui, où, quand. Sans rien forcer, sans écran à regarder.
+        Vos rencontres se comptent toutes seules.
+      </p>
+      <ul class="ticks reveal">
+        <li>Détection automatique, mains sur le guidon</li>
+        <li>Carnet de route : vos croisements, vos régions</li>
+        <li>Badges et séries — pour ceux que ça amuse</li>
+      </ul>
+    </div>
+    <div class="split__stage reveal">
+      <div class="stage">
+        <canvas class="stage__c" data-scene="cross"></canvas>
+        <div class="stage__hud">
+          <span class="stage__tag">Live</span>
+          <div class="stage__metric">
+            <b id="crossCount">0</b><i>croisements aujourd'hui</i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════ RADARS ══════════════════════════════ -->
+<section class="sec sec--split sec--alt" id="radars" data-leg="Radars communautaires">
+  <div class="wrap split split--rev">
+    <div class="split__text">
+      <p class="kicker reveal">Temps réel</p>
+      <h2 class="h2 reveal">Radars communautaires</h2>
+      <p class="lede reveal">
+        Pas de base achetée. Pas de pub. Juste les signalements
+        des motards qui roulent devant vous.
+      </p>
+      <p class="body reveal">
+        Un contrôle, du gravier, une nappe d'huile : un tap ganté suffit.
+        L'alerte remonte, se valide auprès des riders suivants, et s'éteint
+        toute seule quand elle n'a plus lieu d'être.
+      </p>
+      <div class="chips reveal">
+        <span class="chip chip--warn">Contrôle</span>
+        <span class="chip chip--err">Accident</span>
+        <span class="chip">Gravier</span>
+        <span class="chip">Chaussée glissante</span>
+        <span class="chip">Travaux</span>
+      </div>
+    </div>
+    <div class="split__stage reveal">
+      <div class="stage">
+        <canvas class="stage__c" data-scene="radar"></canvas>
+        <div class="stage__hud">
+          <span class="stage__tag">Réseau</span>
+          <div class="stage__metric">
+            <b id="radarCount">0</b><i>signalements actifs</i>
+          </div>
+        </div>
+        <div class="stage__toast" id="radarToast"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════ SAFETY ══════════════════════════════ -->
+<section class="sec sec--split" id="safety" data-leg="Safety Zone">
+  <div class="wrap split">
+    <div class="split__text">
+      <p class="kicker reveal">Filet de sécurité</p>
+      <h2 class="h2 reveal">Safety Zone</h2>
+      <p class="lede reveal">
+        Le mode qu'on active en espérant ne jamais en avoir besoin.
+      </p>
+      <p class="body reveal">
+        Position partagée en éphémère avec vos proches, détection de chute
+        par capteurs, compte à rebours avant alerte, et SOS avec vos
+        coordonnées exactes. Ça s'arrête quand vous coupez le contact.
+      </p>
+      <div class="metrics reveal">
+        <div><b>&lt; 12 s</b><i>de la chute à l'alerte</i></div>
+        <div><b>0</b><i>donnée revendue</i></div>
+        <div><b>Éphémère</b><i>partage auto-expiré</i></div>
+      </div>
+    </div>
+    <div class="split__stage reveal">
+      <div class="stage">
+        <canvas class="stage__c" data-scene="safety"></canvas>
+        <div class="stage__hud">
+          <span class="stage__tag stage__tag--ok" id="safetyTag">Protégé</span>
+          <div class="stage__metric">
+            <b id="safetyContacts">3</b><i>proches en veille</i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════ COCKPIT ══════════════════════════════ -->
+<section class="sec sec--cockpit" id="cockpit" data-leg="Les écrans">
+  <div class="wrap">
+    <div class="cockpit__head">
+      <p class="kicker reveal">Écrans officiels</p>
+      <h2 class="h2 reveal">L'app, telle qu'elle est</h2>
+      <p class="lede reveal">
+        Aucune maquette retouchée : ce sont les écrans de la bêta, capturés sur
+        un vrai téléphone. Bougez la souris — ou inclinez le vôtre.
+      </p>
+    </div>
+
+    <div class="phone-wrap reveal" id="phoneWrap">
+      <div class="phone" id="phone">
+        <div class="phone__glow"></div>
+        <div class="phone__body">
+          <div class="phone__screen">
+            <img class="scr is-on" data-screen="carte" width="540" height="1119"
+                 src="assets/screens/02-carte.jpg"
+                 alt="Écran Carte : alertes communautaires et motards à proximité">
+            <img class="scr" data-screen="itineraire" width="540" height="1119"
+                 src="assets/screens/03-itineraire.jpg"
+                 alt="Écran Itinéraire : recherche de destination, étapes et résumé du trajet">
+            <img class="scr" data-screen="safety" width="540" height="1119"
+                 src="assets/screens/04-safety.jpg"
+                 alt="Écran Safety Zone : rayon de confidentialité autour du domicile">
+            <img class="scr" data-screen="events" width="540" height="1119"
+                 src="assets/screens/05-events.jpg"
+                 alt="Écran Événements : sorties, rassemblements et track days">
+            <img class="scr" data-screen="profil" width="540" height="1119"
+                 src="assets/screens/06-profil.jpg"
+                 alt="Écran Profil : sorties, kilomètres et moto du rider">
+            <img class="scr" data-screen="badges" width="540" height="1119"
+                 src="assets/screens/07-badges.jpg"
+                 alt="Écran Badges : récompenses et sorties récentes">
+            <img class="scr" data-screen="confidentialite" width="540" height="1119"
+                 src="assets/screens/08-confidentialite.jpg"
+                 alt="Écran Paramètres GPS : précision de position partagée et durée d'historique">
+            <img class="scr" data-screen="connexion" width="540" height="1119"
+                 src="assets/screens/01-connexion.jpg"
+                 alt="Écran Connexion : retour dans la communauté">
+            <img class="scr" data-screen="premium" width="540" height="1119"
+                 src="assets/screens/09-premium.jpg"
+                 alt="Écran Premium : likes illimités">
+            <img class="scr" data-screen="abonnements" width="540" height="1119"
+                 src="assets/screens/10-abonnements.jpg"
+                 alt="Écran Abonnements : comparatif gratuit et premium">
+          </div>
+        </div>
+        <div class="phone__reflect"></div>
+      </div>
+    </div>
+
+    <p class="shot-cap reveal" id="shotCap">
+      <b>Carte</b><span>Les signalements et les motards de votre secteur, en direct.</span>
+    </p>
+
+    <div class="shots reveal" role="tablist" aria-label="Écrans de l'application">
+      <button class="shot is-on" data-screen="carte" role="tab" aria-selected="true"
+              data-title="Carte" data-desc="Les signalements et les motards de votre secteur, en direct.">
+        <img src="assets/screens/02-carte.jpg" alt="" loading="lazy" width="540" height="1119"><i>Carte</i>
+      </button>
+      <button class="shot" data-screen="itineraire" role="tab" aria-selected="false"
+              data-title="Itinéraire" data-desc="Destination, étapes, résumé — validé avant de mettre le casque.">
+        <img src="assets/screens/03-itineraire.jpg" alt="" loading="lazy" width="540" height="1119"><i>Itinéraire</i>
+      </button>
+      <button class="shot" data-screen="safety" role="tab" aria-selected="false"
+              data-title="Safety Zone" data-desc="Un rayon de discrétion autour de chez vous. Personne ne vous y voit.">
+        <img src="assets/screens/04-safety.jpg" alt="" loading="lazy" width="540" height="1119"><i>Safety</i>
+      </button>
+      <button class="shot" data-screen="events" role="tab" aria-selected="false"
+              data-title="Événements" data-desc="Sorties, rassemblements et track days près de vous.">
+        <img src="assets/screens/05-events.jpg" alt="" loading="lazy" width="540" height="1119"><i>Events</i>
+      </button>
+      <button class="shot" data-screen="profil" role="tab" aria-selected="false"
+              data-title="Profil" data-desc="Vos sorties, vos kilomètres, votre moto. Le carnet de route.">
+        <img src="assets/screens/06-profil.jpg" alt="" loading="lazy" width="540" height="1119"><i>Profil</i>
+      </button>
+      <button class="shot" data-screen="badges" role="tab" aria-selected="false"
+              data-title="Badges" data-desc="Ce que vous avez roulé, prouvé. Sans surenchère.">
+        <img src="assets/screens/07-badges.jpg" alt="" loading="lazy" width="540" height="1119"><i>Badges</i>
+      </button>
+      <button class="shot" data-screen="confidentialite" role="tab" aria-selected="false"
+              data-title="Confidentialité" data-desc="Vous choisissez la précision partagée : 50 m, 500 m, 5 km — ou invisible.">
+        <img src="assets/screens/08-confidentialite.jpg" alt="" loading="lazy" width="540" height="1119"><i>Vie privée</i>
+      </button>
+      <button class="shot" data-screen="connexion" role="tab" aria-selected="false"
+              data-title="Connexion" data-desc="Bon retour parmi les riders. Deux taps, et vous roulez.">
+        <img src="assets/screens/01-connexion.jpg" alt="" loading="lazy" width="540" height="1119"><i>Connexion</i>
+      </button>
+      <button class="shot" data-screen="premium" role="tab" aria-selected="false"
+              data-title="Premium" data-desc="Plus de likes, plus de filtres, zéro limite quotidienne.">
+        <img src="assets/screens/09-premium.jpg" alt="" loading="lazy" width="540" height="1119"><i>Premium</i>
+      </button>
+      <button class="shot" data-screen="abonnements" role="tab" aria-selected="false"
+              data-title="Abonnements" data-desc="Le gratuit reste complet. Le premium enlève les freins.">
+        <img src="assets/screens/10-abonnements.jpg" alt="" loading="lazy" width="540" height="1119"><i>Offres</i>
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════ STATS ══════════════════════════════ -->
+<section class="sec sec--stats" data-leg="La communauté">
+  <div class="wrap">
+    <div class="stats">
+      <div class="stat reveal"><b data-count="1284">0</b><i>motards en bêta</i></div>
+      <div class="stat reveal"><b data-count="47" data-suffix="k">0</b><i>km enregistrés</i></div>
+      <div class="stat reveal"><b data-count="9130">0</b><i>croisements comptés</i></div>
+      <div class="stat reveal"><b data-count="12" data-suffix=" s">0</b><i>chute → alerte</i></div>
+    </div>
+    <p class="stats__note reveal">Chiffres de la bêta fermée — mis à jour à chaque vague d'invitations.</p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════ MUR D'ÉCRANS ══════════════════════════════ -->
+<div class="wall" aria-hidden="true">
+  <div class="wall__track" id="wallTrack">
+    <img src="assets/screens/01-connexion.jpg" alt="" loading="lazy" width="540" height="1119">
+    <img src="assets/screens/02-carte.jpg" alt="" loading="lazy" width="540" height="1119">
+    <img src="assets/screens/03-itineraire.jpg" alt="" loading="lazy" width="540" height="1119">
+    <img src="assets/screens/04-safety.jpg" alt="" loading="lazy" width="540" height="1119">
+    <img src="assets/screens/05-events.jpg" alt="" loading="lazy" width="540" height="1119">
+    <img src="assets/screens/06-profil.jpg" alt="" loading="lazy" width="540" height="1119">
+    <img src="assets/screens/07-badges.jpg" alt="" loading="lazy" width="540" height="1119">
+    <img src="assets/screens/08-confidentialite.jpg" alt="" loading="lazy" width="540" height="1119">
+    <img src="assets/screens/09-premium.jpg" alt="" loading="lazy" width="540" height="1119">
+    <img src="assets/screens/10-abonnements.jpg" alt="" loading="lazy" width="540" height="1119">
+  </div>
+</div>
+
+<!-- ══════════════════════════════ BETA ══════════════════════════════ -->
+<section class="sec sec--beta" id="beta" data-leg="Arrivée">
+  <div class="beta__bg" aria-hidden="true"></div>
+  <div class="wrap beta">
+    <p class="kicker reveal">Bêta fermée</p>
+    <h2 class="big reveal">Prenez la <em>première vague</em>.</h2>
+    <p class="lede reveal">
+      Les invitations partent par région, par paquets. Laissez votre adresse :
+      vous saurez avant tout le monde quand votre secteur ouvre.
+    </p>
+
+    <form class="form reveal" id="betaForm" novalidate>
+      <div class="form__row">
+        <label class="field">
+          <span>E-mail</span>
+          <input type="email" name="email" id="betaEmail" placeholder="vous@exemple.fr" autocomplete="email" required>
+        </label>
+        <label class="field">
+          <span>Région</span>
+          <select name="region" id="betaRegion">
+            <option>Auvergne-Rhône-Alpes</option>
+            <option>Île-de-France</option>
+            <option>PACA</option>
+            <option>Occitanie</option>
+            <option>Nouvelle-Aquitaine</option>
+            <option>Grand Est</option>
+            <option>Bretagne</option>
+            <option>Autre</option>
+          </select>
+        </label>
+      </div>
+      <button class="btn btn--primary btn--lg" type="submit">Réserver ma place</button>
+      <p class="form__legal">Pas de spam, pas de revente. Une adresse, une invitation.</p>
+      <p class="form__msg" id="betaMsg" role="status"></p>
+    </form>
+  </div>
+</section>
+
+</main>
+
+<!-- ══════════════════════════════ FOOTER ══════════════════════════════ -->
+<footer class="foot">
+  <div class="wrap foot__in">
+    <div class="foot__brand">
+      <svg viewBox="0 0 40 40" class="mark" aria-hidden="true">
+        <rect x="1.6" y="1.6" width="36.8" height="36.8" rx="11.5" class="mark__box"/>
+        <path d="M8.5 32.5 L17.6 8.4" class="mark__edge"/>
+        <path d="M31.5 32.5 L22.4 8.4" class="mark__edge"/>
+        <rect x="19.1" y="10.6" width="1.8" height="3.6" rx=".9" class="mark__dash"/>
+        <rect x="19.05" y="17.4" width="1.9" height="4.6" rx=".95" class="mark__dash"/>
+        <rect x="19" y="25.4" width="2" height="5.8" rx="1" class="mark__dash"/>
+      </svg>
+      <span class="nav__word">Izen<b>Ride</b></span>
+    </div>
+    <nav class="foot__links">
+      <a href="#manifeste">Manifeste</a>
+      <a href="#radars">Sécurité</a>
+      <a href="#beta">Bêta</a>
+      <a href="#hero">Haut de page</a>
+    </nav>
+    <p class="foot__copy">© 2026 IzenRide — Né de la route.</p>
+  </div>
+</footer>
+
+<button class="motion-toggle" id="motionToggle" type="button" title="Réduire les animations">
+  <span class="motion-toggle__dot"></span><span id="motionLabel">Immersion</span>
+</button>
+
+<script src="assets/js/road-gl.js"></script>
+<script src="assets/js/scenes.js"></script>
+<script src="assets/js/app.js"></script>
+</body>
+</html>

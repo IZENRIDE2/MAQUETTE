@@ -12,6 +12,17 @@ powershell -ExecutionPolicy Bypass -File izenride-vr/serve.ps1 -Port 4180
 Puis <http://localhost:4180>. (Ouvrir `index.html` en `file://` fonctionne
 aussi, mais le serveur évite les soucis de cache pendant l'itération.)
 
+### Version autonome (un seul fichier)
+
+```bash
+powershell -ExecutionPolicy Bypass -File izenride-vr/build-standalone.ps1
+```
+
+Produit `GIT SITE/izenride-immersif.html` (~983 ko) : CSS, JS et les dix
+captures intégrés. S'ouvre d'un double-clic, sans serveur, et s'envoie tel
+quel. C'est un fichier **généré** — le régénérer après toute modification
+du site, sinon il diverge en silence.
+
 ### Liens directs
 
 `?go=1` saute l'écran de contact. Une ancre le saute aussi, et amène

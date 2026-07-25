@@ -18,10 +18,14 @@ aussi, mais le serveur évite les soucis de cache pendant l'itération.)
 powershell -ExecutionPolicy Bypass -File izenride-vr/build-standalone.ps1
 ```
 
-Produit `GIT SITE/izenride-immersif.html` (~983 ko) : CSS, JS et les dix
-captures intégrés. S'ouvre d'un double-clic, sans serveur, et s'envoie tel
-quel. C'est un fichier **généré** — le régénérer après toute modification
-du site, sinon il diverge en silence.
+Produit trois fichiers dans `GIT SITE/` : `izenride-immersif.html` (~984 ko,
+CSS + JS + les dix captures intégrés) et `izenride-cgu.html` /
+`izenride-cgv.html` (~50 ko chacun). Ils s'ouvrent d'un double-clic, sans
+serveur. Les trois voyagent ensemble : envoyer le premier seul laisserait
+les liens CGU/CGV dans le vide.
+
+Ce sont des fichiers **générés** — les régénérer après toute modification
+du site, sinon ils divergent en silence.
 
 ### Liens directs
 
@@ -50,7 +54,9 @@ odomètre et étapes dans le rail de gauche.
 
 ```
 index.html                  structure + contenu
+cgu.html / cgv.html         pages légales (texte fourni, non modifié)
 assets/css/main.css         design system (tokens alignés sur l'app)
+assets/css/legal.css        mise en page des documents légaux
 assets/js/road-gl.js        shader WebGL du hero
 assets/js/scenes.js         les trois scènes canvas
 assets/js/app.js            orchestration : un seul RAF pour tout
@@ -102,5 +108,17 @@ Reprises telles quelles de `apps/mobile/lib/theme/colors.ts` et
   waitlist existante (`apps/site-institutionnel/src/pages/api/`).
 - Les chiffres de la section « communauté » (1 284 motards, 47k km,
   9 130 croisements) sont des valeurs de démonstration.
-- Pas de page légale, pas de bandeau cookies — à ajouter avant mise en ligne
-  publique.
+- Pas de politique de confidentialité ni de bandeau cookies. Les CGU
+  renvoient à une Politique de confidentialité qui n'existe pas encore
+  sur le site — à écrire avant mise en ligne publique.
+
+## Pages légales
+
+`cgu.html` (v4.0) et `cgv.html` (v1.0) reprennent **mot pour mot** les
+documents fournis par IZEN RIDE ; seule la mise en page a été transposée
+sur le thème sombre. Ne pas réécrire le texte au fil des retouches de
+style : la source de vérité est le document juridique, pas le site.
+
+À la prochaine version des documents, remplacer le contenu des `<article>`
+et mettre à jour le numéro de version, la date et l'historique en pied de
+page.

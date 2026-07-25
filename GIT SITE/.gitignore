@@ -7,5 +7,7 @@
 izenride/
 SITE WEB/
 
-# Fichier généré par izenride-vr/build-standalone.ps1 — régénérable.
+# Fichiers générés par izenride-vr/build-standalone.ps1 — régénérables.
 izenride-immersif.html
+izenride-cgu.html
+izenride-cgv.html

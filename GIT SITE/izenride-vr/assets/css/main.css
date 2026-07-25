@@ -614,7 +614,9 @@ body.no-fx .wall__track{ animation:none; }
   outline:none; border-color:var(--neon); box-shadow:0 0 0 3px rgba(77,143,255,.16);
 }
 .field input.is-bad{ border-color:var(--err); }
-.form__legal{ margin:14px 0 0; font-size:12.5px; color:var(--ink-mute); }
+.form__legal{ margin:14px 0 0; font-size:12.5px; color:var(--ink-mute); line-height:1.7; }
+.form__legal a{ color:var(--izen-light); text-decoration:underline; text-underline-offset:3px; }
+.form__legal a:hover{ color:var(--neon-bright); }
 .form__msg{ margin:12px 0 0; font-size:14px; min-height:20px; color:var(--ok); }
 .form__msg.is-bad{ color:var(--err); }
 
@@ -626,6 +628,7 @@ body.no-fx .wall__track{ animation:none; }
 .foot__links a{ font-size:13.5px; color:var(--ink-mute); transition:color .2s; }
 .foot__links a:hover{ color:var(--ink-dim); }
 .foot__copy{ margin:0; width:100%; font-size:12.5px; color:#5c6478; }
+.foot__copy span{ display:block; margin-top:4px; color:var(--ink-mute); }
 
 /* ══════════════════════════════ TOGGLE ══════════════════════════════ */
 .motion-toggle{

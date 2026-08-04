@@ -63,8 +63,8 @@
       'contact.l1': 'Prêt à croiser', 'contact.l2': 'la <em>route ?</em>',
       'contact.appstore': 'App Store', 'contact.play': 'Google Play',
       'footer.built': '© 2026 IZEN RIDE SAS', 'footer.top': 'RETOUR EN HAUT ↑',
-      'dock.online': 'riders en ligne',
-      'panel.head': 'EN DIRECT DE LA COMMUNAUTÉ', 'panel.online': 'riders en ligne',
+      'dock.online': "APERÇU DE L'APP — CROISEMENTS & SORTIES",
+      'panel.head': "UN APERÇU DE L'APPLICATION", 'panel.online': "Ce que l'app affiche quand vous roulez",
       'panel.next': 'PROCHAIN RIDE — NIGHT RIDE CORNICHE'
     },
     en: {
@@ -106,7 +106,7 @@
       'process.index': '04 / ON THE ROAD', 'process.title': 'From pocket <em>to</em> tarmac',
       'process.1.name': 'Download', 'process.1.desc': 'Free on iOS and Android. Two minutes, helmet still on.',
       'process.2.name': 'Your bike', 'process.2.desc': 'Profile, machine, riding style. Roadtrips, twisties or night rides — say who you are.',
-      'process.3.name': 'Ride', 'process.3.desc': 'Nothing else to do. Every trip detects the riders you cross, to the metre.',
+      'process.3.name': 'Ride', 'process.3.desc': 'Nothing else to do. Every trip detects the riders you cross.',
       'process.4.name': 'Match', 'process.4.desc': '"Crossed 3× this week." A match, a message, a meeting point.',
       'process.5.name': 'Together', 'process.5.desc': 'Night ride, Friday 9:30pm. Live tracking keeps the group tight. Full circle.',
       'about.index': '05 / ABOUT', 'about.title': 'Born on the road',
@@ -117,8 +117,8 @@
       'contact.l1': 'Ready to cross', 'contact.l2': 'the <em>road?</em>',
       'contact.appstore': 'App Store', 'contact.play': 'Google Play',
       'footer.built': '© 2026 IZEN RIDE SAS', 'footer.top': 'BACK TO TOP ↑',
-      'dock.online': 'riders online',
-      'panel.head': 'LIVE FROM THE COMMUNITY', 'panel.online': 'riders online',
+      'dock.online': 'APP PREVIEW — CROSSINGS & GROUP RIDES',
+      'panel.head': 'A GLIMPSE OF THE APP', 'panel.online': 'What the app shows while you ride',
       'panel.next': 'NEXT RIDE — CORNICHE NIGHT RIDE'
     }
   };
@@ -209,15 +209,16 @@
   /* ----------------------------------------------------------
      Dock RIDE LIVE : compteur, barres canvas, countdown, panneau
      ---------------------------------------------------------- */
-  var riders = 1248;
-  var dockRiders = document.getElementById('dock-riders');
-  var panelRiders = document.getElementById('panel-riders');
-  setInterval(function () {
-    riders = Math.max(900, riders + Math.round((Math.random() - 0.45) * 14));
-    var s = riders.toLocaleString('fr-FR');
-    if (dockRiders) dockRiders.textContent = s;
-    if (panelRiders) panelRiders.textContent = s;
-  }, 2400);
+  // ⚠️ RETIRÉ LE 2026-08-04 — un compteur qui partait de 1 248 et marchait
+  // AU HASARD toutes les 2,4 secondes, présenté sous le titre « EN DIRECT DE
+  // LA COMMUNAUTÉ ». Aucune de ces valeurs n'a jamais existé.
+  //
+  // C'est la même faute que l'application a corrigée de son côté en supprimant
+  // un bloc de navigation qui affichait « A7 sud · 110 km/h » en dur.
+  //
+  // Le brancher sur du vrai n'est PAS une option : il n'existe aucun point
+  // d'accès public, et publier les croisements réels de motards sur un site
+  // ouvert poserait un problème de vie privée bien plus grave que le mensonge.
 
   // Countdown vers le prochain vendredi 21:30
   var panelCount = document.getElementById('panel-count');

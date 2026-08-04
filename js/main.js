@@ -46,7 +46,7 @@
       'tech.loc': 'Système GPS propriétaire · détection des croisements · Safety Zone autour du domicile · géo-temps réel',
       'tech.rt': 'Messagerie instantanée · suivi live des rides · positions du groupe · WebSockets',
       'tech.map': "Navigation pensée moto · itinéraires ZEN (virages d'abord) · cartes nuit natives",
-      'tech.sec': 'Chiffrement en transit · SOS appui long · contacts d'urgence · données jamais revendues',
+      "tech.sec": "Chiffrement en transit · SOS appui long · contacts d'urgence · données jamais revendues",
       'tech.com': 'Matching par affinités · événements & groupes · modération humaine · profils vérifiés',
       'tech.plat': "iOS & Android natifs · mode hors-ligne · batterie maîtrisée · FR aujourd'hui, EN demain",
       'process.index': '04 / EN ROUTE', 'process.title': 'De la poche <em>au</em> bitume',
@@ -89,7 +89,7 @@
       'row.events.desc': 'Create a ride, set the start, share the route. Live tracking keeps the group tight from first to last corner — night rides, Sunday cruises, track days.',
       'row.events.meta': 'GROUP RIDES — alone you ride fast, together you ride far',
       'row.safety.name': 'Safety',
-      'row.safety.desc': 'SOS within thumb's reach: long-press, countdown, and your emergency contacts receive your position. Share a trip by link, for the length of a ride. And your Safety Zone makes you invisible on the map within 2 km of home.',
+      "row.safety.desc": "SOS within thumb's reach: long-press, countdown, and your emergency contacts receive your position. Share a trip by link, for the length of a ride. And your Safety Zone makes you invisible on the map within 2 km of home.",
       'row.safety.meta': 'SERIOUS — the road watches over you',
       'premium.index': '02 / PREMIUM', 'premium.title': 'Switch to high beams',
       'premium.coming': '— SUBSCRIPTION —',
@@ -123,7 +123,7 @@
     }
   };
 
-  function applyLang(lang) {
+  function applyLang(lang, persister) {
     var dict = I18N[lang] || I18N.fr;
     document.documentElement.lang = lang;
     document.querySelectorAll('[data-i18n]').forEach(function (el) {
@@ -137,14 +137,21 @@
     document.querySelectorAll('.lang-switch button').forEach(function (b) {
       b.classList.toggle('is-active', b.getAttribute('data-lang') === lang);
     });
-    try { localStorage.setItem('izen-lang', lang); } catch (e) {}
+    /* ⚠️ NE PERSISTE QUE SUR CHOIX EXPLICITE. Cette ligne écrivait à CHAQUE
+       appel — y compris celui du démarrage, qui passait 'fr' par défaut. Le
+       site s'inventait donc une préférence dès la première visite, et toute
+       détection de la langue de l'appareil devenait inerte : elle relisait ce
+       que le site venait d'écrire. Voir le script en ligne d'index.html. */
+    if (persister) {
+      try { localStorage.setItem('izen-langue-choisie', lang); } catch (e) {}
+    }
   }
   document.querySelectorAll('.lang-switch button').forEach(function (b) {
-    b.addEventListener('click', function () { applyLang(b.getAttribute('data-lang')); });
+    b.addEventListener('click', function () { applyLang(b.getAttribute('data-lang'), true); });
   });
-  var savedLang = 'fr';
-  try { savedLang = localStorage.getItem('izen-lang') || 'fr'; } catch (e) {}
-  applyLang(savedLang);
+  /* La décision a déjà été prise dans <head>, avant le premier paint : choix
+     explicite s'il existe, sinon la langue de l'appareil. On l'applique. */
+  applyLang(window.__izenLangue === 'en' ? 'en' : 'fr', false);
 
   /* ----------------------------------------------------------
      Écrans de l'app : lazy-load + mise à l'échelle (390 × 844)

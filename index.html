@@ -17,6 +17,29 @@
   var seen = sessionStorage.getItem('izen-intro') === '1';
   var rm = matchMedia('(prefers-reduced-motion: reduce)').matches;
   document.documentElement.classList.add((seen || rm) ? 'intro-skip' : 'intro-playing');
+
+  /* ── La langue, décidée ICI et pas plus tard ────────────────────────
+     Appareil en français -> français. Tout le reste -> anglais.
+
+     🔴 CLÉ NEUVE, ET C'EST TOUT LE POINT. L'ancienne, « izen-lang », était
+     écrite par applyLang() À CHAQUE APPEL — y compris l'appel de démarrage,
+     qui passait 'fr' par défaut. Dès la première visite le site s'était donc
+     inventé une préférence, indiscernable d'un vrai choix. Une détection
+     branchée dessus aurait lu ce que le site venait d'écrire une
+     milliseconde plus tôt : elle aurait été INERTE, et verte.
+
+     « izen-langue-choisie » n'est écrite QUE par un clic sur le sélecteur.
+     Un choix explicite prime donc sur l'appareil, et lui seul.
+
+     Décidée avant le premier paint, comme l'intro juste au-dessus : c'est ce
+     qui évite de voir la page changer de langue sous les yeux. */
+  var choix = null;
+  try { choix = localStorage.getItem('izen-langue-choisie'); } catch (e) {}
+  /* navigator.language rend 'fr-CA', 'fr-BE', 'fr'… : on teste le PRÉFIXE. */
+  var appareil = (navigator.language || 'en').toLowerCase().slice(0, 2);
+  window.__izenLangue = (choix === 'fr' || choix === 'en') ? choix
+                      : (appareil === 'fr' ? 'fr' : 'en');
+  document.documentElement.lang = window.__izenLangue;
 }catch(e){}})();
 </script>
 <!-- Polices hébergées chez nous : aucune requête tierce, aucune adresse IP

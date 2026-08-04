@@ -48,7 +48,7 @@ odomètre et étapes dans le rail de gauche.
 | Section | Ce qui s'y passe |
 |---|---|
 | Contact | Écran d'allumage. Le bouton sert aussi de geste utilisateur pour demander l'accès au gyroscope (iOS l'exige). |
-| Hero | Route de nuit générée en shader WebGL. Vitesse pilotée par le scroll, caméra par le pointeur ou le gyroscope. |
+| Hero | Carte GPS en perspective : réseau de rues avec liseré, îlots, itinéraire tracé, motards qui circulent, signalements. Vitesse pilotée par le scroll, caméra par le pointeur ou le gyroscope. |
 | Manifeste | Les trois piliers, repris du manifeste produit. |
 | Le croisement | Canvas 2D : deux trajectoires se croisent, le compteur monte. |
 | Radars | Canvas 2D : signalements qui apparaissent, se propagent aux motards proches, puis expirent. |
@@ -64,7 +64,7 @@ index.html                  structure + contenu
 cgu.html / cgv.html         pages légales (texte fourni, non modifié)
 assets/css/main.css         design system (tokens alignés sur l'app)
 assets/css/legal.css        mise en page des documents légaux
-assets/js/road-gl.js        shader WebGL du hero
+assets/js/hero-map.js       carte GPS du hero (canvas 2D)
 assets/js/scenes.js         les trois scènes canvas
 assets/js/app.js            orchestration : un seul RAF pour tout
 assets/screens/*.jpg        captures officielles recadrées
@@ -100,13 +100,26 @@ Reprises telles quelles de `apps/mobile/lib/theme/colors.ts` et
 
 ## Accessibilité et performance
 
-- Un seul `requestAnimationFrame` pilote le shader et les trois canvas ;
-  chaque scène s'arrête hors écran (IntersectionObserver).
+- Un seul `requestAnimationFrame` pilote la carte du hero et les trois
+  scènes ; chaque scène s'arrête hors écran (IntersectionObserver).
 - `prefers-reduced-motion` coupe les animations ; le bouton « Immersion »
   en bas à droite permet de basculer manuellement.
-- Repli complet si WebGL est indisponible (dégradé statique) et si
+- Repli en dégradé statique si le canvas 2D est indisponible, et si
   JavaScript est désactivé (`<noscript>`).
-- DPR plafonné à 1,75 sur le shader.
+- DPR plafonné à 1,5 sur la carte : elle dessine beaucoup de traits fins,
+  et le gain visuel au-delà ne paie pas le coût de remplissage.
+
+### Le rendu de la carte
+
+Projection au sol : un point `(wx, wy)` — latéral, distance devant — se
+projette en `s = F / wy`, `sx = cx + wx·s`, `sy = horizon + H·s`. Quand
+`wy` tend vers l'infini, le point rejoint le point de fuite. Les routes
+sont échantillonnées en profondeur, avec un pas qui s'élargit au loin,
+pour que l'épaisseur suive la perspective sans facettes visibles.
+
+Chaque voie est tracée deux fois — un liseré sombre plus large, puis la
+chaussée — comme dans un vrai fond de carte : c'est ce qui les détache
+des îlots.
 
 ## Ce qui reste à brancher
 

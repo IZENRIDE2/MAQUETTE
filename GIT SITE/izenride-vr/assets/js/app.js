@@ -1,6 +1,6 @@
 /* ============================================================
    IzenRide — Orchestration
-   Un seul RAF pilote le shader du hero et les scènes canvas.
+   Un seul RAF pilote la carte du hero et les scènes canvas.
    Le scroll fait office d'accélérateur : la page se parcourt
    comme un trajet (odomètre, étapes, télémétrie).
    ============================================================ */
@@ -80,13 +80,13 @@
     });
   }
 
-  /* ══════════════════════════ WEBGL HERO ══════════════════════════ */
+  /* ══════════════════════════ CARTE DU HERO ══════════════════════════ */
   var heroEl = $('#hero');
   var glCanvas = $('#gl');
   var road = null;
 
-  if (glCanvas && window.IzenRoad) {
-    try { road = window.IzenRoad.create(glCanvas); } catch (e) { road = null; }
+  if (glCanvas && window.IzenMap) {
+    try { road = window.IzenMap.create(glCanvas); } catch (e) { road = null; }
   }
   if (!road && heroEl) heroEl.classList.add('no-gl');
 
@@ -331,7 +331,7 @@
     state.look.x = lerp(state.look.x, tiltTarget.x, 0.08);
     state.look.y = lerp(state.look.y, tiltTarget.y, 0.08);
 
-    /* ── Hero WebGL ── */
+    /* ── Carte du hero ── */
     if (road && state.heroRatio > 0.01) {
       var cruise = fxOff ? 0 : 34;
       var push = fxOff ? 0 : clamp(smoothVel * 0.045, 0, 34);

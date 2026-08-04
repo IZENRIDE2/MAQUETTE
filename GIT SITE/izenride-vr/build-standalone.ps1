@@ -43,7 +43,7 @@ $table = "<script>`n(function(){var IMG={" + ($entries -join ",") + "};" +
 
 # ── 3. Scripts, dans l'ordre de chargement ──
 $first = $true
-foreach ($j in @('road-gl', 'scenes', 'app')) {
+foreach ($j in @('hero-map', 'scenes', 'app')) {
   $code  = [IO.File]::ReadAllText("$src\assets\js\$j.js", $utf8)
   $block = "<script>`n$code`n</script>"
   if ($first) { $block = $table + "`n" + $block; $first = $false }

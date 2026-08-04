@@ -400,3 +400,14 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--blue);outline-offse
   .marquee__track{animation:none}
   .work__visual-scan,.hero__scroll-bar::after{display:none}
 }
+
+/* ── Mentions légales ──────────────────────────────────────────────
+   Deux de ces liens sont déclarés à Google Play (politique de
+   confidentialité, suppression de compte) : ils doivent rester visibles
+   et cliquables. Discret, mais jamais masqué. */
+.footer--legal{
+  border-top:0;padding-top:10px;padding-bottom:26px;
+  justify-content:center;gap:8px 18px;font-size:11px;letter-spacing:.04em;
+}
+.footer--legal a{color:var(--muted);text-decoration:none;opacity:.75;transition:opacity .2s,color .2s}
+.footer--legal a:hover,.footer--legal a:focus-visible{color:var(--txt);opacity:1;text-decoration:underline}

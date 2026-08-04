@@ -19,11 +19,9 @@
   document.documentElement.classList.add((seen || rm) ? 'intro-skip' : 'intro-playing');
 }catch(e){}})();
 </script>
-<link rel="preconnect" href="https://api.fontshare.com" crossorigin>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://api.fontshare.com/v2/css?f[]=clash-display@500,600,700&f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<!-- Polices hébergées chez nous : aucune requête tierce, aucune adresse IP
+     transmise avant consentement. Voir tools/rapatrier-polices.py. -->
+<link href="css/fonts.css" rel="stylesheet">
 <link rel="stylesheet" href="css/styles.css">
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"MobileApplication","name":"IZENRIDE",
@@ -457,8 +455,8 @@
 </aside>
 
 <!-- GSAP + ScrollTrigger (CDN) -->
-<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js" defer></script>
-<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js" defer></script>
+<script src="js/vendor/gsap.min.js" defer></script>
+<script src="js/vendor/ScrollTrigger.min.js" defer></script>
 <script src="js/main.js" defer></script>
 </body>
 </html>

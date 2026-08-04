@@ -193,8 +193,8 @@ def gabarit(titre, corps, maj):
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{html.escape(titre)} — IZEN RIDE</title>
   <meta name="description" content="{html.escape(titre)} de IZEN RIDE, l’application des motards.">
-  <link rel="preconnect" href="https://api.fontshare.com">
-  <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=clash-display@600,700&f[]=satoshi@400,500,700&display=swap">
+  <!-- Polices hébergées chez nous : aucune requête tierce. -->
+  <link rel="stylesheet" href="/css/fonts.css">
   <link rel="stylesheet" href="/css/styles.css">
   <link rel="stylesheet" href="/css/legal.css">
 </head>

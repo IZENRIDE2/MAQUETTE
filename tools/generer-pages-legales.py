@@ -82,7 +82,7 @@ LIENS_PIED = [
 # S'y ajoutait une omission : les rapports de plantage (Sentry).
 APO = r"(?:['’]|&rsquo;|&#8217;|&#039;)"
 
-CORRECTIONS = [
+CORRECTIONS_CONFIDENTIALITE = [
     (
         # Le paragraphe fautif, reconnu sur son ossature (la ponctuation et
         # les apostrophes typographiques varient selon l'éditeur WordPress).
@@ -114,6 +114,35 @@ CORRECTIONS = [
 ]
 
 
+# ── Le prix, et la seule source qui fait foi ───────────────────────────
+#
+# Trois documents annonçaient trois prix différents le 2026-08-04 :
+#   • la page d'accueil du site   : 4,99 € / mois, 49,99 € / an
+#   • ces CGV publiées WordPress  : « FORFAIT ZEN à 7,99 € »
+#   • les CGV de l'APPLICATION    : 9,99 € / mois, 49,99 € / 6 mois,
+#                                   79,99 € / an
+#
+# Décision de l'auteur du projet : **les CGV de l'application font foi**,
+# les autres s'alignent. Source :
+#   C:/Izen-ride/Izenride Demo/apps/mobile/lib/legal/content/cgv.ts:73-75
+#
+# ⚠️ La page WordPress d'origine porte TOUJOURS 7,99 €. Cette correction ne
+# la modifie pas — elle corrige la page publiée. À reprendre dans WordPress
+# pour que la source et le publié cessent de diverger.
+CORRECTIONS_CGV = [
+    (
+        r"ABONNEMENT FORFAIT ZEN à 7,99\s*€",
+        "ABONNEMENT FORFAIT ZEN — 9,99 € / mois, 49,99 € / 6 mois "
+        "(soit 8,33 € / mois), ou 79,99 € / an (soit 6,67 € / mois)",
+    ),
+]
+
+CORRECTIONS_PAR_PAGE = {
+    "politique-de-confidentialite": CORRECTIONS_CONFIDENTIALITE,
+    "conditions-generales-de-vente": CORRECTIONS_CGV,
+}
+
+
 def recuperer(slug):
     url = f"{BASE}/wp-json/wp/v2/pages?slug={slug}&_fields=title,content,modified"
     req = urllib.request.Request(url, headers={"User-Agent": "izenride-port/1.0"})
@@ -141,10 +170,11 @@ def nettoyer(contenu):
 
 
 def corriger(slug, contenu):
-    if slug != "politique-de-confidentialite":
+    corrections = CORRECTIONS_PAR_PAGE.get(slug)
+    if not corrections:
         return contenu, []
     appliquees = []
-    for motif, remplacement in CORRECTIONS:
+    for motif, remplacement in corrections:
         nouveau, n = re.subn(motif, remplacement, contenu, count=1)
         if n:
             appliquees.append(motif[:52] + "…")

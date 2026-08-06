@@ -61,6 +61,15 @@ FEUILLES = {
         "https://fonts.googleapis.com/css2?family=JetBrains+Mono"
         ":ital,wght@0,400;0,500;1,400&display=swap"
     ),
+    # ⚠️ Geist n'est utilisée QUE par screens/gps.html, une maquette chargée
+    # dans une iframe PARESSEUSE. C'est ce qui l'a fait échapper à la première
+    # vérification réseau : tant qu'on n'avait pas fait défiler jusqu'à elle,
+    # l'appel ne partait pas. Une page « sans requête tierce » qui en émet une
+    # au premier défilement n'est pas conforme, elle est juste discrète.
+    "Google Fonts — Geist (maquette GPS)": (
+        "https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700"
+        "&family=Geist+Mono:wght@400;500;600;700&display=swap"
+    ),
 }
 
 SCRIPTS = [

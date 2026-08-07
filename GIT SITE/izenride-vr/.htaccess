@@ -1,0 +1,133 @@
+# ═══════════════════════════════════════════════════════════════
+# izenride.com — configuration Apache (hébergement mutualisé OVH)
+#
+# 🔴 POURQUOI CE FICHIER EXISTE
+#
+# Le 2026-08-06, pendant la vérification des corrections, le navigateur a
+# servi une page en cache : le DOM montrait encore 10 captures d'écran là où
+# le fichier n'en portait plus que 9, et l'ancien JavaScript répondait
+# « Place réservée » alors que le nouveau refuse la soumission sans
+# consentement. Le test passait, et il mentait.
+#
+# Ce site publie des textes à portée juridique (politique de confidentialité,
+# mention RGPD au point de collecte, périmètre de l'abonnement). Un visiteur
+# qui garde l'ancienne version en cache lit un document que nous avons
+# corrigé — parfois pour cause d'affirmation fausse. D'où deux règles :
+#
+#   • Les PAGES ne sont jamais servies depuis le cache sans revalidation.
+#   • Les ASSETS portent un numéro de version dans leur URL
+#     (assets/css/main.css?v=2026-08-06) et peuvent donc être gardés
+#     longtemps sans risque.
+#
+# 🔴 EN CHANGEANT UN ASSET, CHANGER SON ?v= DANS LES 6 PAGES.
+# Sinon le cache long ci-dessous fige la modification pendant un an.
+# ═══════════════════════════════════════════════════════════════
+
+# ── HTTPS obligatoire ────────────────────────────────────────────
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{HTTPS} !=on
+  RewriteCond %{HTTP:X-Forwarded-Proto} !https
+  RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R=301,L]
+</IfModule>
+
+# ── Anciennes adresses des pages légales ─────────────────────────
+#
+# 🔴 SANS CES QUATRE LIGNES, PUBLIER CE SITE CASSE L'URL DÉCLARÉE À GOOGLE.
+#
+# La version actuellement en ligne est celle de la racine du dépôt, qui range
+# ses pages légales dans des DOSSIERS :
+#     /politique-de-confidentialite/   /mentions-legales/
+#     /conditions-generales-dutilisation-cgu/   /conditions-generales-de-vente/
+# Cette version-ci les sert à plat (`confidentialite.html`, …). Remplacer l'une
+# par l'autre sans rien d'autre rendrait 404 sur les adresses existantes — dont
+# **l'URL de règlement de confidentialité déclarée dans la Play Console**, que
+# le relecteur ouvre pour la comparer à la divulgation affichée dans l'app. Une
+# politique introuvable est un motif de rejet, au même titre qu'une politique
+# fausse (rejet du 2026-08-03).
+#
+# 301 et non 302 : l'adresse a changé pour de bon, et un permanent transmet
+# l'historique de référencement.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteRule ^politique-de-confidentialite/?$            /confidentialite.html   [R=301,L]
+  RewriteRule ^mentions-legales/?$                        /mentions-legales.html  [R=301,L]
+  RewriteRule ^conditions-generales-dutilisation-cgu/?$   /cgu.html               [R=301,L]
+  RewriteRule ^conditions-generales-de-vente/?$           /cgv.html               [R=301,L]
+</IfModule>
+
+# ── Durées de cache ──────────────────────────────────────────────
+<IfModule mod_expires.c>
+  ExpiresActive On
+
+  # Les pages : jamais de cache aveugle. Le navigateur doit redemander au
+  # serveur si la page a changé (une requête conditionnelle, très légère).
+  ExpiresByType text/html "access plus 0 seconds"
+
+  # Les assets : versionnés dans l'URL, donc immuables à version donnée.
+  ExpiresByType text/css "access plus 1 year"
+  ExpiresByType application/javascript "access plus 1 year"
+  ExpiresByType image/jpeg "access plus 1 year"
+  ExpiresByType image/png "access plus 1 year"
+  ExpiresByType image/svg+xml "access plus 1 year"
+  ExpiresByType font/woff2 "access plus 1 year"
+</IfModule>
+
+<IfModule mod_headers.c>
+  # Ceinture et bretelles sur les pages : `Expires` ci-dessus ne suffit pas
+  # face à tous les caches intermédiaires.
+  <FilesMatch "\.html$">
+    Header set Cache-Control "no-cache, must-revalidate"
+  </FilesMatch>
+
+  # Les assets versionnés peuvent être marqués immuables : le navigateur ne
+  # les revalide même pas.
+  <FilesMatch "\.(css|js|jpg|jpeg|png|svg|woff2)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+
+  # ── En-têtes de sécurité ───────────────────────────────────────
+  # Le site ne charge AUCUNE ressource tierce (vérifié le 2026-08-06 : ni
+  # police distante, ni mesure d'audience, ni CDN). La politique ci-dessous
+  # verrouille cet état : toute réintroduction d'un appel tiers sera bloquée
+  # par le navigateur et donc visible immédiatement, au lieu de passer
+  # inaperçue comme la dernière fois.
+  #
+  # 'unsafe-inline' est requis pour le <style> du <noscript> de index.html et
+  # les styles calculés au fil du scroll. À resserrer si ces deux usages
+  # disparaissent.
+  #
+  # 🔴 PIÈGE CONNU — `connect-src 'self'` BLOQUERA le formulaire de bêta le
+  # jour où on renseignera ENDPOINT dans assets/js/app.js avec une adresse
+  # d'un AUTRE domaine (le projet évoque inscription.izenride.fr). Le
+  # navigateur refusera la requête et le formulaire affichera « l'envoi a
+  # échoué » sans que rien n'apparaisse dans les journaux du serveur — une
+  # panne qui ressemble à un problème réseau alors que c'est cette ligne.
+  # Dans ce cas : ajouter l'origine ici ET les en-têtes CORS côté serveur.
+  # Si le formulaire est servi sous la même origine, ne rien changer.
+  Header set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; form-action 'self'; frame-ancestors 'none'; base-uri 'self'"
+
+  Header set X-Content-Type-Options "nosniff"
+  Header set Referrer-Policy "strict-origin-when-cross-origin"
+  Header set X-Frame-Options "DENY"
+  Header set Permissions-Policy "geolocation=(), camera=(), microphone=(), payment=()"
+</IfModule>
+
+# ── Compression ──────────────────────────────────────────────────
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css application/javascript image/svg+xml
+</IfModule>
+
+# ── Divers ───────────────────────────────────────────────────────
+# Pas de listing de répertoire.
+Options -Indexes
+
+# La page d'accueil.
+DirectoryIndex index.html
+
+# Le dossier docs/ contient les notes de chantier (audit, corrélation
+# site/app) : ce sont des documents internes, pas du contenu public.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteRule ^docs/ - [F,L]
+</IfModule>

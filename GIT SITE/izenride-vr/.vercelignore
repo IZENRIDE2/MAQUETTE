@@ -1,0 +1,17 @@
+# Ce qui ne doit PAS partir sur le site public.
+#
+# 🔴 `docs/` EST LE POINT IMPORTANT. Il contient les notes de chantier —
+# `mise-en-correlation-site-app.md`, 27 Ko — qui listent les écarts entre le
+# site et l'application, citent les chemins locaux du poste de développement et
+# la branche de travail. Apache les bloquait (`RewriteRule ^docs/ - [F,L]` dans
+# .htaccess) ; Vercel IGNORE .htaccess, donc sans ce fichier elles seraient
+# servies publiquement, à l'adresse même que le relecteur Play visite.
+#
+# `.vercelignore` plutôt qu'une règle de routage : ce qui n'est pas téléversé ne
+# peut pas fuiter par une règle mal écrite.
+docs/
+
+# Outils de développement — sans objet en ligne.
+build-standalone.ps1
+serve.ps1
+README.md

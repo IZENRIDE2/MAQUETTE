@@ -106,18 +106,36 @@
   # Dans ce cas : ajouter l'origine ici ET les en-têtes CORS côté serveur.
   # Si le formulaire est servi sous la même origine, ne rien changer.
   #
-  # Le piège s'est produit : le formulaire de secours de reset-password.html
-  # appelle Supabase, d'où l'origine ajoutée à `connect-src`. Elle est
-  # accordée à TOUT le site et non à cette seule page : deux en-têtes CSP se
-  # combinent par INTERSECTION, une règle plus permissive posée sur un chemin
-  # précis serait donc annulée par la règle générale — elle ne relâcherait
-  # rien, elle donnerait juste l'illusion de l'avoir fait.
+  # Le piège s'est produit une fois : le formulaire de secours de
+  # `reset-password.html` appelait Supabase, d'où une origine
+  # `https://onzmjiykvdhhqwvebaqg.supabase.co` ajoutée à `connect-src`. Elle
+  # était accordée à TOUT le site et non à cette seule page : deux en-têtes CSP
+  # se combinent par INTERSECTION, une règle plus permissive posée sur un
+  # chemin précis aurait donc été annulée par la règle générale — elle n'aurait
+  # rien relâché, elle aurait juste donné l'illusion de l'avoir fait.
   #
-  # ⚠️ Cette origine est écrite à trois endroits : ici, dans `vercel.json`
-  # (c'est celui-là qui s'applique en ligne, Apache n'existe pas chez Vercel)
-  # et dans `assets/js/reset-password.js`. Changer de projet Supabase sans
-  # reprendre les trois donne une panne qui ressemble à une coupure réseau.
-  Header set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://onzmjiykvdhhqwvebaqg.supabase.co; form-action 'self'; frame-ancestors 'none'; base-uri 'self'"
+  # 🔴 CETTE ORIGINE A ÉTÉ RETIRÉE LE 2026-08-12, AVEC LA PAGE QUI LA
+  # JUSTIFIAIT. Deux pages de réinitialisation coexistaient — celle-ci et
+  # `apps/site-institutionnel/src/pages/reset-password.astro` dans le dépôt
+  # applicatif — et l'audit de ce jour a établi que Supabase n'atteignait NI
+  # L'UNE NI L'AUTRE : la fonction Edge `auth-request-password-reset` émettait
+  # `redirect_to=izenride://reset-password`, un schéma que seul un téléphone
+  # sait ouvrir. La page du dépôt applicatif a été retenue — elle est
+  # versionnée avec une garde de CI qui vérifie toute la chaîne — et celle-ci
+  # supprimée, `site_url` déplacé vers l'autre.
+  #
+  # L'origine part donc avec elle : `assets/js/reset-password.js` était le SEUL
+  # fichier du site à appeler Supabase (vérifié le 2026-08-12). Les trois pages
+  # légales le NOMMENT — hébergeur, région AWS eu-central-1 — mais ne l'appellent
+  # pas : aucun `fetch`, aucun `createClient`, aucune URL. Une permission qu'on
+  # garde « au cas où » après la disparition de son unique usage n'est plus une
+  # permission, c'est une surface.
+  #
+  # ⚠️ SI UNE PAGE DE CE SITE DOIT UN JOUR REPARLER À SUPABASE, l'origine est à
+  # remettre à DEUX endroits : ici et dans `vercel.json` — et c'est `vercel.json`
+  # qui s'applique en ligne, Apache n'existe pas chez Vercel. N'en reprendre
+  # qu'un donne une panne qui ressemble à une coupure réseau.
+  Header set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; form-action 'self'; frame-ancestors 'none'; base-uri 'self'"
 
   Header set X-Content-Type-Options "nosniff"
   Header set Referrer-Policy "strict-origin-when-cross-origin"

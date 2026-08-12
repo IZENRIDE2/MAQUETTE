@@ -10,6 +10,27 @@
         "-Port", "4180"
       ],
       "port": 4180
+    },
+    {
+      "name": "game-of-drone",
+      "runtimeExecutable": "powershell",
+      "runtimeArgs": [
+        "-ExecutionPolicy", "Bypass",
+        "-File", "game-of-drone/serve.ps1",
+        "-Port", "4190"
+      ],
+      "port": 4190
+    },
+    {
+      "name": "izenride-back-office",
+      "runtimeExecutable": "C:\\Users\\33766\\AppData\\Local\\Programs\\nodejs\\node.exe",
+      "runtimeArgs": [
+        "izenride/node_modules/next/dist/bin/next",
+        "dev",
+        "izenride/apps/back-office",
+        "--port", "3001"
+      ],
+      "port": 3001
     }
   ]
 }

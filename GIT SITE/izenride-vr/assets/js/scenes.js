@@ -3,7 +3,7 @@
    Trois visualisations pilotées par un seul RAF (app.js) :
      · cross  — deux trajectoires qui se croisent
      · radar  — réseau de signalements communautaires
-     · safety — dôme de protection + proches en veille
+     · safety — dôme de protection + contacts enregistrés
    Chaque scène ne tourne que lorsqu'elle est visible.
    ============================================================ */
 (function (global) {
@@ -316,7 +316,10 @@
     ];
     var t = 0;
     var sweep = 0;
-    var alertAt = 14;   // simulation de chute périodique
+    // Cadence de rejeu de la mise en scène. Ce n'est PAS une détection : l'app
+    // n'a aucun capteur de chute, le SOS est un appui volontaire suivi d'un
+    // décompte de 10 s. Ne pas réintroduire « chute » dans cette scène.
+    var alertAt = 14;
     var alerting = -1;
 
     return function frame(dt, w, h) {
@@ -428,10 +431,10 @@
         ctx.font = '700 ' + Math.max(10, w * 0.036) + 'px ui-sans-serif, system-ui, sans-serif';
         ctx.fillStyle = C.err;
         ctx.textAlign = 'center';
-        ctx.fillText('CHUTE DÉTECTÉE', cx, cy - R * 0.72);
+        ctx.fillText('SOS DÉCLENCHÉ', cx, cy - R * 0.72);
         ctx.font = '500 ' + Math.max(9, w * 0.028) + 'px ui-sans-serif, system-ui, sans-serif';
         ctx.fillStyle = C.mute;
-        ctx.fillText('Proches prévenus · position transmise', cx, cy - R * 0.72 + w * 0.05);
+        ctx.fillText('Position transmise avec l’alerte', cx, cy - R * 0.72 + w * 0.05);
       }
     };
   }

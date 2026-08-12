@@ -9,7 +9,7 @@
 <meta property="og:title" content="IzenRide — Le cockpit du motard">
 <meta property="og:description" content="Né de la route. Bâti pour ceux qui la connaissent.">
 <meta property="og:type" content="website">
-<link rel="stylesheet" href="assets/css/main.css">
+<link rel="stylesheet" href="assets/css/main.css?v=2026-08-06">
 <noscript><style>
   .boot,.fx-scan,.fx-grain,.motion-toggle{display:none!important}
   .hero__copy>*,.tele,.scrollcue,.reveal{opacity:1!important;transform:none!important}
@@ -75,6 +75,7 @@
     <a href="#radars">Radars</a>
     <a href="#safety">Safety Zone</a>
     <a href="#cockpit">Les écrans</a>
+    <a href="confidentialite.html">Confidentialité</a>
   </nav>
   <a href="#beta" class="btn btn--sm btn--primary">Rejoindre la bêta</a>
 </header>
@@ -123,8 +124,8 @@
     </h1>
     <p class="hero__lede">
       IzenRide n'est pas une app de plus. C'est le cockpit du motard :
-      une navigation pensée pour vos gants, des dangers signalés par ceux
-      qui roulent devant vous, et un filet de sécurité qui veille
+      une navigation pensée pour vos gants, les dangers de la route annoncés
+      avant que vous les voyiez, et un filet de sécurité qui veille
       quand la route tourne mal.
     </p>
     <div class="hero__cta">
@@ -216,13 +217,13 @@
       <p class="kicker reveal">Temps réel</p>
       <h2 class="h2 reveal">Radars communautaires</h2>
       <p class="lede reveal">
-        Pas de base achetée. Pas de pub. Juste les signalements
-        des motards qui roulent devant vous.
+        Pas de base achetée. Pas de pub. Les dangers de votre trajet,
+        annoncés avant que vous les voyiez.
       </p>
       <p class="body reveal">
-        Un contrôle, du gravier, une nappe d'huile : un tap ganté suffit.
-        L'alerte remonte, se valide auprès des riders suivants, et s'éteint
-        toute seule quand elle n'a plus lieu d'être.
+        Contrôle, gravier, épingle serrée, chaussée glissante : l'app les
+        annonce à l'approche, avec une alerte graduée selon la distance. La
+        remontée par les riders eux-mêmes arrive avec la bêta ouverte.
       </p>
       <div class="chips reveal">
         <span class="chip chip--warn">Contrôle</span>
@@ -257,12 +258,13 @@
         Le mode qu'on active en espérant ne jamais en avoir besoin.
       </p>
       <p class="body reveal">
-        Position partagée en éphémère avec vos proches, détection de chute
-        par capteurs, compte à rebours avant alerte, et SOS avec vos
-        coordonnées exactes. Ça s'arrête quand vous coupez le contact.
+        Position partagée en éphémère avec vos proches, SOS déclenché d'un
+        appui, décompte de dix secondes pour annuler une fausse alerte, et vos
+        coordonnées exactes transmises avec elle. Ça s'arrête quand vous
+        coupez le contact.
       </p>
       <div class="metrics reveal">
-        <div><b>&lt; 12 s</b><i>de la chute à l'alerte</i></div>
+        <div><b>10 s</b><i>pour annuler avant l'envoi</i></div>
         <div><b>0</b><i>donnée revendue</i></div>
         <div><b>Éphémère</b><i>partage auto-expiré</i></div>
       </div>
@@ -273,7 +275,7 @@
         <div class="stage__hud">
           <span class="stage__tag stage__tag--ok" id="safetyTag">Protégé</span>
           <div class="stage__metric">
-            <b id="safetyContacts">3</b><i>proches en veille</i>
+            <b id="safetyContacts">3</b><i>contacts enregistrés</i>
           </div>
         </div>
       </div>
@@ -288,8 +290,8 @@
       <p class="kicker reveal">Écrans officiels</p>
       <h2 class="h2 reveal">L'app, telle qu'elle est</h2>
       <p class="lede reveal">
-        Aucune maquette retouchée : ce sont les écrans de la bêta, capturés sur
-        un vrai téléphone. Bougez la souris — ou inclinez le vôtre.
+        Des écrans de la bêta, capturés sur émulateur à partir du build en
+        cours. Bougez la souris — ou inclinez le vôtre.
       </p>
     </div>
 
@@ -325,9 +327,11 @@
             <img class="scr" data-screen="premium" width="540" height="1119"
                  src="assets/screens/09-premium.jpg"
                  alt="Écran Premium : likes illimités">
-            <img class="scr" data-screen="abonnements" width="540" height="1119"
-                 src="assets/screens/10-abonnements.jpg"
-                 alt="Écran Abonnements : comparatif gratuit et premium">
+<!-- 10-abonnements.jpg retiré le 2026-08-06 : l'image affiche « Trimestriel
+                 −15 % / Annuel −50 % » et un quota « Annonces marketplace », trois
+                 paliers qui n'existent dans aucune version du code. Les prix réels
+                 sont 9,99 € / 49,99 € / 79,99 € (lib/legal/content/cgv.ts:73-75) et
+                 la marketplace est hors périmètre. À réintégrer après recapture. -->
           </div>
         </div>
         <div class="phone__reflect"></div>
@@ -335,12 +339,12 @@
     </div>
 
     <p class="shot-cap reveal" id="shotCap">
-      <b>Carte</b><span>Les signalements et les motards de votre secteur, en direct.</span>
+      <b>Carte</b><span>Les dangers annoncés et les motards de votre secteur.</span>
     </p>
 
     <div class="shots reveal" role="tablist" aria-label="Écrans de l'application">
       <button class="shot is-on" data-screen="carte" role="tab" aria-selected="true"
-              data-title="Carte" data-desc="Les signalements et les motards de votre secteur, en direct.">
+              data-title="Carte" data-desc="Les dangers annoncés et les motards de votre secteur.">
         <img src="assets/screens/02-carte.jpg" alt="" loading="lazy" width="540" height="1119"><i>Carte</i>
       </button>
       <button class="shot" data-screen="itineraire" role="tab" aria-selected="false"
@@ -375,10 +379,7 @@
               data-title="Premium" data-desc="Plus de likes, plus de filtres, zéro limite quotidienne.">
         <img src="assets/screens/09-premium.jpg" alt="" loading="lazy" width="540" height="1119"><i>Premium</i>
       </button>
-      <button class="shot" data-screen="abonnements" role="tab" aria-selected="false"
-              data-title="Abonnements" data-desc="Le gratuit reste complet. Le premium enlève les freins.">
-        <img src="assets/screens/10-abonnements.jpg" alt="" loading="lazy" width="540" height="1119"><i>Offres</i>
-      </button>
+<!-- Onglet « Offres » retiré avec sa capture — voir le commentaire plus haut. -->
     </div>
   </div>
 </section>
@@ -390,7 +391,10 @@
       <div class="stat reveal"><b data-count="1284">0</b><i>motards en bêta</i></div>
       <div class="stat reveal"><b data-count="47" data-suffix="k">0</b><i>km enregistrés</i></div>
       <div class="stat reveal"><b data-count="9130">0</b><i>croisements comptés</i></div>
-      <div class="stat reveal"><b data-count="12" data-suffix=" s">0</b><i>chute → alerte</i></div>
+      <!-- Tuile « 12 s — chute → alerte » retirée le 2026-08-06 : ce n'était pas un
+           chiffre d'usage mais l'affirmation qu'un détecteur de chute existe. Aucun
+           capteur, aucun expo-sensors dans l'app ; le SOS est un appui volontaire
+           suivi d'un décompte de 10 s (app/(safety)/sos.tsx:230). -->
     </div>
     <p class="stats__note reveal">Chiffres de la bêta fermée — mis à jour à chaque vague d'invitations.</p>
   </div>
@@ -408,7 +412,6 @@
     <img src="assets/screens/07-badges.jpg" alt="" loading="lazy" width="540" height="1119">
     <img src="assets/screens/08-confidentialite.jpg" alt="" loading="lazy" width="540" height="1119">
     <img src="assets/screens/09-premium.jpg" alt="" loading="lazy" width="540" height="1119">
-    <img src="assets/screens/10-abonnements.jpg" alt="" loading="lazy" width="540" height="1119">
   </div>
 </div>
 
@@ -443,9 +446,25 @@
           </select>
         </label>
       </div>
+      <label class="field field--check">
+        <input type="checkbox" name="consent" id="betaConsent" value="on" required>
+        <span>J'accepte qu'IZEN RIDE SAS utilise mon adresse e-mail pour m'informer
+          de l'ouverture de la bêta dans mon secteur.</span>
+      </label>
       <button class="btn btn--primary btn--lg" type="submit">Réserver ma place</button>
       <p class="form__legal">
         Pas de spam, pas de revente. Une adresse, une invitation.<br>
+        <b>Responsable de traitement :</b> IZEN RIDE SAS, 4 rue Massilie, 13420 Gémenos.
+        <b>Finalité :</b> gestion de la liste d'attente de la bêta.
+        <b>Base légale :</b> votre consentement (art. 6-1-a du RGPD).
+        <b>Destinataire :</b> IZEN RIDE seule — aucune revente, aucune cession.
+        <b>Hébergement</b> dans l'Union européenne.
+        <b>Conservation :</b> jusqu'à l'ouverture publique de l'application, et au
+        plus tard 24 mois après votre inscription.
+        Vous disposez d'un droit d'accès, de rectification, d'effacement,
+        d'opposition et de portabilité :
+        <a href="mailto:direction@izenride.com">direction@izenride.com</a>.
+        Détails dans la <a href="confidentialite.html">politique de confidentialité</a>.<br>
         En réservant votre place, vous acceptez les <a href="cgu.html">CGU</a>
         et, pour l'abonnement Premium, les <a href="cgv.html">CGV</a>.
       </p>
@@ -470,12 +489,33 @@
       </svg>
       <span class="nav__word">Izen<b>Ride</b></span>
     </div>
+    <!-- 🔴 LIENS BOUTIQUE VOLONTAIREMENT ABSENTS (décision Florian, 2026-08-06).
+         Les fiches Play et App Store décrivent encore l'ANCIENNE application :
+         « zones de contrôles potentielles » (le signalement communautaire
+         n'existe pas) et « invisible dans un rayon de deux kilomètres autour
+         de votre domicile » (l'app gère désormais plusieurs zones à rayon
+         paramétrable). Elles affichent aussi 2,2 ★ et 2,63 ★.
+         Y renvoyer depuis ce site enverrait le visiteur — et le relecteur
+         Play — vers une description que le produit contredit.
+         À rétablir quand les fiches auront été reprises :
+           Play      https://play.google.com/store/apps/details?id=com.izenride.app
+           App Store https://apps.apple.com/fr/app/izenride/id6476877458
+         Le paquet est le même que celui du build en cours (com.izenride.app),
+         les URL resteront donc valables. -->
+    <nav class="foot__links foot__links--stores" aria-label="Réseaux sociaux">
+      <a href="https://www.instagram.com/izenride/" target="_blank" rel="noopener">Instagram</a>
+      <a href="https://www.tiktok.com/@IZENRIDE" target="_blank" rel="noopener">TikTok</a>
+      <a href="https://www.youtube.com/@IZENRIDE" target="_blank" rel="noopener">YouTube</a>
+    </nav>
     <nav class="foot__links">
       <a href="#manifeste">Manifeste</a>
       <a href="#radars">Sécurité</a>
       <a href="#beta">Bêta</a>
       <a href="cgu.html">CGU</a>
       <a href="cgv.html">CGV</a>
+      <a href="mentions-legales.html">Mentions légales</a>
+      <a href="confidentialite.html">Confidentialité</a>
+      <a href="suppression-compte.html">Supprimer mon compte</a>
       <a href="mailto:direction@izenride.com">Contact</a>
     </nav>
     <p class="foot__copy">
@@ -489,8 +529,8 @@
   <span class="motion-toggle__dot"></span><span id="motionLabel">Immersion</span>
 </button>
 
-<script src="assets/js/hero-map.js"></script>
-<script src="assets/js/scenes.js"></script>
-<script src="assets/js/app.js"></script>
+<script src="assets/js/hero-map.js?v=2026-08-06"></script>
+<script src="assets/js/scenes.js?v=2026-08-06"></script>
+<script src="assets/js/app.js?v=2026-08-06"></script>
 </body>
 </html>

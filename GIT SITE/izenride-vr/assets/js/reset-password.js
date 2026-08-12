@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════
-// RELAIS DU LIEN DE RÉINITIALISATION VERS L'APPLICATION.
+// LIEN DE RÉINITIALISATION : RELAIS VERS L'APPLICATION, FORMULAIRE EN SECOURS.
 //
 // 🔴 POURQUOI CETTE PAGE EXISTE. Supabase redirigeait directement vers
 // `izenride://reset-password#…`. Sur un téléphone, l'application s'ouvre.
@@ -8,6 +8,14 @@
 // `izenride://` : rien ne se passe, ou une page d'erreur nue. L'utilisateur
 // en conclut que le lien est cassé, et comme c'est le seul chemin de
 // récupération de compte, il abandonne.
+//
+// 🔴 ET LE RELAIS SEUL NE SUFFISAIT PAS. Il ouvre l'application quand elle
+// est là ; sinon il ne restait qu'un message « ouvrez ce lien sur votre
+// téléphone », c'est-à-dire un cul-de-sac pour qui lit ses mails sur un
+// ordinateur. D'où le formulaire de secours, repris du travail d'IzenRide
+// Dev : il change le mot de passe ici même, MAIS uniquement là où le relais
+// ne peut pas aboutir. Sur un mobile équipé, l'application reste prioritaire
+// — c'est elle qui sait ouvrir une session.
 //
 // ⚠️ LES JETONS SONT DANS LE FRAGMENT (`#…`), ET C'EST CE QUI REND CETTE
 // PAGE DÉLICATE. Un fragment ne quitte jamais le navigateur : il n'apparaît
@@ -22,14 +30,38 @@
 // cette page. Le jour où quelqu'un voudra « juste ajouter un pixel », c'est
 // ce commentaire qu'il doit lire d'abord.
 //
-// Script EN LIGNE et sans dépendance, pour la même raison.
+// Script EN LIGNE et sans dépendance, pour la même raison. Il est SERVI en
+// fichier séparé et non embarqué dans le HTML : la CSP du site interdit
+// `unsafe-inline` (`vercel.json`, `script-src 'self'`).
 // ═══════════════════════════════════════════════════════════════
 (function () {
+  // Projet Supabase qui émet les liens de récupération. La clé anon est
+  // publique par conception : elle n'ouvre que ce que les politiques RLS
+  // autorisent, et tout client de l'application l'embarque déjà. La clé
+  // `service_role`, qui elle contourne le RLS, n'a rien à faire ici.
+  //
+  // ⚠️ CETTE ORIGINE EST AUSSI DÉCLARÉE DANS LA CSP (`vercel.json`,
+  // `connect-src`). Changer de projet sans y toucher ferait échouer l'appel
+  // au niveau du navigateur, avant même d'atteindre le réseau — et le
+  // symptôme ressemblerait à une panne de connexion.
+  var SUPABASE_URL = 'https://onzmjiykvdhhqwvebaqg.supabase.co';
+  var SUPABASE_ANON_KEY =
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9uem1qaXlrdmRoaHF3dmViYXFnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcwNjcxNzcsImV4cCI6MjA5MjY0MzE3N30.YqXmMQBjMiudy_RWWDfxD49wBb50IkXESsAXeIvPS4U';
+
   var fragment = window.location.hash.slice(1);
   var p = new URLSearchParams(fragment);
 
+  var ETATS = [
+    'etat-defaut',
+    'etat-ordinateur',
+    'etat-mobile',
+    'etat-absente',
+    'etat-expire',
+    'etat-autre-projet',
+  ];
+
   function montrer(id) {
-    ['etat-ordinateur', 'etat-mobile', 'etat-expire', 'etat-absente'].forEach(function (x) {
+    ETATS.forEach(function (x) {
       var el = document.getElementById(x);
       if (el) el.hidden = x !== id;
     });
@@ -44,8 +76,177 @@
   }
 
   // Page ouverte sans jetons — lien tronqué par un client de messagerie, ou
-  // simple visite. L'état par défaut dit déjà quoi faire.
-  if (!p.get('access_token') || !p.get('refresh_token')) return;
+  // simple visite. L'état par défaut dit déjà quoi faire, et surtout il ne
+  // promet aucun formulaire.
+  var jeton = p.get('access_token');
+  if (!jeton || !p.get('refresh_token')) return;
+
+  // ── LE FORMULAIRE DE SECOURS ───────────────────────────────────
+
+  // De quel projet Supabase ce jeton vient-il ? La réponse est dans sa
+  // charge utile (`iss`). On la lit pour une seule raison : si le lien vient
+  // d'un autre environnement, l'appel serait bloqué par la CSP et l'écran
+  // afficherait « réseau indisponible » — un diagnostic faux, sur lequel
+  // personne ne peut agir. Mieux vaut dire la vérité et renvoyer vers
+  // l'application, qui sait traiter n'importe quel environnement.
+  //
+  // Lecture par expression régulière plutôt que `JSON.parse` : `atob` rend
+  // une chaîne d'octets, et un simple accent dans une autre revendication
+  // (un e-mail, par exemple) suffirait à faire échouer l'analyse — alors que
+  // `iss` est toujours en ASCII.
+  function projetDuJeton(jwt) {
+    try {
+      var charge = String(jwt).split('.')[1];
+      if (!charge) return null;
+      var b64 = charge.replace(/-/g, '+').replace(/_/g, '/');
+      while (b64.length % 4) b64 += '=';
+      var trouve = window.atob(b64).match(/"iss"\s*:\s*"([^"]+)"/);
+      return trouve ? trouve[1].replace(/\/auth\/v1\/?$/, '') : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  // Les mêmes cinq règles que l'écran de l'application
+  // (`apps/mobile/lib/auth/password-rules.ts`). Elles sont dupliquées ici
+  // faute de code partagé entre les deux dépôts : si elles changent là-bas,
+  // ce fichier est à reprendre à la main. Un mot de passe accepté ici et
+  // refusé par l'application serait pire que pas de formulaire du tout.
+  var REGLES = {
+    longueur: function (v) {
+      return v.length >= 8;
+    },
+    majuscule: function (v) {
+      return /[A-Z]/.test(v);
+    },
+    minuscule: function (v) {
+      return /[a-z]/.test(v);
+    },
+    chiffre: function (v) {
+      return /\d/.test(v);
+    },
+    special: function (v) {
+      return /[^A-Za-z0-9]/.test(v);
+    },
+  };
+
+  function cabler(acces) {
+    var form = document.getElementById('form');
+    var mdp = document.getElementById('motdepasse');
+    var confirmation = document.getElementById('confirmation');
+    var message = document.getElementById('message');
+    var valider = document.getElementById('valider');
+    var criteres = document.getElementById('criteres');
+    var enregistre = document.getElementById('enregistre');
+    if (!form || !mdp || !confirmation || !valider || !criteres) return;
+
+    function evaluer(v) {
+      var toutes = true;
+      Array.prototype.forEach.call(criteres.children, function (li) {
+        var regle = REGLES[li.getAttribute('data-regle')];
+        var ok = typeof regle === 'function' && regle(v);
+        if (ok) li.classList.add('ok');
+        else li.classList.remove('ok');
+        if (!ok) toutes = false;
+      });
+      return toutes;
+    }
+
+    mdp.addEventListener('input', function () {
+      evaluer(mdp.value);
+    });
+
+    form.addEventListener('submit', function (evenement) {
+      evenement.preventDefault();
+      message.textContent = '';
+
+      var v = mdp.value;
+      if (!evaluer(v)) {
+        message.textContent = 'Le mot de passe ne remplit pas encore les cinq conditions ci-dessus.';
+        return;
+      }
+      if (v !== confirmation.value) {
+        message.textContent = 'Les deux saisies diffèrent.';
+        return;
+      }
+
+      valider.disabled = true;
+      valider.textContent = 'Enregistrement…';
+
+      function rendreLaMain() {
+        valider.disabled = false;
+        valider.textContent = 'Enregistrer';
+      }
+
+      // Le jeton de récupération sert d'autorisation : c'est lui, et lui
+      // seul, qui prouve que la personne a reçu le courriel.
+      fetch(SUPABASE_URL + '/auth/v1/user', {
+        method: 'PUT',
+        headers: {
+          apikey: SUPABASE_ANON_KEY,
+          Authorization: 'Bearer ' + acces,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ password: v }),
+      })
+        .then(function (reponse) {
+          return reponse
+            .json()
+            .catch(function () {
+              return {};
+            })
+            .then(function (charge) {
+              return { ok: reponse.ok, statut: reponse.status, charge: charge };
+            });
+        })
+        .then(function (r) {
+          if (!r.ok) {
+            // On remonte le message de Supabase tel quel : un lien expiré
+            // pendant la saisie, une règle de mot de passe côté serveur, un
+            // jeton déjà consommé n'ont pas la même réponse, et les fondre
+            // dans un « échec » générique priverait la personne du seul
+            // indice exploitable.
+            message.textContent =
+              r.charge.msg ||
+              r.charge.error_description ||
+              r.charge.message ||
+              'Échec (HTTP ' + r.statut + ').';
+            rendreLaMain();
+            return;
+          }
+          form.hidden = true;
+          if (enregistre) enregistre.hidden = false;
+        })
+        .catch(function (erreur) {
+          message.textContent =
+            "La demande n'a pas pu partir (" +
+            erreur.message +
+            '). Réessayez, ou ouvrez ce lien depuis le téléphone où IzenRide est installée.';
+          rendreLaMain();
+        });
+    });
+  }
+
+  function proposerFormulaire(acces) {
+    var projet = projetDuJeton(acces);
+    if (projet && projet !== SUPABASE_URL) {
+      montrer('etat-autre-projet');
+      return;
+    }
+
+    // Le jeton ne doit pas rester dans la barre d'adresse : il finirait dans
+    // l'historique du navigateur et dans le moindre partage d'écran. On ne
+    // l'efface qu'ICI, jamais avant : les chemins de relais ont besoin du
+    // fragment intact, et le repli Android le fait même transiter par une
+    // seconde URL.
+    window.history.replaceState(null, '', window.location.pathname);
+
+    var repli = document.getElementById('repli');
+    if (repli) repli.hidden = false;
+    cabler(acces);
+  }
+
+  // ── LE RELAIS VERS L'APPLICATION ───────────────────────────────
 
   // `maxTouchPoints` plutôt que le user-agent : celui-ci est falsifié par la
   // moitié des navigateurs mobiles, et « Request desktop site » suffit à le
@@ -53,6 +254,7 @@
   // s'il vaut la peine de tenter le schéma.
   if (!(navigator.maxTouchPoints > 0)) {
     montrer('etat-ordinateur');
+    proposerFormulaire(jeton);
     return;
   }
 
@@ -79,6 +281,7 @@
   // Retour du repli Android : Chrome nous a rechargés, l'app n'est pas là.
   if (new URLSearchParams(window.location.search).get('applink') === 'absent') {
     montrer('etat-absente');
+    proposerFormulaire(jeton);
     return;
   }
 
@@ -114,7 +317,10 @@
   window.addEventListener('blur', annuler);
 
   setTimeout(function () {
-    if (!fini && !document.hidden) montrer('etat-absente');
+    if (!fini && !document.hidden) {
+      montrer('etat-absente');
+      proposerFormulaire(jeton);
+    }
   }, 1500);
 
   window.location.replace(cible);

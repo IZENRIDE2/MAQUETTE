@@ -105,7 +105,19 @@
   # panne qui ressemble à un problème réseau alors que c'est cette ligne.
   # Dans ce cas : ajouter l'origine ici ET les en-têtes CORS côté serveur.
   # Si le formulaire est servi sous la même origine, ne rien changer.
-  Header set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; form-action 'self'; frame-ancestors 'none'; base-uri 'self'"
+  #
+  # Le piège s'est produit : le formulaire de secours de reset-password.html
+  # appelle Supabase, d'où l'origine ajoutée à `connect-src`. Elle est
+  # accordée à TOUT le site et non à cette seule page : deux en-têtes CSP se
+  # combinent par INTERSECTION, une règle plus permissive posée sur un chemin
+  # précis serait donc annulée par la règle générale — elle ne relâcherait
+  # rien, elle donnerait juste l'illusion de l'avoir fait.
+  #
+  # ⚠️ Cette origine est écrite à trois endroits : ici, dans `vercel.json`
+  # (c'est celui-là qui s'applique en ligne, Apache n'existe pas chez Vercel)
+  # et dans `assets/js/reset-password.js`. Changer de projet Supabase sans
+  # reprendre les trois donne une panne qui ressemble à une coupure réseau.
+  Header set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://onzmjiykvdhhqwvebaqg.supabase.co; form-action 'self'; frame-ancestors 'none'; base-uri 'self'"
 
   Header set X-Content-Type-Options "nosniff"
   Header set Referrer-Policy "strict-origin-when-cross-origin"

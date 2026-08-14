@@ -31,6 +31,19 @@
         "--port", "3001"
       ],
       "port": 3001
+    },
+    {
+      "name": "izenride-back-office-prod",
+      "runtimeExecutable": "C:\\Users\\33766\\AppData\\Local\\Programs\\nodejs\\node.exe",
+      "runtimeArgs": [
+        "izenride/node_modules/next/dist/bin/next",
+        "start",
+        "izenride/apps/back-office",
+        "--hostname", "0.0.0.0",
+        "--port", "3001"
+      ],
+      "port": 3001,
+      "url": "http://localhost:3001"
     }
   ]
 }

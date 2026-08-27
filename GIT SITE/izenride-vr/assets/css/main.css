@@ -599,6 +599,23 @@ body.no-fx .wall__track{ animation:none; }
 }
 .beta{ position:relative; }
 .beta .lede{ margin-left:auto; margin-right:auto; }
+
+/* ── Téléchargement ─────────────────────────────────────────────────────
+   A remplace le formulaire de liste d'attente le 2026-08-27 : l'app est
+   publiee, il n'y a plus de file d'attente a rejoindre. `is-soon` porte
+   l'App Store tant que la fiche Apple sert encore la 3.0.7 — voir le
+   commentaire dans index.html. */
+.stores{ display:flex; flex-wrap:wrap; gap:14px; justify-content:center; margin:38px 0 0; }
+.stores .btn{ flex:0 1 auto; }
+.stores .is-soon{
+  cursor:default; opacity:.55; border-style:dashed;
+}
+.stores .is-soon:hover{ border-color:var(--line-2); color:inherit; background:transparent; }
+.stores__note{
+  margin:18px auto 0; max-width:520px;
+  font-size:13px; color:var(--ink-mute); line-height:1.7;
+}
+@media (max-width:560px){ .stores{ flex-direction:column; } .stores .btn{ width:100%; } }
 .form{ max-width:620px; margin:38px auto 0; }
 .form__row{ display:grid; grid-template-columns:1.4fr 1fr; gap:12px; margin-bottom:14px; }
 .field{ display:block; text-align:left; }

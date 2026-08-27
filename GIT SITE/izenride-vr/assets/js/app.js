@@ -272,103 +272,11 @@
     });
   }
 
-  /* ══════════════════════════ FORMULAIRE ══════════════════════════ */
-  /* 🔴 Ce formulaire affichait « Place réservée » sans RIEN envoyer : pas
-     d'action sur le <form>, aucun appel réseau dans ce fichier. Chaque adresse
-     laissée était jetée, et le visiteur repartait en croyant être inscrit.
-
-     Le back-end existe (route serveur `preinscription.ts` : insertion en base,
-     pot de miel, limitation à 5 requêtes / 10 min). Reste UNE décision avant
-     de pouvoir l'appeler d'ici : le site est statique et l'endpoint vit sur un
-     autre déploiement, donc il faut soit servir les deux sous la même origine,
-     soit ajouter les en-têtes CORS côté serveur — il n'en pose aucun
-     aujourd'hui, un POST d'origine croisée serait bloqué par le navigateur.
-
-     D'ici là ENDPOINT reste vide, et le formulaire bascule sur un envoi par
-     e-mail en le DISANT. Dans tous les cas il ne prétend jamais avoir
-     enregistré ce qu'il n'a pas enregistré. */
-  var ENDPOINT = '';           // ex. 'https://inscription.izenride.fr/preinscription'
-  var CONTACT = 'direction@izenride.com';
-
-  var form = $('#betaForm');
-  if (form) {
-    form.addEventListener('submit', function (e) {
-      e.preventDefault();
-      var email = $('#betaEmail');
-      var msg = $('#betaMsg');
-      var region = $('#betaRegion');
-      var consent = $('#betaConsent');
-      var btn = form.querySelector('button[type="submit"]');
-      var adresse = (email.value || '').trim();
-      var ok = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(adresse);
-
-      email.classList.toggle('is-bad', !ok);
-      msg.classList.toggle('is-bad', !ok);
-
-      if (!ok) {
-        msg.textContent = 'Vérifiez votre adresse e-mail.';
-        email.focus();
-        return;
-      }
-      /* Le serveur REFUSE toute soumission sans consentement (400
-         consentement_requis) : la case est une condition technique autant
-         qu'une obligation légale. */
-      if (consent && !consent.checked) {
-        msg.classList.add('is-bad');
-        msg.textContent = 'Cochez la case de consentement pour continuer.';
-        consent.focus();
-        return;
-      }
-
-      /* Pas encore d'endpoint : on ouvre le client mail plutôt que de mentir. */
-      if (!ENDPOINT) {
-        msg.classList.remove('is-bad');
-        msg.textContent = 'Les inscriptions passent par e-mail pour l’instant : votre message s’ouvre, il ne reste qu’à l’envoyer.';
-        window.location.href = 'mailto:' + CONTACT
-          + '?subject=' + encodeURIComponent('Bêta IzenRide — ' + region.value)
-          + '&body=' + encodeURIComponent(
-              'Bonjour,\n\nJe souhaite rejoindre la bêta IzenRide.\n\n'
-              + 'Adresse : ' + adresse + '\nRégion : ' + region.value + '\n');
-        return;
-      }
-
-      btn.disabled = true;
-      msg.classList.remove('is-bad');
-      msg.textContent = 'Envoi…';
-
-      fetch(ENDPOINT, {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({
-          email: adresse,
-          consent: true,
-          website: '',                      // pot de miel : doit rester vide
-          utm_source: 'site-immersif',
-          utm_campaign: region.value        // la table n'a pas de colonne région
-        })
-      })
-        .then(function (r) {
-          return r.json().catch(function () { return {}; })
-            .then(function (j) { return { statut: r.status, corps: j }; });
-        })
-        .then(function (res) {
-          if (res.corps && res.corps.ok) {
-            msg.textContent = 'Inscription enregistrée. On vous écrit dès l’ouverture de votre secteur.';
-            return;
-          }
-          btn.disabled = false;
-          msg.classList.add('is-bad');
-          msg.textContent = res.statut === 429
-            ? 'Trop de tentatives. Réessayez dans quelques minutes.'
-            : 'L’envoi a échoué. Réessayez, ou écrivez à ' + CONTACT + '.';
-        })
-        .catch(function () {
-          btn.disabled = false;
-          msg.classList.add('is-bad');
-          msg.textContent = 'L’envoi a échoué. Réessayez, ou écrivez à ' + CONTACT + '.';
-        });
-    });
-  }
+  /* ══════════════════ PRE-INSCRIPTION — RETIREE 2026-08-27 ══════════════
+     L'application est publiee : il n'y a plus de liste d'attente a rejoindre.
+     Le formulaire n'avait par ailleurs JAMAIS enregistre quoi que ce soit —
+     `ENDPOINT` est reste vide, il ouvrait le client mail. La section #beta
+     de l'accueil est devenue une section de telechargement. */
 
   /* ══════════════════════════ TOGGLE IMMERSION ══════════════════════════ */
   var motionToggle = $('#motionToggle');

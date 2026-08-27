@@ -66,7 +66,7 @@
     <a href="#cockpit">Les écrans</a>
     <a href="confidentialite.html">Confidentialité</a>
   </nav>
-  <a href="#beta" class="btn btn--sm btn--primary">Rejoindre la bêta</a>
+  <a href="#beta" class="btn btn--sm btn--primary">Télécharger</a>
 </header>
 
 <!-- ══════════════════════════════ TRIP RAIL ══════════════════════════════ -->
@@ -105,7 +105,7 @@
   </div>
 
   <div class="hero__copy">
-    <p class="eyebrow"><span class="pip"></span>Bêta — inscriptions ouvertes</p>
+    <p class="eyebrow"><span class="pip"></span>Disponible sur Google Play</p>
     <h1 class="hero__title">
       <span class="line">Né de la route.</span>
       <span class="line line--accent">Bâti pour ceux</span>
@@ -118,7 +118,7 @@
       quand la route tourne mal.
     </p>
     <div class="hero__cta">
-      <a href="#beta" class="btn btn--primary">Rejoindre la bêta</a>
+      <a href="#beta" class="btn btn--primary">Télécharger l'app</a>
       <a href="#manifeste" class="btn btn--ghost">Lancer l'immersion</a>
     </div>
   </div>
@@ -408,57 +408,35 @@
 <section class="sec sec--beta" id="beta" data-leg="Arrivée">
   <div class="beta__bg" aria-hidden="true"></div>
   <div class="wrap beta">
-    <p class="kicker reveal">Bêta fermée</p>
-    <h2 class="big reveal">Prenez la <em>première vague</em>.</h2>
+    <p class="kicker reveal">Disponible</p>
+    <h2 class="big reveal">Elle est <em>en ligne</em>.</h2>
     <p class="lede reveal">
-      Les invitations partent par région, par paquets. Laissez votre adresse :
-      vous saurez avant tout le monde quand votre secteur ouvre.
+      IzenRide se télécharge maintenant. L'essentiel est gratuit, guidage GPS
+      compris ; Premium ne fait que lever les limites.
     </p>
 
-    <form class="form reveal" id="betaForm" novalidate>
-      <div class="form__row">
-        <label class="field">
-          <span>E-mail</span>
-          <input type="email" name="email" id="betaEmail" placeholder="vous@exemple.fr" autocomplete="email" required>
-        </label>
-        <label class="field">
-          <span>Région</span>
-          <select name="region" id="betaRegion">
-            <option>Auvergne-Rhône-Alpes</option>
-            <option>Île-de-France</option>
-            <option>PACA</option>
-            <option>Occitanie</option>
-            <option>Nouvelle-Aquitaine</option>
-            <option>Grand Est</option>
-            <option>Bretagne</option>
-            <option>Autre</option>
-          </select>
-        </label>
-      </div>
-      <label class="field field--check">
-        <input type="checkbox" name="consent" id="betaConsent" value="on" required>
-        <span>J'accepte qu'IZEN RIDE SAS utilise mon adresse e-mail pour m'informer
-          de l'ouverture de la bêta dans mon secteur.</span>
-      </label>
-      <button class="btn btn--primary btn--lg" type="submit">Réserver ma place</button>
-      <p class="form__legal">
-        Pas de spam, pas de revente. Une adresse, une invitation.<br>
-        <b>Responsable de traitement :</b> IZEN RIDE SAS, 4 rue Massilie, 13420 Gémenos.
-        <b>Finalité :</b> gestion de la liste d'attente de la bêta.
-        <b>Base légale :</b> votre consentement (art. 6-1-a du RGPD).
-        <b>Destinataire :</b> IZEN RIDE seule — aucune revente, aucune cession.
-        <b>Hébergement</b> dans l'Union européenne.
-        <b>Conservation :</b> jusqu'à l'ouverture publique de l'application, et au
-        plus tard 24 mois après votre inscription.
-        Vous disposez d'un droit d'accès, de rectification, d'effacement,
-        d'opposition et de portabilité :
-        <a href="mailto:direction@izenride.com">direction@izenride.com</a>.
-        Détails dans la <a href="confidentialite.html">politique de confidentialité</a>.<br>
-        En réservant votre place, vous acceptez les <a href="cgu.html">CGU</a>
-        et, pour l'abonnement Premium, les <a href="cgv.html">CGV</a>.
-      </p>
-      <p class="form__msg" id="betaMsg" role="status"></p>
-    </form>
+    <div class="stores reveal">
+      <a class="btn btn--primary btn--lg" href="https://play.google.com/store/apps/details?id=com.izenride.app"
+         target="_blank" rel="noopener">Télécharger sur Google Play</a>
+
+      <!-- 🔴 LIEN APP STORE VOLONTAIREMENT INACTIF — 2026-08-27.
+           La fiche Apple sert encore la 3.0.7 du 18 novembre 2025, c'est-à-dire
+           l'ANCIENNE application Flutter. Y envoyer un visiteur aujourd'hui, ce
+           serait lui faire installer un autre produit que celui décrit ici.
+           La 3.1.0 (build 56) est en vérification depuis le 2026-08-27, avec ses
+           trois abonnements. DÈS QU'ELLE EST APPROUVÉE, remplacer ce bloc par :
+             <a class="btn btn--ghost btn--lg" href="https://apps.apple.com/fr/app/izenride/id6476877458"
+                target="_blank" rel="noopener">Télécharger sur l'App Store</a>
+           Vérifier d'abord que la fiche sert bien la 3.1.0 :
+             curl -s "https://itunes.apple.com/lookup?id=6476877458&country=fr" | grep -o '"version":"[^"]*"'
+      -->
+      <span class="btn btn--ghost btn--lg is-soon" aria-disabled="true">App Store — bientôt</span>
+    </div>
+
+    <p class="stores__note reveal">
+      L'application iOS est en cours de vérification chez Apple. Le lien
+      apparaîtra ici dès qu'elle sera publiée.
+    </p>
   </div>
 </section>
 
@@ -492,7 +470,7 @@
     <nav class="foot__links">
       <a href="#manifeste">Manifeste</a>
       <a href="#radars">Sécurité</a>
-      <a href="#beta">Bêta</a>
+      <a href="#beta">Télécharger</a>
       <a href="cgu.html">CGU</a>
       <a href="cgv.html">CGV</a>
       <a href="mentions-legales.html">Mentions légales</a>

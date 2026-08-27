@@ -4,7 +4,9 @@
     { "source": "/politique-de-confidentialite", "destination": "/confidentialite.html", "permanent": true },
     { "source": "/mentions-legales", "destination": "/mentions-legales.html", "permanent": true },
     { "source": "/conditions-generales-dutilisation-cgu", "destination": "/cgu.html", "permanent": true },
-    { "source": "/conditions-generales-de-vente", "destination": "/cgv.html", "permanent": true }
+    { "source": "/conditions-generales-de-vente", "destination": "/cgv.html", "permanent": true },
+    { "source": "/support", "destination": "/support.html", "permanent": true },
+    { "source": "/aide", "destination": "/support.html", "permanent": true }
   ],
   "headers": [
     {

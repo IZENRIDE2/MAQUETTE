@@ -86,14 +86,13 @@ button,input,select{ font:inherit; color:inherit; }
 
 /* ────────────── Marque ────────────── */
 .mark{ width:34px; height:34px; flex:0 0 auto; }
-.mark__box{ fill:none; stroke:var(--line-2); stroke-width:1.6; }
-.mark__edge{ fill:none; stroke:var(--izen-bright); stroke-width:2; stroke-linecap:round; }
-.mark__dash{ fill:var(--neon); }
 .mark--xl{ width:74px; height:74px; }
-.mark--xl .mark__dash{ animation:markFlow 1.6s var(--ease) infinite; }
-.mark--xl .mark__dash:nth-of-type(2){ animation-delay:.12s; }
-.mark--xl .mark__dash:nth-of-type(3){ animation-delay:.24s; }
-@keyframes markFlow{ 0%,100%{opacity:.35} 40%{opacity:1} }
+/* L'ecran d'allumage respirait par les traits internes de l'ancienne marque
+   vectorielle. Le logo officiel est une image : la pulsation porte donc sur
+   elle, en CSS — le site n'autorise aucun script (CSP script-src 'self'). */
+.mark--xl{ animation:markFlow 1.8s var(--ease) infinite; }
+@keyframes markFlow{ 0%,100%{opacity:.55; transform:scale(.985)} 45%{opacity:1; transform:scale(1)} }
+@media (prefers-reduced-motion:reduce){ .mark--xl{ animation:none; } }
 
 /* ══════════════════════════════ BOOT ══════════════════════════════ */
 .boot{

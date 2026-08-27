@@ -6,6 +6,9 @@
 <title>IzenRide — Le cockpit du motard</title>
 <meta name="description" content="IzenRide : navigation pensée pour les motards, radars signalés par la communauté, Safety Zone. Entrez dans l'expérience.">
 <meta name="theme-color" content="#08090E">
+<link rel="icon" href="assets/img/favicon-32.png" sizes="32x32">
+<link rel="icon" href="assets/img/logo-192.png" sizes="192x192">
+<link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
 <meta property="og:title" content="IzenRide — Le cockpit du motard">
 <meta property="og:description" content="Né de la route. Bâti pour ceux qui la connaissent.">
 <meta property="og:type" content="website">
@@ -21,14 +24,7 @@
 <div id="boot" class="boot">
   <div class="boot__inner">
     <div class="boot__mark" aria-hidden="true">
-      <svg viewBox="0 0 40 40" class="mark mark--xl">
-        <rect x="1.6" y="1.6" width="36.8" height="36.8" rx="11.5" class="mark__box"/>
-        <path d="M8.5 32.5 L17.6 8.4" class="mark__edge"/>
-        <path d="M31.5 32.5 L22.4 8.4" class="mark__edge"/>
-        <rect x="19.1" y="10.6" width="1.8" height="3.6" rx=".9" class="mark__dash"/>
-        <rect x="19.05" y="17.4" width="1.9" height="4.6" rx=".95" class="mark__dash"/>
-        <rect x="19" y="25.4" width="2" height="5.8" rx="1" class="mark__dash"/>
-      </svg>
+      <img class="mark mark--xl" src="assets/img/logo.png" width="74" height="74" alt="" aria-hidden="true">
     </div>
     <p class="boot__eyebrow">IzenRide · Immersion</p>
     <h1 class="boot__title">Mettez le contact.</h1>
@@ -60,14 +56,7 @@
 <!-- ══════════════════════════════ NAV ══════════════════════════════ -->
 <header class="nav" id="nav">
   <a class="nav__brand" href="#hero">
-    <svg viewBox="0 0 40 40" class="mark" aria-hidden="true">
-      <rect x="1.6" y="1.6" width="36.8" height="36.8" rx="11.5" class="mark__box"/>
-      <path d="M8.5 32.5 L17.6 8.4" class="mark__edge"/>
-      <path d="M31.5 32.5 L22.4 8.4" class="mark__edge"/>
-      <rect x="19.1" y="10.6" width="1.8" height="3.6" rx=".9" class="mark__dash"/>
-      <rect x="19.05" y="17.4" width="1.9" height="4.6" rx=".95" class="mark__dash"/>
-      <rect x="19" y="25.4" width="2" height="5.8" rx="1" class="mark__dash"/>
-    </svg>
+    <img class="mark" src="assets/img/logo.png" width="34" height="34" alt="" aria-hidden="true">
     <span class="nav__word">Izen<b>Ride</b></span>
   </a>
   <nav class="nav__links" aria-label="Navigation principale">
@@ -223,7 +212,7 @@
       <p class="body reveal">
         Contrôle, gravier, épingle serrée, chaussée glissante : l'app les
         annonce à l'approche, avec une alerte graduée selon la distance. La
-        remontée par les riders eux-mêmes arrive avec la bêta ouverte.
+        remontée par les riders eux-mêmes arrivera dans une prochaine version.
       </p>
       <div class="chips reveal">
         <span class="chip chip--warn">Contrôle</span>
@@ -290,8 +279,8 @@
       <p class="kicker reveal">Écrans officiels</p>
       <h2 class="h2 reveal">L'app, telle qu'elle est</h2>
       <p class="lede reveal">
-        Des écrans de la bêta, capturés sur émulateur à partir du build en
-        cours. Bougez la souris — ou inclinez le vôtre.
+        Des écrans de l'application publiée, capturés sur émulateur à partir du
+        build en production. Bougez la souris — ou inclinez le vôtre.
       </p>
     </div>
 
@@ -388,7 +377,7 @@
 <section class="sec sec--stats" data-leg="La communauté">
   <div class="wrap">
     <div class="stats">
-      <div class="stat reveal"><b data-count="1284">0</b><i>motards en bêta</i></div>
+      <div class="stat reveal"><b data-count="1284">0</b><i>motards inscrits</i></div>
       <div class="stat reveal"><b data-count="47" data-suffix="k">0</b><i>km enregistrés</i></div>
       <div class="stat reveal"><b data-count="9130">0</b><i>croisements comptés</i></div>
       <!-- Tuile « 12 s — chute → alerte » retirée le 2026-08-06 : ce n'était pas un
@@ -396,7 +385,7 @@
            capteur, aucun expo-sensors dans l'app ; le SOS est un appui volontaire
            suivi d'un décompte de 10 s (app/(safety)/sos.tsx:230). -->
     </div>
-    <p class="stats__note reveal">Chiffres de la bêta fermée — mis à jour à chaque vague d'invitations.</p>
+    <p class="stats__note reveal">Chiffres d'usage de l'application, mis à jour régulièrement.</p>
   </div>
 </section>
 
@@ -479,14 +468,7 @@
 <footer class="foot">
   <div class="wrap foot__in">
     <div class="foot__brand">
-      <svg viewBox="0 0 40 40" class="mark" aria-hidden="true">
-        <rect x="1.6" y="1.6" width="36.8" height="36.8" rx="11.5" class="mark__box"/>
-        <path d="M8.5 32.5 L17.6 8.4" class="mark__edge"/>
-        <path d="M31.5 32.5 L22.4 8.4" class="mark__edge"/>
-        <rect x="19.1" y="10.6" width="1.8" height="3.6" rx=".9" class="mark__dash"/>
-        <rect x="19.05" y="17.4" width="1.9" height="4.6" rx=".95" class="mark__dash"/>
-        <rect x="19" y="25.4" width="2" height="5.8" rx="1" class="mark__dash"/>
-      </svg>
+      <img class="mark" src="assets/img/logo.png" width="34" height="34" alt="" aria-hidden="true">
       <span class="nav__word">Izen<b>Ride</b></span>
     </div>
     <!-- 🔴 LIENS BOUTIQUE VOLONTAIREMENT ABSENTS (décision Florian, 2026-08-06).

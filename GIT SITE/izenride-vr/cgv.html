@@ -61,9 +61,26 @@
     <h3><span class="art-num">Article 1</span>Objet et champ d'application</h3>
     <p>Les présentes Conditions générales de vente (« CGV ») régissent la souscription des abonnements payants « IzenRide Premium » proposés par IZEN RIDE SAS dans l'application mobile IzenRide. Elles complètent les <a href="cgu.html">Conditions générales d'utilisation (CGU)</a>, qui restent applicables à l'ensemble du service.</p>
     <p>Toute souscription d'un abonnement Premium implique l'acceptation pleine et entière des présentes CGV, présentées avant la validation de l'achat.</p>
-    <div class="callout callout--warn">
-      <b>Phase de bêta</b>
-      Pendant la phase de bêta de l'Application, l'activation de l'abonnement Premium est offerte : aucun paiement n'est prélevé et aucun engagement financier n'est souscrit. Les présentes CGV s'appliqueront intégralement dès l'activation de la facturation via les plateformes de téléchargement.
+    <!-- 🔴 CET ENCADRÉ DISAIT QUE LE PREMIUM ÉTAIT OFFERT PENDANT LA BÊTA.
+         Retiré le 2026-08-29 — Apple a refusé les trois abonnements iOS le
+         2026-08-28, guideline 3.1.1 : « the app unlocks or enables additional
+         functionality with mechanisms other than In-App Purchase ».
+
+         ⚠️ CETTE PAGE-CI EST CELLE QUE LE VÉRIFICATEUR APPLE LIT. L'URL de
+         confidentialité déclarée à App Store Connect pointe cet hôte
+         (izenride-vr.vercel.app) et cette page est à un lien de là. Les
+         corrections du 2026-08-28 portaient sur `apps/mobile`, `apps/web` et
+         `apps/site-institutionnel` — trois surfaces qui ne sont PAS celle-ci.
+         Le site vit dans un AUTRE dépôt (`C:\Izen-ride\site-immersif`, branche
+         `feat/site-immersif`), donc aucune garde du dépôt applicatif ne peut
+         l'atteindre. La corriger là-bas ne la corrigeait pas ici.
+
+         ⚠️ ET CORRIGER CE FICHIER NE CHANGE RIEN À CE QU'APPLE VOIT tant que
+         le site n'est pas redéployé : Vercel n'est pas relié à Git sur ce
+         projet. Le déploiement est un geste distinct. -->
+    <div class="callout">
+      <b>Souscription</b>
+      L'abonnement Premium se souscrit exclusivement via l'App Store d'Apple ou Google Play, qui encaissent le paiement et gèrent le renouvellement. Aucun autre moyen — code, parrainage, contact direct — ne donne accès aux fonctionnalités Premium. Une remise éventuelle est proposée par la plateforme elle-même, au moment de l'achat.
     </div>
   </article>
 
@@ -73,7 +90,13 @@
     <table class="info-card">
       <tbody>
         <tr><th>Mensuel</th><td><strong>9,99 € / mois</strong></td></tr>
-        <tr><th>Semestriel</th><td>49,99 € / 6 mois (soit 8,33 € / mois)</td></tr>
+        <!-- La formule intermédiaire n'est plus semestrielle depuis le
+             2026-06-02 : 24,99 € / 3 mois. Source unique :
+             `apps/mobile/lib/subscription/static-plans.ts` du dépôt
+             applicatif — l'identifiant `izenride_premium_6m` n'existe dans
+             aucune boutique. Annoncer une durée et un prix faux sur un
+             abonnement payant est un motif Apple 3.1.2 à part entière. -->
+        <tr><th>Trimestriel</th><td>24,99 € / 3 mois (soit 8,33 € / mois)</td></tr>
         <tr><th>Annuel</th><td>79,99 € / an (soit 6,67 € / mois)</td></tr>
       </tbody>
     </table>

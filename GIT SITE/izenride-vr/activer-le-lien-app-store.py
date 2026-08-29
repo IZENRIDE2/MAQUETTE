@@ -95,6 +95,23 @@ def main() -> int:
         print("   Rien n'a ete modifie.")
         return 1
 
+    # 🔴 LE DRAPEAU ETAIT DECLARE ET JAMAIS LU — corrige le 2026-08-29.
+    # `--controler` est documente en tete comme « verifie seulement ». Il ne
+    # verifiait rien de plus que l'execution normale : l'ecriture suivait quand
+    # meme. Le defaut ne se serait manifeste qu'UNE fois, LE JOUR OU la fiche
+    # sert enfin la version attendue — c'est-a-dire le jour precis ou quelqu'un
+    # tape la commande de controle pour savoir s'il peut activer. L'invocation
+    # presentee comme non destructive aurait modifie `index.html` sans le dire.
+    #
+    # ⚠️ LE CONTROLE RESTE APRES L'APPEL RESEAU, deliberement : sa raison
+    # d'etre est de comparer ce que l'App Store SERT a ce qu'on attend. Un
+    # `--controler` qui n'interrogerait pas la fiche ne controlerait rien.
+    if a.controler:
+        print("\n✅ La fiche sert bien la version attendue.")
+        print("   --controler : RIEN n'a ete modifie. Relancer sans le drapeau")
+        print("   pour activer le lien.")
+        return 0
+
     texte = INDEX.read_text(encoding="utf-8")
 
     # 🔴 ON CHERCHE HORS DES COMMENTAIRES, ET C'EST TOUT LE SUJET.

@@ -149,6 +149,33 @@ def main() -> int:
         print("\n🔴 AUCUNE page n'a pu etre lue — on ne conclut RIEN.")
         return 2
 
+    # ═══════════════════════════════════════════════════════════════
+    # 🔴 UNE RESSOURCE `assets/` SANS VERSION EST UNE BOMBE A RETARDEMENT.
+    #
+    # `vercel.json` marque `/assets/(.*)` en
+    # `public, max-age=31536000, immutable`. Mesure du 2026-08-29 : cet en-tete
+    # est servi AUSSI SUR LES 404. Chaque navigateur qui a charge le site pendant
+    # que les fichiers manquaient a donc mis « ce fichier n'existe pas » en cache
+    # **pour un an**, par URL. Reparer le deploiement ne les atteint pas : ils ne
+    # redemandent rien.
+    #
+    # Le seul levier est la CLE DE CACHE. Une ressource portant `?v=…` se
+    # deverrouille en changeant la version ; une ressource nue reste empoisonnee
+    # jusqu'a expiration. Les images du site etaient nues — c'est ce qui a rendu
+    # l'incident durable au lieu d'etre corrige d'un deploiement.
+    #
+    # Cette verification n'a donc rien de cosmetique : elle interdit de
+    # reintroduire la seule condition qui transforme une panne de dix minutes en
+    # panne d'un an.
+    nues = sorted(u for u in ressources if "/assets/" in u and "?v=" not in u)
+    if nues:
+        print()
+        print(f"── {len(nues)} ressource(s) `assets/` SANS version ──")
+        for u in nues:
+            court = u[len(base):] if u.startswith(base) else u
+            print(f"  🔴 {court}")
+            echecs.append((court, "sans ?v= — un 404 serait cache un an (immutable)"))
+
     print()
     print(f"── Les ressources referencees par ces pages ({len(ressources)}) ──")
     # 🔴 C'EST LA RAISON D'ETRE DE L'OUTIL. Les pages peuvent toutes rendre 200

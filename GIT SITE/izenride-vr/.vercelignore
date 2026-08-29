@@ -25,12 +25,40 @@
 # Un fichier déposé ici ne sera donc PAS publié tant qu'il n'est pas nommé
 # ci-dessous. C'est le sens du défaut : silencieux du bon côté.
 
+# 🔴 LA LISTE BLANCHE A EXCLU TOUT `assets/` — CORRIGÉ LE 2026-08-29.
+#
+# Elle disait `!assets/` puis `!assets/**`, ce qui est le motif documenté par
+# git pour ré-inclure un dossier exclu et son contenu. Vercel ne l'honore pas :
+# les DIX-NEUF fichiers d'`assets/` ont été absents du déploiement, et le site
+# a servi du HTML nu — feuille de style, scripts, logo et les dix captures
+# d'écran, tous en **404**. Mesuré sur les deux hôtes.
+#
+# ⚠️ CE DÉFAUT EST EXACTEMENT CELUI QUE LA LISTE BLANCHE DEVAIT ÉVITER, retourné.
+# Une liste noire laisse passer ce qu'on n'a pas prévu d'exclure ; une liste
+# blanche retient ce qu'on n'a pas su ré-inclure. Les deux échouent en silence —
+# mais celle-ci échoue du côté visible, et personne ne l'avait vu parce que
+# `curl` sur la page d'accueil rend 200 : le HTML est là, ce sont ses ressources
+# qui manquent. Un contrôle qui ne teste que la page ne voit rien.
+#
+# La garde qui manque : tester les RESSOURCES référencées, pas seulement les
+# pages. C'est ce que fait désormais `verifier-site-en-ligne.py` à côté.
+#
 # ── tout est exclu ──
 *
 
 # ── sauf, explicitement, ce que le site sert ──
-# (l'ordre compte : un dossier exclu doit être ré-inclus AVANT son contenu)
+# ⚠️ CHAQUE NIVEAU EST NOMMÉ. `!assets/**` ne suffit pas : on ré-inclut le
+# dossier, PUIS chaque sous-dossier, PUIS son contenu. C'est verbeux et c'est
+# le prix : une ligne oubliée ici se voit tout de suite sur le site, alors
+# qu'une ligne oubliée dans une liste noire publie un secret en silence.
 !*.html
-!assets/
-!assets/**
 !vercel.json
+!assets
+!assets/css
+!assets/css/*
+!assets/img
+!assets/img/*
+!assets/js
+!assets/js/*
+!assets/screens
+!assets/screens/*

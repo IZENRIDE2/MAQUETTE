@@ -1,17 +1,36 @@
-# Ce qui ne doit PAS partir sur le site public.
+# Ce qui part sur le site public — par liste BLANCHE.
 #
-# 🔴 `docs/` EST LE POINT IMPORTANT. Il contient les notes de chantier —
-# `mise-en-correlation-site-app.md`, 27 Ko — qui listent les écarts entre le
-# site et l'application, citent les chemins locaux du poste de développement et
-# la branche de travail. Apache les bloquait (`RewriteRule ^docs/ - [F,L]` dans
-# .htaccess) ; Vercel IGNORE .htaccess, donc sans ce fichier elles seraient
-# servies publiquement, à l'adresse même que le relecteur Play visite.
+# 🔴 C'ÉTAIT UNE LISTE NOIRE, ET ELLE A FUI. Elle nommait `docs/`,
+# `build-standalone.ps1`, `serve.ps1` et `README.md` — le point important étant
+# `docs/`, qui contient les notes de chantier (27 Ko citant les chemins locaux
+# du poste et la branche de travail). Apache les bloquait par `.htaccess` ;
+# Vercel ignore `.htaccess`, d'où ce fichier.
 #
-# `.vercelignore` plutôt qu'une règle de routage : ce qui n'est pas téléversé ne
-# peut pas fuiter par une règle mal écrite.
-docs/
+# Mais DEUX fichiers y ont échappé, et étaient servis en 200 le 2026-08-29 sur
+# l'hôte déclaré à App Store Connect :
+#
+#     .htaccess                      → règles de réécriture, arborescence
+#     activer-le-lien-app-store.py   → ref du projet Supabase de démonstration
+#                                      et nom d'une fonction d'authentification
+#
+# Une liste noire ne protège que de ce à quoi on a pensé, et reste verte pour
+# tout fichier ajouté ensuite. C'est le mode d'échec normal : on dépose un outil
+# dans le dossier, personne ne pense à l'exclure, il part.
+#
+# ⚠️ MÊME LEÇON QUE LA GARDE DES PROMESSES « PREMIUM OFFERT », le même jour :
+# elle ÉNUMÉRAIT trois fichiers, et six surfaces vivaient ailleurs. Énumérer ce
+# qu'on refuse, c'est se fier à son imagination ; énumérer ce qu'on autorise,
+# c'est se fier à ce dont on a besoin.
+#
+# Un fichier déposé ici ne sera donc PAS publié tant qu'il n'est pas nommé
+# ci-dessous. C'est le sens du défaut : silencieux du bon côté.
 
-# Outils de développement — sans objet en ligne.
-build-standalone.ps1
-serve.ps1
-README.md
+# ── tout est exclu ──
+*
+
+# ── sauf, explicitement, ce que le site sert ──
+# (l'ordre compte : un dossier exclu doit être ré-inclus AVANT son contenu)
+!*.html
+!assets/
+!assets/**
+!vercel.json

@@ -62,7 +62,13 @@
     <ol>
       <li>Ouvrez IzenRide et connectez-vous à votre compte.</li>
       <li>Allez dans <strong>Réglages</strong> → <strong>Supprimer mon compte</strong>.</li>
-      <li>Suivez les étapes affichées, puis confirmez en saisissant le mot <strong>SUPPRIMER</strong>.</li>
+      <!-- 🔴 NE PAS NOMMER LE MOT ICI. L'application le demande dans SA langue :
+           SUPPRIMER, DELETE, LÖSCHEN, ΔΙΑΓΡΑΦΗ… depuis l'ajout de sept langues le
+           2026-08-30. Cette page est en français et sert les neuf : un mot écrit en
+           dur y est faux pour huit lecteurs sur neuf, et il l'est en silence.
+           Source : apps/mobile/i18n/locales/*.json → settings.delete.confirmWord. -->
+      <li>Suivez les étapes affichées, puis confirmez en saisissant le mot que l’écran
+          vous demande de recopier.</li>
     </ol>
     <p>La demande est prise en compte immédiatement et votre compte est désactivé. La suppression définitive intervient <strong>30 jours</strong> plus tard (voir l'article 3).</p>
   </article>

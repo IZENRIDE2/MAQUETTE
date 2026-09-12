@@ -145,7 +145,13 @@
       // compteur (lissé pour éviter le clignotement)
       if (out && shown !== count) {
         shown = count;
-        out.textContent = (9130 + count).toLocaleString('fr-FR');
+        // 🔴 ICI VIVAIT « 9130 + count », ET C'ÉTAIT LE CHIFFRE LE PLUS
+        // TROMPEUR DU SITE : un total écrit en dur, additionné aux
+        // croisements de l'animation, affiché sous les mots « Live » et
+        // « aujourd'hui ». `crossings` compte ZÉRO ligne en production.
+        // Le compteur a été retiré de la page le 2026-09-12 ; ce garde-fou
+        // reste pour que la scène ne rechiffre rien si l'élément revient.
+        out.textContent = count.toLocaleString('fr-FR');
       }
     };
   }

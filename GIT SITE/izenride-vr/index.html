@@ -100,7 +100,12 @@
       <div><i>CAP</i><b id="teleCap">N 002°</b></div>
       <div><i>ANGLE</i><b id="teleLean">0°</b></div>
       <div><i>EXT.</i><b>14°C</b></div>
-      <div><i>RÉSEAU</i><b class="ok">1 284 en ligne</b></div>
+      <!-- 🔴 « 1 284 EN LIGNE » A ÉTÉ RETIRÉ LE 2026-09-12 : c'était un nombre
+           écrit en dur, et il affirmait une audience simultanée que rien ne
+           mesure. Même motif que la tuile « 12 s — chute → alerte » retirée le
+           2026-08-06, et que les deux chiffres de la section STATS plus bas.
+           Une valeur « en direct » ne peut pas être datée : elle se mesure ou
+           elle ne s'affiche pas. Le cadran garde ses trois tuiles réelles. -->
     </div>
   </div>
 
@@ -113,9 +118,9 @@
     </h1>
     <p class="hero__lede">
       IzenRide n'est pas une app de plus. C'est le cockpit du motard :
-      une navigation pensée pour vos gants, les dangers de la route annoncés
-      avant que vous les voyiez, et un filet de sécurité qui veille
-      quand la route tourne mal.
+      une navigation pensée pour vos gants, le croisement des motards transformé
+      en carnet de route, et un filet de sécurité qui veille quand la route
+      tourne mal.
     </p>
     <div class="hero__cta">
       <a href="#beta" class="btn btn--primary">Télécharger l'app</a>
@@ -188,10 +193,20 @@
     <div class="split__stage reveal">
       <div class="stage">
         <canvas class="stage__c" data-scene="cross"></canvas>
+        <!-- 🔴 « LIVE — 9 130 CROISEMENTS AUJOURD'HUI » ÉTAIT LA PIRE DES
+             TROIS. Le nombre venait de `assets/js/scenes.js`, où 9130 était
+             écrit en dur et additionné aux croisements de l'ANIMATION ; les
+             mots « Live » et « aujourd'hui » en faisaient une mesure du jour.
+             Or `crossings` compte ZÉRO ligne en production, et l'a toujours
+             fait (mesuré le 2026-09-12, et déjà le 2026-09-05).
+             ⚠️ Le mécanisme, lui, EST réel : un déclencheur pose le
+             croisement à l'insertion de la position, vérifié à 200 m. C'est
+             la DENSITÉ qui manque, pas la détection — la scène l'illustre
+             donc toujours, elle ne la chiffre plus. -->
         <div class="stage__hud">
-          <span class="stage__tag">Live</span>
+          <span class="stage__tag">Démonstration</span>
           <div class="stage__metric">
-            <b id="crossCount">0</b><i>croisements aujourd'hui</i>
+            <i>deux trajectoires qui se croisent</i>
           </div>
         </div>
       </div>
@@ -205,14 +220,32 @@
     <div class="split__text">
       <p class="kicker reveal">Temps réel</p>
       <h2 class="h2 reveal">Radars communautaires</h2>
+      <!-- ⚠️ CE CHAPÔ CONTREDISAIT LE PARAGRAPHE JUSTE EN DESSOUS. Il
+           affirmait à plat « les dangers de votre trajet, annoncés avant que
+           vous les voyiez », deux lignes au-dessus du texte qui explique
+           qu'aucune base ne les alimente encore. Une page qui se dédit
+           elle-même à deux lignes d'intervalle n'est pas honnête, elle est
+           négligente. -->
       <p class="lede reveal">
-        Pas de base achetée. Pas de pub. Les dangers de votre trajet,
-        annoncés avant que vous les voyiez.
+        Pas de base achetée. Pas de pub. Les dangers de la route signalés par
+        les motards eux-mêmes — c'est ce que nous construisons.
       </p>
+      <!-- 🔴 CE PARAGRAPHE PROMETTAIT UNE CAPACITÉ QUI NE PEUT PAS SE
+           DÉCLENCHER. Mesuré le 2026-09-12 : le moteur d'alerte existe bien
+           (`apps/mobile/lib/gps/hazard-engine.ts`, `hooks/useHazardAlert.ts`
+           — l'alerte graduée par distance est réelle et testée), mais AUCUNE
+           table de dangers n'existe en production : la seule source est
+           `hazards-fixtures.ts`, des fixtures de démonstration. Un motard
+           réel ne recevra donc jamais une seule annonce.
+           Le texte dit maintenant les deux moitiés : le mécanisme, et ce qui
+           lui manque. -->
       <p class="body reveal">
-        Contrôle, gravier, épingle serrée, chaussée glissante : l'app les
-        annonce à l'approche, avec une alerte graduée selon la distance. La
-        remontée par les riders eux-mêmes arrivera dans une prochaine version.
+        Contrôle, gravier, épingle serrée, chaussée glissante : le guidage sait
+        les annoncer à l'approche, avec une alerte graduée selon la distance.
+        Ce que nous construisons maintenant, c'est ce qui la nourrit — la
+        remontée par les riders eux-mêmes. Tant qu'elle n'est pas là, aucune
+        alerte de danger ne part : nous préférons le dire que laisser croire
+        qu'une base existe.
       </p>
       <div class="chips reveal">
         <span class="chip chip--warn">Contrôle</span>
@@ -227,8 +260,12 @@
         <canvas class="stage__c" data-scene="radar"></canvas>
         <div class="stage__hud">
           <span class="stage__tag">Réseau</span>
+          <!-- 🔴 « SIGNALEMENTS ACTIFS » COMPTAIT VERS UN NOMBRE INVENTÉ,
+               au-dessus d'une base qui n'existe pas. L'animation reste — elle
+               illustre le mécanisme d'alerte, qui est réel — mais elle ne
+               chiffre plus rien. -->
           <div class="stage__metric">
-            <b id="radarCount">0</b><i>signalements actifs</i>
+            <i>alerte graduée par la distance</i>
           </div>
         </div>
         <div class="stage__toast" id="radarToast"></div>
@@ -263,8 +300,14 @@
         <canvas class="stage__c" data-scene="safety"></canvas>
         <div class="stage__hud">
           <span class="stage__tag stage__tag--ok" id="safetyTag">Protégé</span>
+          <!-- 🔴 « 3 CONTACTS ENREGISTRÉS » ÉTAIT ÉCRIT EN DUR DANS CETTE
+               PAGE. La production en compte 2, dont 0 relié — et la fiche
+               `sos-contacts-durgence-jamais-alertes` dit pourquoi : la requête
+               d'alerte exige `linked_user_id`, que le formulaire ne pose
+               jamais. Afficher un compte ici, c'était chiffrer une capacité
+               qui n'est pas encore joignable. -->
           <div class="stage__metric">
-            <b id="safetyContacts">3</b><i>contacts enregistrés</i>
+            <i>vos proches, prévenus d'un appui</i>
           </div>
         </div>
       </div>
@@ -384,15 +427,36 @@
 <section class="sec sec--stats" data-leg="La communauté">
   <div class="wrap">
     <div class="stats">
-      <div class="stat reveal"><b data-count="1284">0</b><i>motards inscrits</i></div>
-      <div class="stat reveal"><b data-count="47" data-suffix="k">0</b><i>km enregistrés</i></div>
-      <div class="stat reveal"><b data-count="9130">0</b><i>croisements comptés</i></div>
+      <!-- 🔴 DEUX DE CES TROIS CHIFFRES ÉTAIENT FAUX, ET LE TROISIÈME ÉTAIT
+           SOUS-ESTIMÉ. Mesuré en production le 2026-09-12 :
+
+               motards inscrits      4 299   le site annonçait 1 284
+               croisements comptés       0   le site annonçait 9 130
+               trajets enregistrés      15   le site annonçait « 47k km »
+
+           « 9 130 croisements » affirmait une fonction qui n'a jamais produit
+           une ligne — c'est exactement le motif qui a fait retirer la tuile
+           « 12 s — chute → alerte » le 2026-08-06 : pas un chiffre d'usage,
+           mais l'affirmation qu'une capacité existe. Les deux sont partis.
+
+           ⚠️ ET CELUI QUI RESTE EST DATÉ. Un nombre écrit dans une page
+           pourrit ; daté, il vieillit honnêtement au lieu de mentir. La
+           commande qui le remesure :
+               select count(*) from users;   -- projet wfethkylnnnvahgojhfz -->
+      <div class="stat reveal">
+        <b data-count="4299">0</b><i>motards inscrits au 12 septembre 2026</i>
+      </div>
       <!-- Tuile « 12 s — chute → alerte » retirée le 2026-08-06 : ce n'était pas un
            chiffre d'usage mais l'affirmation qu'un détecteur de chute existe. Aucun
            capteur, aucun expo-sensors dans l'app ; le SOS est un appui volontaire
            suivi d'un décompte de 10 s (app/(safety)/sos.tsx:230). -->
     </div>
-    <p class="stats__note reveal">Chiffres d'usage de l'application, mis à jour régulièrement.</p>
+    <!-- ⚠️ « MIS À JOUR RÉGULIÈREMENT » ÉTAIT FAUX : les chiffres étaient
+         écrits en dur, donc jamais mis à jour. La légende dit maintenant ce
+         qui est vrai — un relevé daté — et le chiffre porte sa date. -->
+    <p class="stats__note reveal">
+      Relevé dans la base de production le 12 septembre 2026.
+    </p>
   </div>
 </section>
 

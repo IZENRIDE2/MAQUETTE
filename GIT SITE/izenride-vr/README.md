@@ -3,6 +3,70 @@
 Landing page « nouvelle génération » pour la bêta IzenRide. Zéro dépendance,
 zéro build : trois fichiers JS, une feuille de style, dix captures.
 
+## Hébergement — `vercel.json` est un vestige, et il n'est pas encore mort
+
+Le site part chez **OVH mutualisé** ; c'est `.htaccess` qui gouvernera alors.
+`vercel.json` ne servira plus à rien — mais il sert encore aujourd'hui, et le
+supprimer avant la bascule casserait la version en ligne : les trois
+redirections d'hôte (`izenride.com`, `www.izenride.com`, `www.izenride.fr` →
+`izenride.fr`), les six de chemin, les cinq en-têtes de sécurité et les deux
+règles de cache ne vivent, pour l'instant, que là.
+
+**Pourquoi cette note est ici et pas dans le fichier** : JSON n'a pas de
+syntaxe de commentaire. Ce n'est pas une préférence de style, c'est la
+grammaire (RFC 8259) — mesuré le 2026-09-13 :
+
+```
+$ python -c "import json; json.loads('// note\n{\"a\":1}')"
+  json.decoder.JSONDecodeError: Expecting value: line 1 column 1
+$ python -c "import json; json.loads('{/* note */ \"a\":1}')"
+  json.decoder.JSONDecodeError: Expecting property name enclosed in double quotes
+```
+
+Et une clé `"_commentaire"` n'est pas une échappatoire : Vercel valide
+`vercel.json` contre son schéma et refuse les propriétés inconnues. Un
+déploiement perdu pour loger une phrase serait un mauvais marché.
+
+### Quand il pourra partir
+
+Pas à une date : à six mesures. Tant qu'une seule est rouge, le fichier reste.
+
+```bash
+# 1. le nom ne pointe plus vers Vercel (216.198.79.1 aujourd'hui)
+#    nslookup plutôt que dig : c'est celui qui existe sur le poste Windows
+nslookup izenride.fr 1.1.1.1
+# 2. ce n'est plus Vercel qui répond
+curl -sI https://izenride.fr/ | grep -i '^server'
+# 3. le .htaccess est bien LU par le serveur qui répond
+#    (cet en-tête n'existe QUE dans .htaccess — s'il est là, Apache l'a lu)
+curl -sI https://izenride.fr/ | grep -i strict-transport
+# 4. la canonisation d'hôte fonctionne sans Vercel
+curl -sI https://www.izenride.fr/cgu.html | grep -iE '^(HTTP|location)'
+# 5. la page d'erreur est servie, avec le bon code
+curl -sI https://izenride.fr/adresse-qui-nexiste-pas | head -1     # doit dire 404
+# 6. les quatre anciennes adresses légales répondent encore en 301
+for u in politique-de-confidentialite mentions-legales \
+         conditions-generales-dutilisation-cgu conditions-generales-de-vente; do
+  curl -sI "https://izenride.fr/$u" | head -1
+done
+```
+
+Les six vertes, `vercel.json` et `.vercelignore` peuvent être supprimés dans le
+même commit, et le projet Vercel de la vitrine détaché de ses domaines (geste
+humain, panneau Vercel — aucun identifiant sur cette machine).
+
+⚠️ **Date de relance, pas date de suppression : le 2026-11-27.** C'est le jour
+où expirent les certificats Let's Encrypt servis aujourd'hui pour les quatre
+noms. Si la bascule n'a pas eu lieu d'ici là, ce n'est pas ce fichier qu'il
+faut supprimer — c'est la question qu'il faut rouvrir.
+
+⚠️ **`.htaccess` est déjà en place et ne fait RIEN tant que le site est chez
+Vercel** : Vercel ne lit pas les fichiers Apache. Les deux configurations
+peuvent donc cohabiter sans se gêner — mais elles peuvent aussi diverger en
+silence. Toute règle ajoutée à l'une pendant cette période doit être ajoutée à
+l'autre, ou notée ici comme délibérément non reportée.
+
+
 ## Lancer
 
 ```bash

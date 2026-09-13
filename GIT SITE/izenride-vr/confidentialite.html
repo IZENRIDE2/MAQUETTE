@@ -164,7 +164,24 @@
 
   <article id="hebergement">
     <h3><span class="art-num">Article 7</span>Hébergement</h3>
-    <p>Les données de l'Application sont hébergées dans l'Union européenne : infrastructure Supabase, région AWS eu-central-1 (Francfort, Allemagne). Le site vitrine izenride.com est hébergé par OVH SAS, 2 rue Kellermann, 59100 Roubaix, France.</p>
+    <!--
+      🔴 CETTE PHRASE SE CONTREDISAIT AVEC CELLE D'EN DESSOUS, DANS LE MÊME
+      ARTICLE. Elle disait « Le site vitrine izenride.com est hébergé par OVH
+      SAS » trois lignes avant « la page que vous lisez est servie par Vercel
+      Inc. » — or `izenride.com` est justement une redirection 308 vers
+      `izenride.fr`, qui sert CETTE page. Deux affirmations opposées sur le même
+      hébergeur, à quinze lignes d'écart, dans un document opposable.
+
+      Mesuré le 2026-09-12 : izenride.com et izenride.fr résolvent tous deux en
+      216.198.79.1 (Vercel), et `curl -sI https://izenride.com/` rend
+      « 308 Permanent Redirect -> https://izenride.fr/ — Server: Vercel ».
+
+      ⚠️ Le rôle qui RESTE chez OVH — courrier (MX mx0…mx4.mail.ovh.net) et zone
+      DNS (NS ns107.ovh.net) — est nommé dans `mentions-legales.html`, article 2.
+      Il n'a pas sa place ici : cet article-là parle d'HÉBERGEMENT DE DONNÉES,
+      et y remettre « OVH » ferait revenir la confusion qu'on vient de retirer.
+    -->
+    <p>Les données de l'Application sont hébergées dans l'Union européenne : infrastructure Supabase, région AWS eu-central-1 (Francfort, Allemagne). Le site vitrine izenride.fr — ainsi que izenride.com, qui redirige vers lui — n'est plus hébergé par OVH SAS : il est servi par Vercel Inc., comme indiqué ci-dessous.</p>
     <div class="callout callout--ok">
       <b>Hébergement UE</b>
       Aucune donnée de l'Application n'est stockée hors de l'Union européenne par notre hébergeur.
@@ -228,7 +245,15 @@
       Les sept pages du site (accueil, CGU, CGV, mentions légales, confidentialité, suppression de compte, aide et support) ne chargent que des fichiers servis depuis le même domaine : feuilles de style, scripts et images. Aucune balise ne pointe vers un autre domaine, aucune police d'écriture n'est téléchargée (seules les polices déjà présentes sur votre appareil sont utilisées), et aucune mesure d'audience, régie publicitaire ou bouton de réseau social n'est présent. La carte animée de la page d'accueil est dessinée localement par votre navigateur : aucune tuile cartographique n'est demandée à un service extérieur. Le seul échange possible avec l'extérieur est celui décrit ci-dessous, et il n'a lieu que si vous soumettez le formulaire.
     </div>
     <h4>13.2 Hébergement du site</h4>
-    <p>Ce site est servi par Vercel Inc. (États-Unis) ; le site vitrine izenride.com est hébergé par OVH SAS, 2 rue Kellermann, 59100 Roubaix, France. Les conséquences de l'hébergement hors Union européenne sont détaillées à l'article 7.</p>
+    <!--
+      🔴 LA MÊME CONTRADICTION QU'À L'ARTICLE 7, EN PIRE : DANS UNE SEULE PHRASE.
+      Elle disait « Ce site est servi par Vercel Inc. ; le site vitrine
+      izenride.com est hébergé par OVH SAS » — deux hébergeurs pour un seul
+      site, séparés par un point-virgule. Le « site vitrine » et « ce site »
+      sont le même objet depuis que izenride.com redirige (308) vers
+      izenride.fr. Mesuré le 2026-09-12, cf. article 7.
+    -->
+    <p>Ce site est servi par Vercel Inc. (États-Unis), sous les deux noms de domaine izenride.fr et izenride.com — le second redirigeant vers le premier. Les conséquences de l'hébergement hors Union européenne sont détaillées à l'article 7.</p>
   </article>
 
   <footer class="doc__foot">

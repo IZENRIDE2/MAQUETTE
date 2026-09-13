@@ -71,15 +71,65 @@
     </table>
   </article>
 
+  <!--
+    ═══════════════════════════════════════════════════════════════
+    🔴 CETTE PAGE EST LA SURFACE LÉGALE QU'ON A OUBLIÉE, ET C'EST CELLE QUE LE
+    PUBLIC ATTEINT LE PLUS FACILEMENT : https://izenride.fr/mentions-legales.html
+
+    Le 2026-09-12, l'application et le miroir /legal/mentions du site
+    institutionnel avaient été corrigés — celle-ci servait encore, mot pour mot,
+    « Site web izenride.com : OVH SAS » et « tous deux situés dans l'Union
+    européenne ». « Version 3.3 » nommait donc DEUX hébergeurs différents selon
+    l'endroit où on la lisait. Un document opposable ne peut pas faire ça.
+
+    ⚠️ ET ELLE EST VIVANTE, PAS UNE ARCHIVE. Mesuré avant d'écrire une ligne :
+
+        $ curl -sI https://izenride.fr/mentions-legales.html
+          HTTP/1.1 200 OK — Server: Vercel
+          Content-Length: 7116 — Last-Modified: Fri, 11 Sep 2026 16:06:23 GMT
+        $ curl -s  https://izenride.fr/mentions-legales.html | grep OVH
+          &lt;tr&gt;&lt;th&gt;Site web izenride.com&lt;/th&gt;&lt;td&gt;&lt;strong&gt;OVH SAS&lt;/strong&gt;…
+
+    Le texte servi était identique à CE fichier : c'est bien lui qui est publié.
+
+    🔴 CE QUI A CHANGÉ DANS LE MONDE, MESURÉ LE MÊME JOUR, PAS SUPPOSÉ :
+
+        $ nslookup izenride.com 1.1.1.1  ->  216.198.79.1
+        $ nslookup izenride.fr  1.1.1.1  ->  216.198.79.1
+        $ curl -sI https://izenride.com/
+          HTTP/1.1 308 Permanent Redirect -> https://izenride.fr/ — Server: Vercel
+        $ curl -sI https://izenride.fr/
+          HTTP/1.1 200 OK — Server: Vercel
+
+    ⚠️ ON NE REMPLACE PAS « OVH » PAR « VERCEL » PARTOUT — ce serait poser deux
+    mensonges pour en corriger un. OVH garde deux rôles, mesurés le même jour :
+
+        $ nslookup -type=MX izenride.fr  ->  mx0…mx4.mail.ovh.net  (le COURRIER)
+        $ nslookup -type=NS izenride.fr  ->  ns107.ovh.net / dns107.ovh.net (la ZONE)
+
+    Seuls les enregistrements A ont été repointés. D'où trois rôles distincts
+    ci-dessous, et non deux prestataires fondus en un.
+
+    ⚠️ LE NUMÉRO DE VERSION NE BOUGE PAS, VOLONTAIREMENT. Il doit rester égal à
+    celui de apps/mobile/lib/legal/content/legal-mentions.ts dans le dépôt
+    applicatif, qui est la SOURCE de cette page ; là-bas, incrémenter version:
+    exige une migration du registre legal_documents. Désynchroniser les deux
+    pour faire joli créerait le défaut d'à côté : deux surfaces qui annoncent
+    des versions différentes du même texte.
+    ═══════════════════════════════════════════════════════════════
+  -->
   <article id="hebergeur">
     <h3><span class="art-num">Article 2</span>Hébergement</h3>
-    <p>Le site web et les données applicatives de l'application sont hébergés par deux prestataires distincts, tous deux situés dans l'Union européenne.</p>
+    <p>Le site web, les données applicatives et la messagerie relèvent de trois prestataires distincts. Les pages de ce site sont rendues depuis un serveur situé aux États-Unis, donc hors de l'Union européenne ; les données de l'application et les courriels que vous nous adressez, eux, restent dans l'Union européenne.</p>
     <table class="info-card">
       <tbody>
-        <tr><th>Site web izenride.com</th><td><strong>OVH SAS</strong></td></tr>
-        <tr><th>Adresse OVH</th><td>2 rue Kellermann, 59100 Roubaix, France</td></tr>
+        <tr><th>Sites web izenride.fr et izenride.com</th><td><strong>Vercel Inc.</strong></td></tr>
+        <tr><th>Adresse Vercel</th><td>440 N Barranca Avenue #4133, Covina, CA 91723, États-Unis</td></tr>
+        <tr><th>Rendu des pages</th><td>États-Unis — hors Union européenne</td></tr>
         <tr><th>Données applicatives</th><td><strong>Supabase</strong></td></tr>
         <tr><th>Infrastructure Supabase</th><td>AWS eu-central-1 (Francfort, Allemagne)</td></tr>
+        <tr><th>Messagerie et zone DNS</th><td><strong>OVH SAS</strong></td></tr>
+        <tr><th>Adresse OVH</th><td>2 rue Kellermann, 59100 Roubaix, France</td></tr>
       </tbody>
     </table>
   </article>

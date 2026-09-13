@@ -23,6 +23,55 @@
 # Sinon le cache long ci-dessous fige la modification pendant un an.
 # ═══════════════════════════════════════════════════════════════
 
+# ── Un seul nom d'hôte ───────────────────────────────────────────
+#
+# 🔴 CES TROIS HÔTES NE VIVAIENT QUE DANS `vercel.json`. Le jour où le site
+# passe chez OVH, `vercel.json` cesse d'être lu. Les quatre noms sont destinés
+# au MÊME hébergement OVH, donc au même dossier : sans les lignes ci-dessous,
+# `izenride.com`, `www.izenride.com` et `www.izenride.fr` servent le site à leur
+# propre nom au lieu de renvoyer à `izenride.fr`. Le site ne tombe pas — il se
+# met à exister en quatre exemplaires, avec quatre fois chaque page légale, et
+# un moteur de recherche qui doit deviner laquelle fait foi.
+# C'est le pire mode de panne : rien n'est cassé, tout est en double.
+#
+# 🔴 CE BLOC EST AVANT LE HTTPS OBLIGATOIRE, ET C'EST DÉLIBÉRÉ.
+#
+# Une règle de canonisation placée APRÈS le forçage HTTPS coûte deux sauts au
+# lieu d'un, parce que chaque saut repart du haut du fichier :
+#
+#   après : http://www.izenride.fr/x
+#             → 301 https://www.izenride.fr/x   (règle HTTPS, l'hôte est intact)
+#             → 301 https://izenride.fr/x       (règle d'hôte, au tour suivant)
+#   avant : http://www.izenride.fr/x
+#             → 301 https://izenride.fr/x       (un seul saut : la substitution
+#                                                porte DÉJÀ le schéma https)
+#
+# La clef est que la destination est absolue et commence par `https://` : elle
+# corrige le schéma ET l'hôte du même geste. C'est aussi ce qui empêche la
+# boucle — aucune des deux conditions ne reconnaît `izenride.fr` seul, donc la
+# requête redirigée ne repasse pas par ici.
+#
+# ⚠️ `(:\d+)?` — `%{HTTP_HOST}` porte le port quand le client l'a écrit dans
+# l'URL. Un motif ancré sur `$` sans lui laisserait passer `www.izenride.fr:443`
+# sans le canoniser. Les ancres `^`/`$` sont indispensables dans l'autre sens :
+# sans elles, `www.izenride.fr.exemple.net` déclencherait la règle.
+#
+# ⚠️ LA CHAÎNE DE REQUÊTE SURVIT SANS `[QSA]` : la substitution ne contient
+# aucun `?`, donc Apache réattache celle d'origine. En ajouter un la remplacerait.
+#
+# ⚠️ 301 ICI, 308 CHEZ VERCEL. `"permanent": true` de `vercel.json` émet un
+# **308**, qui interdit au client de retomber en GET ; `[R=301]` le lui permet.
+# L'écart est sans effet sur ce site — pages statiques, aucun formulaire
+# (`grep -c '<form' *.html` → 0 partout, mesuré le 2026-09-13) — et 301 est la
+# forme qu'emploient déjà les quatre redirections légales ci-dessous. Si un
+# formulaire apparaît un jour sur un de ces trois hôtes, relire cette ligne.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{HTTP_HOST} ^(www\.)?izenride\.com(:\d+)?$ [NC,OR]
+  RewriteCond %{HTTP_HOST} ^www\.izenride\.fr(:\d+)?$     [NC]
+  RewriteRule ^(.*)$ https://izenride.fr/$1 [R=301,L]
+</IfModule>
+
 # ── HTTPS obligatoire ────────────────────────────────────────────
 <IfModule mod_rewrite.c>
   RewriteEngine On
@@ -54,6 +103,41 @@
   RewriteRule ^mentions-legales/?$                        /mentions-legales.html  [R=301,L]
   RewriteRule ^conditions-generales-dutilisation-cgu/?$   /cgu.html               [R=301,L]
   RewriteRule ^conditions-generales-de-vente/?$           /cgv.html               [R=301,L]
+</IfModule>
+
+# ── Aide : /support et /aide ─────────────────────────────────────
+#
+# 🔴 CE BLOC EST UNE DÉVIATION AU MANDAT, ASSUMÉE, ET VOICI LA MESURE QUI LA
+# JUSTIFIE. La consigne disait « ajoute les trois manques et RIEN de plus », en
+# posant que le `.htaccess` couvrait déjà les six redirections de CHEMIN de
+# `vercel.json`. Il en couvrait QUATRE. Compté le 2026-09-13 :
+#
+#     $ python -c "import json;print([r['source'] for r in
+#                  json.load(open('vercel.json'))['redirects']][3:])"
+#       ['/politique-de-confidentialite', '/mentions-legales',
+#        '/conditions-generales-dutilisation-cgu',
+#        '/conditions-generales-de-vente', '/support', '/aide']
+#
+#     → les quatre premières sont juste au-dessus ; /support et /aide, nulle part.
+#
+# ⚠️ ET C'EST LE `404.html` AJOUTÉ LE MÊME JOUR QUI AURAIT RENDU L'OUBLI
+# INVISIBLE. Sans page d'erreur, `https://izenride.fr/aide` aurait rendu le 404
+# nu d'Apache — moche, donc remarqué. Avec elle, il rend une belle page « Cette
+# page n'existe pas », signée, dans la charte : une régression déguisée en soin.
+# Deux corrections justes qui, ensemble, cachaient un défaut.
+#
+# ⚠️ CE QUI N'EST PAS EN JEU : les boutiques déclarent `/support.html`, la forme
+# à plat, pas `/support` (`docs/apple/metadonnees-app-store.md` et
+# `tools/verifier-urls-declarees-apple.py`, dépôt applicatif). Ces deux-ci sont
+# des alias de confort — ils répondent aujourd'hui en ligne, ils doivent
+# répondre demain. Rien de plus, mais rien de moins.
+#
+# Pour annuler cette déviation : supprimer ce bloc entier. /support et /aide
+# rendront alors 404 comme n'importe quelle adresse inconnue.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteRule ^support/?$ /support.html [R=301,L]
+  RewriteRule ^aide/?$    /support.html [R=301,L]
 </IfModule>
 
 # ── Durées de cache ──────────────────────────────────────────────
@@ -141,6 +225,88 @@
   Header set Referrer-Policy "strict-origin-when-cross-origin"
   Header set X-Frame-Options "DENY"
   Header set Permissions-Policy "geolocation=(), camera=(), microphone=(), payment=()"
+
+  # ── HTTPS non négociable, et mémorisé par le navigateur ────────
+  #
+  # Le bloc de forçage en tête de fichier corrige la requête EN CLAIR : elle
+  # part sur le réseau avant d'être renvoyée en 301. Sur un réseau hostile,
+  # cette première requête suffit. `Strict-Transport-Security` supprime le
+  # premier aller : le navigateur qui a déjà vu cet en-tête réécrit l'URL en
+  # `https://` lui-même, sans jamais émettre la requête en clair.
+  #
+  # 🔴 PAS DE `includeSubDomains`. Ce serait un choix pris ICI, sur
+  # `izenride.fr`, et SUBI par `app.izenride.fr` et `inscription.izenride.fr`,
+  # qui restent chez Vercel et que ce fichier ne sert pas. Une politique HSTS
+  # ne se retire pas d'un geste : elle vit dans le cache du navigateur du
+  # visiteur jusqu'à l'expiration du `max-age`. Le jour où un de ces deux
+  # hôtes a un incident de certificat, l'erreur devient infranchissable — pas
+  # d'« accepter le risque », pas de contournement — et l'équipe qui les
+  # exploite subirait une contrainte posée dans un fichier qu'elle ne lit pas.
+  # Si HSTS est voulu pour eux, chacun doit émettre SON en-tête.
+  #
+  #   ⚠️ `www.izenride.fr` EST COUVERT SANS `includeSubDomains` : le bloc
+  #   d'hôte en tête de fichier lui répond un 301, et `always` (voir plus bas)
+  #   met l'en-tête sur CE 301. Le sous-domaine est donc épinglé pour son
+  #   propre compte, ce qui est la bonne façon de le faire.
+  #
+  # 🔴 PAS DE `preload` NON PLUS, ET SURTOUT PAS AUJOURD'HUI. `preload` n'est
+  # pas un réglage de serveur : c'est une demande d'inscription dans une liste
+  # compilée DANS LE BINAIRE des navigateurs. Retirer un domaine de cette liste
+  # prend des mois, et n'atteint jamais les versions déjà installées : c'est
+  # irréversible à l'échelle du parc. Il exige en outre `includeSubDomains`,
+  # qu'on vient de refuser. Demander ça au milieu d'un changement d'hébergeur
+  # serait signer pour des années une configuration vieille d'un jour.
+  #
+  # `max-age=31536000` (un an) : la valeur usuelle. Elle n'a de sens qu'une
+  # fois le certificat OVH vérifié — tant qu'il ne l'est pas, un visiteur
+  # épinglé ne peut PAS passer outre un avertissement de certificat.
+  #
+  # 🔴 ORDRE DE BASCULE, À RESPECTER : (1) le site répond en HTTPS chez OVH
+  # sous son vrai nom, certificat valide, vérifié ; (2) SEULEMENT ENSUITE les
+  # DNS basculent. Poser HSTS avant d'avoir vu le certificat, c'est se
+  # condamner à une panne qu'on ne peut plus contourner côté visiteur.
+  #
+  # ⚠️ `always` ET NON `set` SEUL. `Header set` ne s'applique qu'aux réponses
+  # de succès ; `always` couvre aussi les 3xx et les 4xx — donc le 301 de
+  # `www.` et la page 404. Sans lui, l'en-tête manquerait exactement sur les
+  # réponses qui en ont le plus besoin.
+  #
+  # ⚠️ LA CONDITION `expr=` EST LE POINT FRAGILE, ET IL EST INVÉRIFIABLE SANS
+  # LE SERVEUR. RFC 6797 interdit d'émettre cet en-tête sur une réponse en
+  # clair ; il faut donc savoir si la requête est arrivée en HTTPS. Sur du
+  # mutualisé OVH, TLS peut être terminé en amont : `%{HTTPS}` vaut alors
+  # `off` et c'est `X-Forwarded-Proto` qui porte l'information. Les deux sont
+  # testés, comme le fait déjà le bloc de forçage en tête de fichier.
+  #
+  #   ⚠️ MAIS PAS DANS LA MÊME LANGUE, ET C'EST UN PIÈGE À LA RELECTURE.
+  #   Le bloc de forçage est du mod_rewrite : `%{HTTP:X-Forwarded-Proto}`.
+  #   Cette ligne-ci est une expression ap_expr : `%{req:X-Forwarded-Proto}`.
+  #   Deux analyseurs différents, deux syntaxes ; recopier l'une dans l'autre
+  #   « pour homogénéiser » casse celle qu'on déplace.
+  #
+  #   ⚠️ `%{req:…}` peut faire ajouter `Vary: X-Forwarded-Proto` aux réponses
+  #   (ap_expr signale les en-têtes de requête qu'il consulte). Sans conséquence
+  #   ici — les pages sont déjà en `no-cache` — mais à vérifier si un cache
+  #   intermédiaire est placé devant le site un jour.
+  #
+  # 🔴 UNE ERREUR DE SYNTAXE DANS CE FICHIER NE SE VOIT PAS : ELLE REND 500.
+  # Apache ne « saute pas » une directive qu'il ne comprend pas dans un
+  # `.htaccess` — il refuse la requête entière, sur TOUT le site, y compris
+  # l'accueil. Le `expr=` de cette ligne demande mod_headers 2.4.10 ou plus.
+  # D'où l'ordre de bascule ci-dessus : déposer les fichiers chez OVH et ouvrir
+  # l'URL de prévisualisation de l'hébergement AVANT de toucher aux DNS. Si la
+  # page d'accueil s'affiche, le fichier est accepté ; si elle rend 500, il ne
+  # l'est pas, et personne d'autre que vous ne l'aura vu.
+  #
+  #   À MESURER LE JOUR DE LA BASCULE, une seule commande :
+  #       curl -sI https://izenride.fr/ | grep -i strict-transport
+  #   Si elle ne rend RIEN, ce n'est pas le max-age qui est en cause : c'est
+  #   que la condition n'a jamais été vraie. Remplacer alors la ligne par sa
+  #   forme inconditionnelle, dont le seul défaut est d'émettre l'en-tête
+  #   aussi sur les réponses en clair, où les navigateurs l'ignorent :
+  #       Header always set Strict-Transport-Security "max-age=31536000"
+  Header always set Strict-Transport-Security "max-age=31536000" "expr=%{HTTPS} == 'on' || %{req:X-Forwarded-Proto} == 'https'"
+
 </IfModule>
 
 # ── Compression ──────────────────────────────────────────────────
@@ -154,6 +320,32 @@ Options -Indexes
 
 # La page d'accueil.
 DirectoryIndex index.html
+
+# La page d'erreur.
+#
+# 🔴 SANS CETTE LIGNE, APACHE RÉPOND LA SIENNE : « Not Found — The requested
+# URL was not found on this server », en Times noir sur blanc, suivie d'une
+# signature qui annonce sa version et le nom de l'hôte. Sur un site qui publie
+# des documents opposables, la première page qu'un visiteur égaré rencontre ne
+# peut pas être celle-là. Vercel, lui, en servait déjà une.
+#
+# ⚠️ `ErrorDocument` NE REDIRIGE PAS — il RE-REND `404.html` sous l'adresse
+# demandée, en gardant le code 404. C'est ce qu'on veut : une redirection vers
+# une page d'erreur rendrait 200, et ferait indexer l'erreur comme une page.
+# Conséquence directe : `404.html` est servie depuis n'importe quelle
+# profondeur d'URL, et TOUS ses liens y sont donc écrits en absolu. La raison
+# est en tête de ce fichier-là — ne pas les repasser en relatif « pour faire
+# comme les sept autres pages ».
+#
+# ⚠️ L'ARGUMENT COMMENCE PAR `/` ET N'EST PAS UNE URL COMPLÈTE. Avec un
+# `http://…`, Apache émettrait une vraie redirection au lieu de rendre la page,
+# et le code 404 serait perdu.
+#
+# ⚠️ CE QUE CETTE LIGNE NE COUVRE PAS : le 403 du bloc `docs/` ci-dessous, et
+# le 500. Ils gardent la page par défaut d'Apache, délibérément — un refus sur
+# `docs/` doit rester sec, et une page d'erreur maison servie pendant une panne
+# serveur suppose que le serveur va assez bien pour aller la chercher.
+ErrorDocument 404 /404.html
 
 # Le dossier docs/ contient les notes de chantier (audit, corrélation
 # site/app) : ce sont des documents internes, pas du contenu public.

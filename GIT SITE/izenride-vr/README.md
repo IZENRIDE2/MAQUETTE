@@ -1,0 +1,208 @@
+# IzenRide — site immersif
+
+Landing page « nouvelle génération » pour la bêta IzenRide. Zéro dépendance,
+zéro build : trois fichiers JS, une feuille de style, dix captures.
+
+## Hébergement — `vercel.json` est un vestige, et il n'est pas encore mort
+
+Le site part chez **OVH mutualisé** ; c'est `.htaccess` qui gouvernera alors.
+`vercel.json` ne servira plus à rien — mais il sert encore aujourd'hui, et le
+supprimer avant la bascule casserait la version en ligne : les trois
+redirections d'hôte (`izenride.com`, `www.izenride.com`, `www.izenride.fr` →
+`izenride.fr`), les six de chemin, les cinq en-têtes de sécurité et les deux
+règles de cache ne vivent, pour l'instant, que là.
+
+**Pourquoi cette note est ici et pas dans le fichier** : JSON n'a pas de
+syntaxe de commentaire. Ce n'est pas une préférence de style, c'est la
+grammaire (RFC 8259) — mesuré le 2026-09-13 :
+
+```
+$ python -c "import json; json.loads('// note\n{\"a\":1}')"
+  json.decoder.JSONDecodeError: Expecting value: line 1 column 1
+$ python -c "import json; json.loads('{/* note */ \"a\":1}')"
+  json.decoder.JSONDecodeError: Expecting property name enclosed in double quotes
+```
+
+Et une clé `"_commentaire"` n'est pas une échappatoire : Vercel valide
+`vercel.json` contre son schéma et refuse les propriétés inconnues. Un
+déploiement perdu pour loger une phrase serait un mauvais marché.
+
+### Quand il pourra partir
+
+Pas à une date : à six mesures. Tant qu'une seule est rouge, le fichier reste.
+
+```bash
+# 1. le nom ne pointe plus vers Vercel (216.198.79.1 aujourd'hui)
+#    nslookup plutôt que dig : c'est celui qui existe sur le poste Windows
+nslookup izenride.fr 1.1.1.1
+# 2. ce n'est plus Vercel qui répond
+curl -sI https://izenride.fr/ | grep -i '^server'
+# 3. le .htaccess est bien LU par le serveur qui répond
+#    (cet en-tête n'existe QUE dans .htaccess — s'il est là, Apache l'a lu)
+curl -sI https://izenride.fr/ | grep -i strict-transport
+# 4. la canonisation d'hôte fonctionne sans Vercel
+curl -sI https://www.izenride.fr/cgu.html | grep -iE '^(HTTP|location)'
+# 5. la page d'erreur est servie, avec le bon code
+curl -sI https://izenride.fr/adresse-qui-nexiste-pas | head -1     # doit dire 404
+# 6. les quatre anciennes adresses légales répondent encore en 301
+for u in politique-de-confidentialite mentions-legales \
+         conditions-generales-dutilisation-cgu conditions-generales-de-vente; do
+  curl -sI "https://izenride.fr/$u" | head -1
+done
+```
+
+Les six vertes, `vercel.json` et `.vercelignore` peuvent être supprimés dans le
+même commit, et le projet Vercel de la vitrine détaché de ses domaines (geste
+humain, panneau Vercel — aucun identifiant sur cette machine).
+
+⚠️ **Date de relance, pas date de suppression : le 2026-11-27.** C'est le jour
+où expirent les certificats Let's Encrypt servis aujourd'hui pour les quatre
+noms. Si la bascule n'a pas eu lieu d'ici là, ce n'est pas ce fichier qu'il
+faut supprimer — c'est la question qu'il faut rouvrir.
+
+⚠️ **`.htaccess` est déjà en place et ne fait RIEN tant que le site est chez
+Vercel** : Vercel ne lit pas les fichiers Apache. Les deux configurations
+peuvent donc cohabiter sans se gêner — mais elles peuvent aussi diverger en
+silence. Toute règle ajoutée à l'une pendant cette période doit être ajoutée à
+l'autre, ou notée ici comme délibérément non reportée.
+
+
+## Lancer
+
+```bash
+powershell -ExecutionPolicy Bypass -File izenride-vr/serve.ps1 -Port 4180
+```
+
+Puis <http://localhost:4180>. (Ouvrir `index.html` en `file://` fonctionne
+aussi, mais le serveur évite les soucis de cache pendant l'itération.)
+
+### Version autonome (un seul fichier)
+
+```bash
+powershell -ExecutionPolicy Bypass -File izenride-vr/build-standalone.ps1
+```
+
+Produit `GIT SITE/SITEWEB OFFICIEL.html` (~1 Mo) : **un seul fichier**, CSS,
+JS, les dix captures et les deux documents légaux intégrés. S'ouvre d'un
+double-clic, sans serveur, et s'envoie tel quel.
+
+Les CGU/CGV y sont embarquées et s'affichent à la place du site selon le
+fragment d'URL (`#cgu`, `#cgv`, ou une ancre interne comme
+`#cgu-marketplace`). Leurs identifiants sont préfixés à la fabrication :
+`#beta` et `#litiges` existent des deux côtés, et des id en double
+casseraient la navigation par ancre.
+
+Le script échoue s'il reste une ressource externe, un identifiant en
+double ou une ancre morte.
+
+C'est un fichier **généré** — le régénérer après toute modification du
+site, sinon il diverge en silence.
+
+### Liens directs
+
+`?go=1` saute l'écran de contact. Une ancre le saute aussi, et amène
+directement à la section — `/#radars`, `/?go=1#cockpit`. Pratique pour
+partager un point précis ou capturer la page.
+
+## Le parcours
+
+Le scroll fait office d'accélérateur : la page se lit comme un trajet, avec
+odomètre et étapes dans le rail de gauche.
+
+| Section | Ce qui s'y passe |
+|---|---|
+| Contact | Écran d'allumage. Le bouton sert aussi de geste utilisateur pour demander l'accès au gyroscope (iOS l'exige). |
+| Hero | Carte GPS en perspective : réseau de rues avec liseré, îlots, itinéraire tracé, motards qui circulent, signalements. Vitesse pilotée par le scroll, caméra par le pointeur ou le gyroscope. |
+| Manifeste | Les trois piliers, repris du manifeste produit. |
+| Le croisement | Canvas 2D : deux trajectoires se croisent, le compteur monte. |
+| Radars | Canvas 2D : signalements qui apparaissent, se propagent aux motards proches, puis expirent. |
+| Safety Zone | Canvas 2D : dôme de protection, proches en veille, simulation de détection de chute. |
+| Les écrans | Les dix captures officielles de la bêta dans un châssis 3D, pilotées par un rail de vignettes. |
+| Chiffres | Compteurs animés à l'entrée dans le viewport. |
+| Bêta | Formulaire de pré-inscription (validation côté client uniquement — **non branché**, voir plus bas). |
+
+## Fichiers
+
+```
+index.html                  structure + contenu
+cgu.html / cgv.html         pages légales (texte fourni, non modifié)
+assets/css/main.css         design system (tokens alignés sur l'app)
+assets/css/legal.css        mise en page des documents légaux
+assets/js/hero-map.js       carte GPS du hero (canvas 2D)
+assets/js/scenes.js         les trois scènes canvas
+assets/js/app.js            orchestration : un seul RAF pour tout
+assets/screens/*.jpg        captures officielles recadrées
+docs/apercu/*.png           aperçu du rendu, section par section
+serve.ps1                   serveur statique local
+```
+
+## Les captures
+
+Recadrées depuis les captures d'émulateur du dépôt `IZENRIDE2/izenride` :
+barre de statut Android (96 px) et barre de navigation système (126 px)
+retirées, redimensionnées en 540 × 1119 (2× l'affichage), JPEG q90 —
+664 ko au total.
+
+Sources :
+
+- `apps/mobile/docs/walkthrough/2026-04-29/` — connexion, safety, events, premium
+- `audit-reports/2026-05-15/{map,itineraire,profile}/` — carte, itinéraire, profil, badges, paramètres GPS
+
+Le ratio du châssis (`.phone`) est calé sur 540/1119 : si vous remplacez les
+captures par d'autres dimensions, ajustez `height` sur `.phone` sinon
+`object-fit: cover` rognera.
+
+## Couleurs
+
+Reprises telles quelles de `apps/mobile/lib/theme/colors.ts` et
+`packages/ui/src/theme.ts` : fond `#08090E`, marque `#4D6284`, accent
+`#4d8fff`, argent `#AAB1BC`. Le site et l'app parlent la même langue.
+
+> À noter : `apps/site-institutionnel` utilise une palette orange
+> (`#ff6b35`) qui date d'avant la refonte v3. Ce site suit le canon de
+> l'app, pas celui du site institutionnel.
+
+## Accessibilité et performance
+
+- Un seul `requestAnimationFrame` pilote la carte du hero et les trois
+  scènes ; chaque scène s'arrête hors écran (IntersectionObserver).
+- `prefers-reduced-motion` coupe les animations ; le bouton « Immersion »
+  en bas à droite permet de basculer manuellement.
+- Repli en dégradé statique si le canvas 2D est indisponible, et si
+  JavaScript est désactivé (`<noscript>`).
+- DPR plafonné à 1,5 sur la carte : elle dessine beaucoup de traits fins,
+  et le gain visuel au-delà ne paie pas le coût de remplissage.
+
+### Le rendu de la carte
+
+Projection au sol : un point `(wx, wy)` — latéral, distance devant — se
+projette en `s = F / wy`, `sx = cx + wx·s`, `sy = horizon + H·s`. Quand
+`wy` tend vers l'infini, le point rejoint le point de fuite. Les routes
+sont échantillonnées en profondeur, avec un pas qui s'élargit au loin,
+pour que l'épaisseur suive la perspective sans facettes visibles.
+
+Chaque voie est tracée deux fois — un liseré sombre plus large, puis la
+chaussée — comme dans un vrai fond de carte : c'est ce qui les détache
+des îlots.
+
+## Ce qui reste à brancher
+
+- **Le formulaire de pré-inscription ne poste nulle part.** Il valide
+  l'e-mail et affiche une confirmation, rien de plus. À câbler sur l'API
+  waitlist existante (`apps/site-institutionnel/src/pages/api/`).
+- Les chiffres de la section « communauté » (1 284 motards, 47k km,
+  9 130 croisements) sont des valeurs de démonstration.
+- Pas de politique de confidentialité ni de bandeau cookies. Les CGU
+  renvoient à une Politique de confidentialité qui n'existe pas encore
+  sur le site — à écrire avant mise en ligne publique.
+
+## Pages légales
+
+`cgu.html` (v4.0) et `cgv.html` (v1.0) reprennent **mot pour mot** les
+documents fournis par IZEN RIDE ; seule la mise en page a été transposée
+sur le thème sombre. Ne pas réécrire le texte au fil des retouches de
+style : la source de vérité est le document juridique, pas le site.
+
+À la prochaine version des documents, remplacer le contenu des `<article>`
+et mettre à jour le numéro de version, la date et l'historique en pied de
+page.

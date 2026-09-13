@@ -1,0 +1,132 @@
+/* ═══════════════════════════════════════════════════════════════
+   Pages légales — lisibilité d'abord.
+
+   Le site d'accueil est une expérience : scroll-driven, plein écran,
+   animations. Ces pages-ci sont l'inverse : on y vient pour LIRE un
+   texte juridique, souvent sur téléphone, parfois pour vérifier un
+   point précis avant d'installer l'application.
+
+   D'où trois partis pris :
+     • une colonne étroite (68 caractères environ) — au-delà, l'œil
+       perd la ligne suivante ;
+     • aucune animation d'entrée : le texte est là au premier pixel
+       peint, y compris si le CDN de polices ne répond pas ;
+     • des titres qui se distinguent par la taille et l'espace, pas par
+       un effet.
+
+   Les variables de couleur viennent de styles.css, chargé avant.
+   ═══════════════════════════════════════════════════════════════ */
+
+body.legal {
+  background: var(--bg);
+  color: var(--txt);
+  font-family: var(--body);
+  line-height: 1.65;
+  margin: 0;
+  /* Le site d'accueil bloque le scroll natif (Lenis) ; ici on le veut. */
+  overflow-y: auto;
+}
+
+.legal__head {
+  border-bottom: 1px solid var(--border);
+  padding: 18px 24px;
+}
+
+.legal__back {
+  color: var(--muted);
+  text-decoration: none;
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: color 0.2s;
+}
+.legal__back:hover,
+.legal__back:focus-visible {
+  color: var(--txt);
+}
+
+.legal__main {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 48px 24px 20px;
+}
+
+.legal__title {
+  font-family: var(--display);
+  font-size: clamp(28px, 5vw, 44px);
+  line-height: 1.1;
+  margin: 0 0 8px;
+}
+
+.legal__meta {
+  color: var(--muted);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  margin: 0 0 40px;
+}
+
+.legal__body h1,
+.legal__body h2 {
+  font-family: var(--display);
+  font-size: 22px;
+  line-height: 1.25;
+  margin: 44px 0 12px;
+  color: var(--txt);
+}
+.legal__body h3,
+.legal__body h4,
+.legal__body h5 {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 30px 0 8px;
+  color: var(--txt);
+}
+
+.legal__body p,
+.legal__body li {
+  color: #c9cfdb;
+  font-size: 15px;
+  margin: 0 0 14px;
+}
+
+.legal__body ul,
+.legal__body ol {
+  padding-left: 22px;
+  margin: 0 0 18px;
+}
+
+.legal__body strong {
+  color: var(--txt);
+}
+
+.legal__body a {
+  color: var(--blue);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* Un tableau de CGV déborde sur téléphone : on le fait défiler dans sa
+   propre boîte plutôt que de faire déborder la page entière. */
+.legal__body table {
+  display: block;
+  overflow-x: auto;
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0 0 18px;
+}
+.legal__body th,
+.legal__body td {
+  border: 1px solid var(--border);
+  padding: 8px 10px;
+  font-size: 14px;
+  text-align: left;
+}
+
+/* Le pied de page légal est défini dans styles.css (.footer--legal) —
+   on ne redéfinit ici que sa marge haute sur ces pages. */
+body.legal .footer--legal {
+  margin-top: 56px;
+  border-top: 1px solid var(--border);
+  padding-top: 22px;
+}

@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Page introuvable — IzenRide</title>
+<meta name="description" content="L'adresse demandée ne correspond à aucune page du site IzenRide.">
+<meta name="robots" content="noindex, follow">
+<meta name="theme-color" content="#08090E">
+<!--
+  ══════════════════════════════════════════════════════════════
+  🔴 TOUS LES CHEMINS DE CETTE PAGE COMMENCENT PAR « / ». C'EST LA SEULE
+  DIFFÉRENCE DE FOND AVEC LES AUTRES PAGES, ET ELLE N'EST PAS COSMÉTIQUE.
+
+  Les autres pages du site s'écrivent en chemins RELATIFS
+  (`assets/css/main.css`) parce qu'elles sont toujours servies à la racine :
+  `/cgu.html`, `/support.html`… Celle-ci ne l'est pas. Apache la sert à
+  l'adresse que le visiteur a demandée — `ErrorDocument` ne redirige pas, il
+  RE-REND le document sous l'URL fautive. Sur
+  `https://izenride.fr/vieux/dossier/page`, un `href="/assets/css/main.css"`
+  se résoudrait en `/vieux/dossier/assets/css/main.css` : 404 à son tour.
+
+  La page s'afficherait alors sans feuille de style — du texte noir sur fond
+  blanc — exactement dans le cas où le visiteur est déjà perdu. Le défaut
+  serait invisible depuis la racine, où les deux formes se valent, et
+  n'apparaîtrait qu'en profondeur.
+
+  ⚠️ Le lien de retour vaut « / » et non « index.html », pour la même raison.
+
+  ⚠️ LE BOUTON DE NAVIGATION DIT « Télécharger », PAS « Rejoindre la bêta ».
+  Ce n'est pas une fantaisie : il y a deux libellés en circulation, et un seul
+  est vrai. Mesuré le 2026-09-13 dans ce dépôt :
+
+      $ grep -l "Rejoindre la bêta" *.html
+        cgu cgv confidentialite mentions-legales oss-licenses support
+        suppression-compte          → SEPT pages, toutes internes
+      $ grep -n 'href="#beta"' index.html
+        69: …>Télécharger</a>   126: …>Télécharger l'app</a>
+                                    → l'ACCUEIL, lui, a été corrigé
+
+  La section `#beta` de l'accueil annonce « Elle est en ligne — IzenRide se
+  télécharge maintenant » : c'est l'accueil qui dit vrai, et les sept pages
+  internes qui invitent encore à une bêta fermée depuis la publication.
+  Recopier ici l'intitulé majoritaire, c'était le rendre faux à un endroit de
+  plus — une page neuve n'hérite pas d'un défaut par politesse.
+
+  ⚠️ LES SEPT AUTRES RESTENT À CORRIGER. Cette page ne les corrige pas : elle
+  n'était pas mandatée pour ça, et sept fichiers modifiés dans un chantier
+  d'hébergement se relisent mal. Le jour où ce sera fait, l'écart disparaît.
+  ══════════════════════════════════════════════════════════════
+-->
+<link rel="icon" href="/assets/img/favicon-32.png?v=2026-08-29b" sizes="32x32">
+<link rel="icon" href="/assets/img/logo-192.png?v=2026-08-29b" sizes="192x192">
+<link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png?v=2026-08-29b">
+<link rel="stylesheet" href="/assets/css/main.css?v=2026-08-29b">
+<link rel="stylesheet" href="/assets/css/legal.css?v=2026-08-29b">
+</head>
+<body>
+
+<header class="nav is-stuck">
+  <a class="nav__brand" href="/">
+    <img class="mark" src="/assets/img/logo.png?v=2026-08-29b" width="34" height="34" alt="" aria-hidden="true">
+    <span class="nav__word">Izen<b>Ride</b></span>
+  </a>
+  <nav class="nav__links" aria-label="Navigation principale">
+    <a href="/index.html#manifeste">Manifeste</a>
+    <a href="/index.html#cockpit">Les écrans</a>
+    <a href="/cgv.html">CGV</a>
+  </nav>
+  <a href="/index.html#beta" class="btn btn--sm btn--primary">Télécharger</a>
+</header>
+
+<main class="doc-page">
+<article class="doc">
+
+  <header class="doc__head">
+    <h1 class="doc__title">Cette page n'existe pas</h1>
+    <p class="doc__sub">L'adresse demandée ne correspond à aucune page de ce site.</p>
+  </header>
+
+  <p>Le lien qui vous a mené ici est peut-être incomplet, ou la page a changé
+  d'adresse. Rien n'est perdu : toutes les pages du site sont accessibles
+  depuis l'accueil.</p>
+
+  <p>Si vous cherchiez un document en particulier, les liens ci-dessous y mènent
+  directement ; les conditions générales sont en pied de page. Et si c'est nous
+  qui vous avons donné ce lien, dites-le-nous : <a href="mailto:direction@izenride.com">direction@izenride.com</a>.</p>
+
+  <!--
+    Cinq liens, pas huit : les CGU et les CGV sont déjà dans le pied de page, et
+    une page d'erreur qui réénumère tout le site n'aide personne — elle déplace
+    seulement le problème du visiteur. Ceux qui restent sont ceux qu'on vient
+    chercher directement, sans passer par l'accueil : l'aide, les deux documents
+    que les boutiques exigent, et la suppression de compte.
+  -->
+  <div class="doc__cross">
+    <a href="/" class="btn btn--sm btn--primary">Retour à l'accueil</a>
+    <a href="/support.html" class="btn btn--ghost btn--sm">Aide</a>
+    <a href="/confidentialite.html" class="btn btn--ghost btn--sm">Confidentialité</a>
+    <a href="/mentions-legales.html" class="btn btn--ghost btn--sm">Mentions légales</a>
+    <a href="/suppression-compte.html" class="btn btn--ghost btn--sm">Suppression de compte</a>
+  </div>
+
+</article>
+</main>
+
+<footer class="foot">
+  <div class="wrap foot__in">
+    <div class="foot__brand">
+      <img class="mark" src="/assets/img/logo.png?v=2026-08-29b" width="34" height="34" alt="" aria-hidden="true">
+      <span class="nav__word">Izen<b>Ride</b></span>
+    </div>
+    <nav class="foot__links">
+      <a href="/">Accueil</a>
+      <a href="/cgu.html">CGU</a>
+      <a href="/cgv.html">CGV</a>
+      <a href="/support.html">Aide</a>
+      <a href="mailto:direction@izenride.com">Contact</a>
+    </nav>
+    <p class="foot__copy">© 2026 IZEN RIDE SAS — 4 rue Massilie, 13420 Gémenos — RCS Marseille 981 848 922.</p>
+  </div>
+</footer>
+
+</body>
+</html>

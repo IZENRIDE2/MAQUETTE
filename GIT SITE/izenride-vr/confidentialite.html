@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Politique de confidentialité — IzenRide</title>
-<meta name="description" content="Politique de confidentialité de l'application IzenRide (v3.7, en vigueur au 27 août 2026).">
+<meta name="description" content="Politique de confidentialité de l'application IzenRide (v3.7, en vigueur au 13 septembre 2026).">
 <meta name="theme-color" content="#08090E">
 <link rel="icon" href="assets/img/favicon-32.png?v=2026-08-29b" sizes="32x32">
 <link rel="icon" href="assets/img/logo-192.png?v=2026-08-29b" sizes="192x192">
@@ -36,7 +36,7 @@
     <p class="doc__sub">Conforme RGPD</p>
     <div class="doc__meta">
       <span><b>Version</b><i>v3.7</i></span>
-      <span><b>Dernière mise à jour</b><i>27 août 2026</i></span>
+      <span><b>Dernière mise à jour</b><i>13 septembre 2026</i></span>
       <span><b>Droit applicable</b><i>RGPD · UE</i></span>
       <span><b>Lecture</b><i>~10 min</i></span>
     </div>
@@ -79,7 +79,7 @@
     <p>Les principales catégories de données rattachées à un compte sont :</p>
     <ul>
       <li><b>Profil :</b> identifiants (prénom, nom, date de naissance, e-mail), photos, biographie, motos renseignées dans le garage.</li>
-      <li><b>Localisation (GPS) :</b> positions collectées pendant l'utilisation de l'application ; pendant un guidage, la collecte se poursuit lorsque l'application passe en arrière-plan, afin que les instructions continuent (voir l'article 4). Supprimées après 7 à 30 jours selon votre offre (voir la durée de conservation à l'article 6).</li>
+      <li><b>Localisation (GPS) :</b> positions collectées pendant l'utilisation de l'application ; pendant un guidage, la collecte et le partage de votre position se poursuivent lorsque l'application passe en arrière-plan, tant que la notification permanente du guidage est affichée (voir l'article 4). Supprimées après 7 à 30 jours selon votre offre (voir la durée de conservation à l'article 6).</li>
       <li><b>Adresse du domicile :</b> facultative, saisie par vos soins pour définir une zone de confidentialité — elle sert à masquer vos abords immédiats sur la carte, et n'est jamais montrée aux autres membres.</li>
       <li><b>Messages :</b> conversations entre membres, chiffrées en transit.</li>
       <li><b>Micro et messages vocaux :</b> le micro n'est sollicité que lorsque vous enregistrez un message vocal dans une conversation : un appui démarre l'enregistrement, un second l'arrête et l'envoie, et il s'arrête seul au bout de deux minutes. L'enregistrement est déposé chez notre hébergeur dans un espace de stockage privé : il n'est lisible que par les participants de la conversation, au moyen d'un lien signé valable une heure. Le micro n'est utilisé ni pour la navigation, ni en arrière-plan, ni à aucun autre moment.</li>
@@ -106,13 +106,17 @@
     <p>IzenRide collecte des données de localisation afin d'afficher les motards proches de toi, de détecter les croisements et d'assurer le guidage GPS.</p>
     <div class="callout callout--warn">
       <b>Pendant un guidage, en arrière-plan</b>
-      Pendant un guidage, la collecte se poursuit lorsque l'application passe en arrière-plan, afin que les instructions continuent : une notification permanente te le signale, et elle disparaît dès que tu arrêtes le guidage.
+      Pendant un guidage, la collecte se poursuit lorsque l'application passe en arrière-plan : les instructions continuent, et ta position continue d'être partagée dans les mêmes conditions qu'à l'écran — aux autres motards si tu l'as autorisé, et au proche à qui tu as envoyé un lien. Une notification permanente te le signale, et elle disparaît dès que tu arrêtes le guidage.
     </div>
     <p>Sur Android, cette continuité repose sur un service de premier plan, matérialisé par cette notification. L'application n'y déclare ni ne demande l'autorisation de localisation en arrière-plan (<code>ACCESS_BACKGROUND_LOCATION</code>) : hors d'un guidage en cours, aucune position n'est relevée lorsque l'application est fermée.</p>
-    <p>Sur iOS, l'application déclare le mode d'arrière-plan « localisation » et demande séparément l'autorisation « Toujours ». Sur iOS, si tu l'accordes, la position peut être relevée pour la détection de croisements et l'alerte SOS y compris lorsque l'application est fermée ou inutilisée, et tu peux la retirer à tout moment dans les réglages du système.</p>
+    <p>Sur iOS, l'application déclare le mode d'arrière-plan « localisation » et ne demande que l'autorisation d'accéder à ta position lorsque l'app est active : pendant un guidage, iOS affiche son indicateur de localisation tant que la collecte se poursuit, et hors d'un guidage aucune position n'est relevée lorsque l'application est fermée. Tu peux retirer cette autorisation à tout moment dans les réglages du système.</p>
     <p>Ta position n'est visible par d'autres membres que si tu l'autorises. Elle n'est ni vendue ni transmise à des tiers à des fins publicitaires. Tu peux retirer cet accès à tout moment dans les Réglages.</p>
+    <div class="callout callout--info">
+      <b>Pendant un guidage, ce réglage suffit</b>
+      Pendant un guidage GPS, ce consentement suffit à lui seul : dès que « Visible sur la carte » est activé dans Réglages › Confidentialité, ta position est diffusée aux autres motards pendant le trajet, sans geste supplémentaire. L'écran de guidage te le signale en permanence — « Tu es visible sur la carte » — et le même bandeau porte un bouton qui coupe cette diffusion pour le trajet en cours, d'un seul appui. Cette diffusion suit la collecte décrite ci-dessus : elle se poursuit lorsque l'application passe en arrière-plan, aussi longtemps que la notification permanente du guidage reste affichée, et elle s'arrête avec elle ; si cette notification ne peut pas être affichée, la diffusion s'interrompt dès que l'application n'est plus au premier plan. La coupure vaut pour le trajet en cours — au trajet suivant, le bandeau t'indique à nouveau que tu es visible.
+    </div>
     <h4>4.1 Qui reçoit votre position</h4>
-    <p>Afficher une carte, calculer un itinéraire ou traduire une adresse en coordonnées suppose d'interroger des services de cartographie extérieurs : votre position, ou la zone que vous consultez, leur est nécessairement transmise. Le détail figure à l'article 5.</p>
+    <p>Afficher une carte, calculer un itinéraire, traduire une adresse en coordonnées ou nommer le quartier où a eu lieu un croisement suppose d'interroger des services de cartographie extérieurs, et donc de leur transmettre votre position, le lieu de ce croisement ou la zone que vous consultez. Le détail figure à l'article 5.</p>
     <h4>4.2 Alerte SOS</h4>
     <p>Le déclenchement d'une alerte SOS transmet ta position aux membres proches et à tes contacts d'urgence, afin qu'ils puissent te porter secours.</p>
     <h4>4.3 Ta photo sur la carte</h4>
@@ -126,13 +130,13 @@
       <tbody>
         <tr><th>Supabase</th><td>Hébergeur : compte, profil, messages, contenus, et votre localisation — positions, trajets enregistrés, alertes SOS. C'est aussi le proxy serveur cité plus bas. Union européenne — AWS eu-central-1 (Francfort).</td></tr>
         <tr><th>OpenFreeMap</th><td>Fonds de carte : les tuiles demandées révèlent la zone que vous consultez.</td></tr>
-        <tr><th>IGN</th><td><span class="mono">data.geopf.fr</span> — en France, recherche d'adresse et calcul d'itinéraire : adresses saisies et coordonnées.</td></tr>
         <tr><th>GraphHopper</th><td>Itinéraires en France et à l'étranger : départ, arrivée et étapes. Appelé via notre proxy serveur.</td></tr>
         <tr><th>Google (Places)</th><td>Recherche de lieux : texte saisi et position de référence. Appelé via notre proxy serveur.</td></tr>
         <tr><th>Projet OpenStreetMap</th><td>Nominatim : conversion d'une position en adresse lisible. Appelé directement depuis l'appareil, sans passer par notre proxy — seules vos coordonnées sont transmises, ni votre itinéraire ni le texte que vous saisissez.</td></tr>
+        <tr><th>Apple / Google (géocodeur du système)</th><td>Géocodeur intégré au téléphone — celui d'Apple sur iOS, celui de Google sur Android. Pour afficher où ont eu lieu vos croisements, l'application lui transmet les seules coordonnées du lieu de chaque croisement — ni votre identité, ni celle de l'autre motard — et n'en garde que le nom du quartier ou de la commune, jamais la rue. Appelé directement depuis l'appareil, sans passer par notre proxy.</td></tr>
         <tr><th>Algolia</th><td>Moteur de recherche de profils, lorsque la fonction est activée sur votre version : pseudo, prénom, ville, description, photos, moto, statut Premium — et les coordonnées de votre ville, jamais votre position en temps réel.</td></tr>
         <tr><th>Expo, puis Apple / Google</th><td>Remise des notifications : jeton de notification et contenu du message, relayés vers APNs (Apple) ou FCM (Google).</td></tr>
-        <tr><th>Sentry</th><td>Diagnostic des plantages, seulement si vous activez les statistiques (désactivées par défaut) : trace d'erreur, fil des dernières actions dans l'app, modèle d'appareil, version. Hébergement Union européenne, sans données personnelles directes.</td></tr>
+        <tr><th>Sentry</th><td>Diagnostic des plantages, actif par défaut au titre de l'intérêt légitime et débrayable dans Réglages › Consentements : trace d'erreur, fil des dernières actions dans l'app, modèle d'appareil, version. Hébergement Union européenne, sans données personnelles directes. Les traces de performance, elles, ne partent que si vous activez les statistiques (désactivées par défaut).</td></tr>
         <tr><th>RevenueCat et les stores</th><td>Abonnement Premium, lorsque la fonction est activée sur votre version : identifiant de compte et statut d'abonnement. Le paiement lui-même reste chez Apple ou Google.</td></tr>
       </tbody>
     </table>
@@ -264,7 +268,8 @@
     </div>
     <h2>Historique des versions</h2>
     <ul>
-      <li><b>v3.7</b> — 2026-08-27 — Retrait de l'article sur le formulaire « Rejoindre la bêta » : l'application étant publiée, le formulaire a été supprimé du site et ne collecte donc plus rien. L'hébergement passe de l'article 13.3 à 13.2. <em>(en vigueur)</em></li>
+      <li><b>v3.7</b> — 2026-09-13 — Localisation : pendant un guidage, ta position continue d'être diffusée lorsque l'application passe en arrière-plan, tant que la notification permanente est affichée — aux autres motards si « Visible sur la carte » est activé, sans geste supplémentaire, et au proche à qui tu as envoyé un lien. Destinataires : ajout du géocodeur du système (Apple sur iOS, Google sur Android), qui nomme le quartier ou la commune d'un croisement à partir de ses coordonnées. Sur ce site, report de deux corrections déjà faites dans l'application : l'IGN, qui n'est plus appelé, est retiré, et le diagnostic des plantages (Sentry) est décrit comme actif par défaut et débrayable. <em>(en vigueur)</em></li>
+      <li><b>Révision du site</b> — 2026-08-27 — Sur ce site seulement : retrait de l'article sur le formulaire « Rejoindre la bêta » — l'application étant publiée, le formulaire a été supprimé du site et ne collecte donc plus rien. L'hébergement passe de l'article 13.3 à 13.2. Cette révision a d'abord été affichée ici sous le numéro v3.7, alors que l'application était encore en v3.6 ; ce numéro désigne désormais la version du 13 septembre 2026, commune à l'application et à ce site.</li>
       <li><b>v3.6</b> — 2026-08-16 — Localisation : la photo de profil devient le marqueur des motards sur la carte. Elle est nette si « Photos publiques » est activé, floutée sinon ; la position reste floutée comme avant. Inventaire des pages du site mis à jour (article 13.1).</li>
       <li><b>v3.5</b> — 2026-08-06 — Localisation : la continuité pendant un guidage est décrite par le service de premier plan et sa notification permanente, l'autorisation d'arrière-plan ayant été retirée sur Android. Ajout du micro (messages vocaux) et de l'alerte SOS.</li>
       <li><b>v3.4</b> — 2026-08-05 — Article 4 aligné mot pour mot sur la divulgation de localisation affichée dans l'application ; article 5 : destinataires nommés un par un.</li>

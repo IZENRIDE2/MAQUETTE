@@ -1,14 +1,37 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Pressable, TextInput } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { ChevronLeft, User, Calendar, Mail, Lock, Eye, EyeOff, Check, ArrowRight } from 'lucide-react-native';
+import { useRouter } from 'expo-router';
+import { ChevronLeft, User, Calendar, Mail, Lock, Eye, EyeOff, Check, ArrowRight, Gift } from 'lucide-react-native';
 import { Screen } from '@/components';
 import { colors, fonts, shadow } from '@/theme';
+import { isDemo } from '@/api/supabase';
+import { claimFriendInvite, readPendingInviteCode, savePendingInviteCode } from '@/api/friends';
+import { friendRoutes } from '@/screens/friends/routes';
 
 /** Inscription — étape 1/3 : création de compte (SSO + email). */
 export default function InscriptionScreen() {
   const [reveal, setReveal] = useState(false);
   const [consent, setConsent] = useState(true);
+  const router = useRouter();
+  // Code d'invitation : pré-rempli quand l'app a été ouverte depuis un lien.
+  const [inviteCode, setInviteCode] = useState('');
+  useEffect(() => {
+    readPendingInviteCode().then((c) => c && setInviteCode(c));
+  }, []);
+
+  const submit = async () => {
+    const code = inviteCode.trim().toUpperCase();
+    if (isDemo) {
+      // Démo : « Tom » s'inscrit ; son invitation est rattachée tout de suite.
+      const r = await claimFriendInvite(code || null, 'u-tom').catch(() => ({ status: 'none' as const }));
+      router.push(r.status === 'none' ? '/s/009' : friendRoutes.onboarding());
+      return;
+    }
+    // Rattachement après vérification du compte (voir src/friends/claimOnSignIn.ts).
+    if (code) await savePendingInviteCode(code);
+    router.push('/s/009');
+  };
 
   return (
     <Screen scroll pad={24} contentStyle={{ paddingBottom: 32 }}>
@@ -118,6 +141,24 @@ export default function InscriptionScreen() {
           </Text>
         </View>
 
+        <View>
+          <Text style={styles.fieldLabel}>Code d’invitation (optionnel)</Text>
+          <View style={styles.inputWrap}>
+            <View style={styles.inputIcon}>
+              <Gift size={18} color={colors.inkMute} />
+            </View>
+            <TextInput
+              style={styles.input}
+              placeholder="Ex. YAN2S7RD"
+              placeholderTextColor={colors.lineStrong}
+              autoCapitalize="characters"
+              maxLength={8}
+              value={inviteCode}
+              onChangeText={setInviteCode}
+            />
+          </View>
+        </View>
+
         <Pressable style={styles.consent} onPress={() => setConsent((c) => !c)}>
           <View style={[styles.checkbox, consent && styles.checkboxOn]}>
             {consent && <Check size={12} color="#fff" strokeWidth={3} />}
@@ -131,7 +172,7 @@ export default function InscriptionScreen() {
 
       {/* CTA */}
       <View style={styles.ctaZone}>
-        <Pressable>
+        <Pressable onPress={submit}>
           <LinearGradient colors={['#4A9CE8', '#2E7FCC']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.cta}>
             <Text style={styles.ctaTxt}>Créer mon compte</Text>
             <ArrowRight size={18} color="#fff" strokeWidth={2.5} />

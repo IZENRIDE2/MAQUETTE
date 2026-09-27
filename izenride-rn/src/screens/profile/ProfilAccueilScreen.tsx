@@ -11,7 +11,13 @@ import {
   Bike,
   HelpCircle,
   ChevronRight,
+  UserPlus,
+  Mail,
+  ShieldCheck,
 } from 'lucide-react-native';
+import { useQuery } from '@/api/useQuery';
+import { isModerator } from '@/api/pro';
+import { useRouter } from 'expo-router';
 import { Screen, BottomTabBar } from '@/components';
 import { colors, fonts } from '@/theme';
 
@@ -21,7 +27,9 @@ const STATS = [
   { value: '1 240', label: 'km' },
 ];
 
-const MENU = [
+const MENU: { Icon: typeof User; label: string; href?: string }[] = [
+  { Icon: UserPlus, label: 'Inviter un ami', href: '/friends/invite' },
+  { Icon: Mail, label: 'Mes invitations', href: '/friends/invites' },
   { Icon: User, label: 'Éditer mon profil' },
   { Icon: ShoppingBag, label: 'Mes annonces & ventes' },
   { Icon: Bike, label: 'Mes motos' },
@@ -31,6 +39,9 @@ const MENU = [
 
 /** Profil — accueil (onglet principal), localisé Paris. */
 export default function ProfilAccueilScreen() {
+  const router = useRouter();
+  const moderator = useQuery(isModerator, []).data;
+  const menu = moderator ? [...MENU, { Icon: ShieldCheck, label: 'Modération · badges pro', href: '/moderation' }] : MENU;
   return (
     <Screen scroll={false} pad={0} edges={['top']}>
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
@@ -83,8 +94,8 @@ export default function ProfilAccueilScreen() {
 
         {/* Menu */}
         <View style={styles.menu}>
-          {MENU.map(({ Icon, label }, i) => (
-            <Pressable key={label} style={[styles.mrow, i > 0 && styles.mrowBorder]}>
+          {menu.map(({ Icon, label, href }, i) => (
+            <Pressable key={label} onPress={href ? () => router.push(href) : undefined} style={[styles.mrow, i > 0 && styles.mrowBorder]}>
               <View style={styles.mi}>
                 <Icon size={17} color={colors.neon} />
               </View>

@@ -1,11 +1,17 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
+import { useRouter } from 'expo-router';
 import {
   CheckCircle, MessageSquare, Search, Heart, ShoppingCart, Users,
-  Calendar, Check, CheckCheck,
+  Calendar, Check, CheckCheck, Plus,
 } from 'lucide-react-native';
 import { Screen, BottomTabBar } from '@/components';
+import { MyGroupsStrip, GroupConversations, ReceivedInvites } from './MessagesGroups';
+import { FriendsSection } from './MessagesFriends';
 import { colors, fonts, radius } from '@/theme';
+import { useQuery } from '@/api/useQuery';
+import { listMyGroups, listMyGroupInvites } from '@/api/groups';
+import { groupRoutes } from '@/screens/groups/routes';
 
 const FILTERS = [
   { label: 'Tout', count: '12', dot: false },
@@ -24,13 +30,24 @@ const NEW_MATCHES = [
 
 /** Messages — liste des conversations (matchs / marketplace / événements / pro). */
 export default function MessagesScreen() {
+  const router = useRouter();
   const [active, setActive] = useState('Tout');
+  const { data: groups = [] } = useQuery(listMyGroups, []);
+  const { data: invites = [] } = useQuery(listMyGroupInvites, []);
+  const filters = [
+    FILTERS[0]!,
+    { label: 'Groupes', count: String(groups.length), dot: false },
+    ...FILTERS.slice(1),
+  ];
   return (
     <Screen scroll={false} pad={0} edges={['top']}>
       {/* Nav top */}
       <View style={styles.navTop}>
         <Text style={styles.navTitle}>Messages</Text>
         <View style={styles.navActions}>
+          <Pressable style={styles.navBtn} onPress={() => router.push(groupRoutes.create())}>
+            <Plus size={16} color={colors.inkDim} />
+          </Pressable>
           <Pressable style={styles.navBtn}>
             <CheckCircle size={16} color={colors.inkDim} />
           </Pressable>
@@ -54,7 +71,7 @@ export default function MessagesScreen() {
         contentContainerStyle={styles.filters}
         style={{ flexGrow: 0 }}
       >
-        {FILTERS.map((f) => (
+        {filters.map((f) => (
           <Pressable
             key={f.label}
             onPress={() => setActive(f.label)}
@@ -70,6 +87,15 @@ export default function MessagesScreen() {
       </ScrollView>
 
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+        {/* Invitations reçues + Mes groupes */}
+        <FriendsSection />
+        <ReceivedInvites invites={invites} />
+        <MyGroupsStrip groups={groups} />
+
+        {active === 'Groupes' ? (
+          <GroupConversations groups={groups} />
+        ) : (
+        <>
         {/* Nouveaux matchs */}
         <View style={styles.nmSection}>
           <View style={styles.nmHead}>
@@ -280,6 +306,8 @@ export default function MessagesScreen() {
             </View>
           </View>
         </View>
+        </>
+        )}
       </ScrollView>
 
       <BottomTabBar active="messages" />

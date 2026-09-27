@@ -102,6 +102,26 @@ import ForceUpdateVersionTropAncienneScreen from './system/ForceUpdateVersionTro
 import RateLimitQuotaDepasseScreen from './system/RateLimitQuotaDepasseScreen';
 import PaiementEchoueScreen from './system/PaiementEchoueScreen';
 
+import CreerUnGroupeScreen from './groups/CreerUnGroupeScreen';
+import GroupeAccueilScreen from './groups/GroupeAccueilScreen';
+import GererLeGroupeScreen from './groups/GererLeGroupeScreen';
+import RolesDuGroupeScreen from './groups/RolesDuGroupeScreen';
+import EditeurDeRoleScreen from './groups/EditeurDeRoleScreen';
+import ProposerScreen from './groups/ProposerScreen';
+import SuggestionScreen from './groups/SuggestionScreen';
+import MesSuggestionsScreen from './groups/MesSuggestionsScreen';
+import InviterUnAmiScreen from './friends/InviterUnAmiScreen';
+import MesInvitationsScreen from './friends/MesInvitationsScreen';
+import BienvenueAmiScreen from './friends/BienvenueAmiScreen';
+import OnboardingInviteScreen from './friends/OnboardingInviteScreen';
+import ConversationDirecteScreen from './friends/ConversationDirecteScreen';
+import DemandeBadgeScreen from './pro/DemandeBadgeScreen';
+import StatsScreen from './pro/StatsScreen';
+import JournalScreen from './pro/JournalScreen';
+import ModerationScreen from './pro/ModerationScreen';
+import SortieProScreen from './pro/SortieProScreen';
+import { DEMO_PRO_GROUP_ID } from '@/api/demoPro';
+import { DEMO_GROUP_ID } from '@/api/demoStore';
 export const REGISTRY: Record<string, React.ComponentType<any>> = {
   '000': SplashScreen,
   '001': Onboarding1BienvenueScreen,
@@ -204,4 +224,33 @@ export const REGISTRY: Record<string, React.ComponentType<any>> = {
   '098': ForceUpdateVersionTropAncienneScreen,
   '099': RateLimitQuotaDepasseScreen,
   '100': PaiementEchoueScreen,
+  // Groupes (lot 1) — rendus sur le groupe de démo.
+  '101': CreerUnGroupeScreen,
+  '102': () => React.createElement(GroupeAccueilScreen, { groupId: DEMO_GROUP_ID, initialTab: 'chat' }),
+  '103': () => React.createElement(GroupeAccueilScreen, { groupId: DEMO_GROUP_ID, initialTab: 'sorties' }),
+  '104': () => React.createElement(GroupeAccueilScreen, { groupId: DEMO_GROUP_ID, initialTab: 'membres' }),
+  '105': () => React.createElement(GroupeAccueilScreen, { groupId: DEMO_GROUP_ID, initialTab: 'infos' }),
+  '106': () => React.createElement(GererLeGroupeScreen, { groupId: DEMO_GROUP_ID }),
+  '107': () => React.createElement(RolesDuGroupeScreen, { groupId: DEMO_GROUP_ID }),
+  '108': () => React.createElement(EditeurDeRoleScreen, { groupId: DEMO_GROUP_ID, roleId: 'new' }),
+  // Groupes (lot 2) — suggestions 1 clic.
+  '109': () => React.createElement(GroupeAccueilScreen, { groupId: DEMO_GROUP_ID, initialTab: 'valider' }),
+  '110': () => React.createElement(SuggestionScreen, { groupId: DEMO_GROUP_ID, suggestionId: 's-vexin' }),
+  '111': () => React.createElement(ProposerScreen, { groupId: DEMO_GROUP_ID, type: 'ride' }),
+  '112': () => React.createElement(ProposerScreen, { groupId: DEMO_GROUP_ID, type: 'poll' }),
+  '113': () => React.createElement(ProposerScreen, { groupId: DEMO_GROUP_ID, type: 'ride', suggestionId: 's-vexin' }),
+  '114': () => React.createElement(MesSuggestionsScreen, { groupId: DEMO_GROUP_ID }),
+  // Invitation d'amis (lot 3).
+  '115': () => React.createElement(InviterUnAmiScreen, {}),
+  '116': MesInvitationsScreen,
+  '117': () => React.createElement(BienvenueAmiScreen, { inviteId: 'f-yanis' }),
+  '118': () => React.createElement(OnboardingInviteScreen, { step: 'accueil', demoAs: 'u-yanis' }),
+  '119': () => React.createElement(OnboardingInviteScreen, { step: 'groupes', demoAs: 'u-yanis' }),
+  '120': () => React.createElement(ConversationDirecteScreen, { userId: 'u-yanis' }),
+  // Groupes pro (lot 4).
+  '121': () => React.createElement(DemandeBadgeScreen, { groupId: DEMO_PRO_GROUP_ID }),
+  '122': ModerationScreen,
+  '123': () => React.createElement(StatsScreen, { groupId: DEMO_GROUP_ID }),
+  '124': () => React.createElement(JournalScreen, { groupId: DEMO_GROUP_ID }),
+  '125': () => React.createElement(SortieProScreen, { rideId: 'r-carole' }),
 };

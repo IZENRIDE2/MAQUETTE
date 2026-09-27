@@ -16,10 +16,11 @@ import { isDemo } from '@/api/supabase';
 import { decideSuggestion, registerPushToken } from '@/api/groups';
 import { dialog } from '@/components/Dialog';
 import { groupRoutes } from '@/screens/groups/routes';
+import { friendRoutes } from '@/screens/friends/routes';
 
 export const SUGGESTION_CATEGORY = 'group_suggestion';
 
-type SuggestionData = { kind?: string; suggestionId?: string; groupId?: string };
+type SuggestionData = { kind?: string; suggestionId?: string; groupId?: string; inviteId?: string; fromId?: string };
 
 async function registerDevice() {
   let { status } = await Notifications.getPermissionsAsync();
@@ -46,6 +47,9 @@ async function onResponse(response: Notifications.NotificationResponse) {
   handled.add(id);
 
   const d = response.notification.request.content.data as SuggestionData;
+  // Lot 3 : ami arrivé -> écran de bienvenue ; message 1-1 -> conversation.
+  if (d?.kind === 'friend_joined' && d.inviteId) return void router.push(friendRoutes.welcome(d.inviteId));
+  if (d?.kind === 'direct_message' && d.fromId) return void router.push(friendRoutes.dm(d.fromId));
   if (d?.kind !== 'group_suggestion' || !d.suggestionId || !d.groupId) return;
 
   if (response.actionIdentifier === 'accept') {

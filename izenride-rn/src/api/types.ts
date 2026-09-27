@@ -193,3 +193,59 @@ export type DecisionResult = { status: SuggestionStatus; resultId?: string | nul
 
 export type NotificationPref = { suggestions: boolean; outcome: boolean };
 export type NotificationPrefs = { global: NotificationPref; groups: Record<string, NotificationPref> };
+
+// ---------------------------------------------------------------------------
+// Lot 3 : invitation d'un ami, onboarding, bienvenue, messages 1-1
+// ---------------------------------------------------------------------------
+export type FriendInviteStatus = 'pending' | 'claimed' | 'cancelled' | 'expired' | 'unlinked';
+
+/** Invitation vue par l'inviteur (jamais le téléphone ni l'email : seulement s'ils sont renseignés). */
+export type FriendInvite = {
+  id: string;
+  code: string;
+  status: FriendInviteStatus;
+  hasPhone: boolean;
+  hasEmail: boolean;
+  presetGroupIds: string[];
+  acceptedBy: string | null;
+  friend: Profile | null;
+  claimedAt: string | null;
+  welcomedAt: string | null;
+  expiresAt: string;
+  createdAt: string;
+};
+
+export type OpenedGroup = { groupId: string; mode: 'invite' | 'suggestion' | 'skipped'; id?: string };
+export type ClaimResult =
+  | { status: 'none' }
+  | { status: 'already_claimed'; inviteId: string; inviterId: string }
+  | { status: 'claimed'; inviteId: string; inviterId: string; via: 'code' | 'contact'; groups: OpenedGroup[] };
+
+export type InvitationGroupStatus = 'member' | 'invited' | 'pending_approval' | 'none';
+/** Ce que voit l'ami invité pendant son onboarding. */
+export type MyInvitation = {
+  inviteId: string;
+  inviter: Profile;
+  claimedAt: string;
+  groups: {
+    groupId: string;
+    name: string;
+    kind: GroupKind;
+    verifiedAt: string | null;
+    memberCount: number;
+    inviteId: string | null;
+    status: InvitationGroupStatus;
+  }[];
+};
+
+export type DirectMessageKind = 'text' | 'wave' | 'ride';
+export type DirectMessage = {
+  id: string;
+  senderId: string;
+  recipientId: string;
+  kind: DirectMessageKind;
+  body: string | null;
+  payload: { title: string; starts_at: string; meeting_point: string } | null;
+  createdAt: string;
+};
+export type DirectThread = { other: Profile; last: DirectMessage; unread: number };

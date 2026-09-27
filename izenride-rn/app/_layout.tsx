@@ -16,6 +16,7 @@ import { GeistMono_500Medium, GeistMono_700Bold } from '@expo-google-fonts/geist
 import { colors } from '@/theme';
 import { DialogHost } from '@/components/Dialog';
 import { initNotifications } from '@/notifications';
+import { startClaimOnSignIn } from '@/friends/claimOnSignIn';
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
@@ -41,6 +42,9 @@ export default function RootLayout() {
       .catch(() => {});
     return () => cleanup?.();
   }, []);
+
+  // Rattachement à une invitation d'ami dès la connexion (Supabase).
+  useEffect(() => startClaimOnSignIn(), []);
 
   if (!loaded) return <View style={{ flex: 1, backgroundColor: colors.bg }} />;
 

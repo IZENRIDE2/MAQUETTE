@@ -10,6 +10,7 @@ import { useQuery } from '@/api/useQuery';
 import { canAccept, canCreate, decideSuggestion, getGroupBundle, getGroupFeed, groupAction, searchProfiles } from '@/api/groups';
 import { FieldErrors, LEVELS, normalizePayload, parseFrenchDateTime, PayloadError, splitFrenchDateTime, TYPE_META } from '@/api/payloads';
 import type { GroupBundle, PayloadOf, Profile, RideLevel, Suggestion, SuggestionType } from '@/api/types';
+import { friendRoutes } from '@/screens/friends/routes';
 
 type Draft = {
   title: string;
@@ -314,6 +315,7 @@ function AnnouncementFields({ d, set, errors }: FieldsProps) {
 }
 
 function MemberFields({ b, d, set, errors, initial }: FieldsProps & { b: GroupBundle; initial?: Profile }) {
+  const router = useRouter();
   const [q, setQ] = useState('');
   const [results, setResults] = useState<Profile[]>([]);
   const [selected, setSelected] = useState<Profile | null>(initial ?? null);
@@ -371,6 +373,9 @@ function MemberFields({ b, d, set, errors, initial }: FieldsProps & { b: GroupBu
                 </Pressable>
               ))}
               {results.length === 0 && <Text style={styles.switchSub}>{q.trim().length < 2 ? 'Tape au moins 2 lettres.' : 'Aucun rider trouvé.'}</Text>}
+              <Pressable onPress={() => router.push(friendRoutes.invite(b.group.id))} style={styles.person}>
+                <Text style={[styles.change, { flex: 1 }]}>Pas encore sur IzenRide ? Invite-le par lien ou QR code</Text>
+              </Pressable>
             </View>
           </>
         )}

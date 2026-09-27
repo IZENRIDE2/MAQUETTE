@@ -7,6 +7,7 @@ import {
 } from 'lucide-react-native';
 import { Screen, BottomTabBar } from '@/components';
 import { MyGroupsStrip, GroupConversations, ReceivedInvites } from './MessagesGroups';
+import { FriendsSection } from './MessagesFriends';
 import { colors, fonts, radius } from '@/theme';
 import { useQuery } from '@/api/useQuery';
 import { listMyGroups, listMyGroupInvites } from '@/api/groups';
@@ -87,6 +88,7 @@ export default function MessagesScreen() {
 
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         {/* Invitations reçues + Mes groupes */}
+        <FriendsSection />
         <ReceivedInvites invites={invites} />
         <MyGroupsStrip groups={groups} />
 

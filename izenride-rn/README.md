@@ -87,7 +87,9 @@ PGHOST=localhost PGUSER=postgres ./supabase/tests/run.sh
 ```
 Rejoue la migration sur un Postgres local (schéma `auth` simulé) et vérifie RLS, permissions,
 rangs, rôles par défaut, transfert du fondateur (lot 1), puis suggestions, décision en 1 clic,
-concurrence, invitations, sourdine, sondages, expiration et destinataires des push (lot 2).
+concurrence, invitations, sourdine, sondages, expiration et destinataires des push (lot 2),
+puis normalisation, empreintes, rattachement par code / téléphone / email, groupes mémorisés,
+« Ce n'est pas moi », messages 1-1 et expiration des invitations (lot 3).
 
 ### Écrans et routes
 
@@ -143,4 +145,40 @@ Le premier qui décide gagne (verrou de ligne) ; les suivants reçoivent `alread
 | Mes suggestions | `/groups/<id>/mine` | 114 |
 | Messages → Invitations, Réglages → Notifications → Groupes | `/s/035`, `/s/071` | — |
 
-Les invitations par lien / QR code et l'onboarding de l'ami invité arrivent au lot 3.
+## Invitation d'amis (lot 3)
+
+- **Inviter** (Profil → Inviter un ami, ou depuis une suggestion de membre) : téléphone et/ou email
+  optionnels, **groupes mémorisés dès la création** (modifiables jusqu'à l'inscription de l'ami),
+  puis lien personnel `izenride.app/i/<CODE>` + QR code à faire scanner au point de RDV.
+- **Rattachement** (`claim_friend_invite`, à la connexion) : par le code du lien / du QR / saisi à
+  l'inscription, sinon par téléphone ou email **vérifiés** (l'invitation la plus récente gagne).
+  Téléphone et email ne sont jamais stockés en clair : empreinte HMAC-SHA256 (clé dans
+  `private.app_secrets`), effacée au rattachement ou à l'expiration (30 jours).
+- **Groupes mémorisés** : à l'arrivée de l'ami, invitation directe si l'inviteur a `member.invite`,
+  sinon suggestion « Membre » à valider en 1 clic.
+- **Ami invité** : « Julie t'a invité », puis ses groupes à rejoindre en 1 tap ; « Ce n'est pas moi »
+  annule le rattachement et ce qu'il a ouvert. Bandeau dans Messages pendant 7 jours.
+- **Inviteur** : push « Yanis vient d'arriver » + carte dans Messages → écran de bienvenue :
+  message pré-écrit, V de motard, invitation dans d'autres groupes, sortie à deux. Conversation 1-1.
+
+### Mise en service
+
+1. Appliquer `supabase/migrations/20260929000001_friend_invites.sql` (active `pgcrypto`).
+2. Déployer la page du lien : `supabase functions deploy invite-landing --no-verify-jwt`, secrets
+   `APP_STORE_URL`, `PLAY_STORE_URL`, puis rediriger `https://izenride.app/i/*` vers la fonction.
+3. Webhooks vers `notify` : ajouter `public.friend_invites` (UPDATE) et `public.direct_messages` (INSERT).
+4. `pg_cron` : `select cron.schedule('expire-friend-invites', '0 * * * *', 'select public.expire_friend_invites()');`
+5. Liens universels (optionnel) : associer `izenride.app` à l'app iOS / Android ; sinon la page
+   ouvre `izenride://i/<CODE>` et affiche le code à saisir à l'inscription.
+
+### Écrans
+
+| Écran | Route | Catalogue |
+| --- | --- | --- |
+| Inviter un ami (lien, QR, groupes) | `/friends/invite` | 115 |
+| Mes invitations | `/friends/invites` | 116 |
+| Souhaite la bienvenue (inviteur) | `/friends/welcome/<inviteId>` | 117 |
+| Onboarding invité : accueil, groupes | `/welcome`, `/welcome?step=groupes` | 118, 119 |
+| Conversation 1-1 | `/dm/<userId>` | 120 |
+| Lien d'invitation ouvert dans l'app | `/i/<CODE>` | — |
+| Inscription avec « Code d'invitation » | `/s/006` | 006 |

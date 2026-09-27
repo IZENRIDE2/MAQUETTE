@@ -1,9 +1,11 @@
-// Edge Function `notify` — push Expo pour les suggestions de groupe.
+// Edge Function `notify` — push Expo de l'univers Groupes.
 //
-// Déclenchée par un Database Webhook Supabase sur `public.group_suggestions`
-// (INSERT et UPDATE), avec l'en-tête `x-webhook-secret: <NOTIFY_WEBHOOK_SECRET>`.
-//   - INSERT  : prévient les membres habilités à valider (préférences respectées).
-//   - UPDATE pending -> accepté/refusé : prévient l'auteur de l'issue.
+// Déclenchée par des Database Webhooks Supabase, avec l'en-tête
+// `x-webhook-secret: <NOTIFY_WEBHOOK_SECRET>` :
+//   - group_suggestions INSERT : prévient les membres habilités à valider.
+//   - group_suggestions UPDATE pending -> décidée : prévient l'auteur.
+//   - friend_invites UPDATE -> claimed : « Léo vient d'arriver sur IzenRide ».
+//   - direct_messages INSERT : message, « V » de motard ou sortie proposée.
 // Les boutons Accepter / Refuser de la notification sont traités par l'app
 // (catégorie `group_suggestion`, voir src/notifications.ts).
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
@@ -18,7 +20,9 @@ type Suggestion = {
   status: string;
   refusal_reason: string | null;
 };
-type WebhookPayload = { type: 'INSERT' | 'UPDATE' | 'DELETE'; table: string; record: Suggestion; old_record: Suggestion | null };
+type FriendInvite = { id: string; inviter_id: string; accepted_by: string | null; status: string };
+type DirectMessage = { id: string; sender_id: string; recipient_id: string; kind: 'text' | 'wave' | 'ride'; body: string | null; payload: Record<string, unknown> | null };
+type WebhookPayload<T> = { type: 'INSERT' | 'UPDATE' | 'DELETE'; table: string; record: T; old_record: T | null };
 type Recipient = { user_id: string; token: string; platform: string };
 
 const supabase = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
@@ -70,14 +74,13 @@ async function sendPush(recipients: Recipient[], title: string, body: string, da
   }
 }
 
-Deno.serve(async (req) => {
-  if (req.headers.get('x-webhook-secret') !== Deno.env.get('NOTIFY_WEBHOOK_SECRET')) {
-    return new Response('forbidden', { status: 403 });
-  }
-  const event = (await req.json()) as WebhookPayload;
-  if (event.table !== 'group_suggestions') return new Response('ignored');
-  const s = event.record;
+async function tokensOf(userId: string): Promise<Recipient[]> {
+  const { data } = await supabase.rpc('user_push_tokens_of', { p_user: userId });
+  return (data ?? []) as Recipient[];
+}
 
+async function onSuggestion(event: WebhookPayload<Suggestion>) {
+  const s = event.record;
   const { data: group } = await supabase.from('groups').select('name').eq('id', s.group_id).maybeSingle();
   const groupName = group?.name ?? 'Ton groupe';
   const data = { kind: 'group_suggestion', suggestionId: s.id, groupId: s.group_id };
@@ -106,6 +109,50 @@ Deno.serve(async (req) => {
           : `Acceptée — ${summary(s)}`;
     await sendPush((author ?? []) as Recipient[], `${groupName} · ta suggestion (${label})`, body, data);
   }
+}
 
+async function onFriendInvite(event: WebhookPayload<FriendInvite>) {
+  const f = event.record;
+  if (event.type !== 'UPDATE' || event.old_record?.status !== 'pending' || f.status !== 'claimed' || !f.accepted_by) return;
+  const friend = await displayName(f.accepted_by);
+  await sendPush(
+    await tokensOf(f.inviter_id),
+    `${friend} vient d’arriver sur IzenRide 🎉`,
+    'Souhaite-lui la bienvenue et ouvre-lui tes groupes en 1 tap.',
+    { kind: 'friend_joined', inviteId: f.id, friendId: f.accepted_by },
+  );
+}
+
+async function onDirectMessage(event: WebhookPayload<DirectMessage>) {
+  const m = event.record;
+  if (event.type !== 'INSERT') return;
+  const sender = await displayName(m.sender_id);
+  const body =
+    m.kind === 'wave'
+      ? 'T’envoie un V de motard 🤘'
+      : m.kind === 'ride'
+        ? `Te propose une sortie : ${String(m.payload?.title ?? '')}`
+        : String(m.body ?? '').slice(0, 120);
+  await sendPush(await tokensOf(m.recipient_id), sender, body, { kind: 'direct_message', fromId: m.sender_id });
+}
+
+Deno.serve(async (req) => {
+  if (req.headers.get('x-webhook-secret') !== Deno.env.get('NOTIFY_WEBHOOK_SECRET')) {
+    return new Response('forbidden', { status: 403 });
+  }
+  const event = (await req.json()) as WebhookPayload<unknown>;
+  switch (event.table) {
+    case 'group_suggestions':
+      await onSuggestion(event as WebhookPayload<Suggestion>);
+      break;
+    case 'friend_invites':
+      await onFriendInvite(event as WebhookPayload<FriendInvite>);
+      break;
+    case 'direct_messages':
+      await onDirectMessage(event as WebhookPayload<DirectMessage>);
+      break;
+    default:
+      return new Response('ignored');
+  }
   return new Response('ok');
 });

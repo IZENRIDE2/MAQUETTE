@@ -25,6 +25,11 @@ export type GroupErrorCode =
   | 'poll_not_found'
   | 'poll_closed'
   | 'invite_not_found'
+  | 'invalid_phone'
+  | 'invalid_email'
+  | 'too_many_groups'
+  | 'too_many_invites'
+  | 'friend_invite_not_found'
   | 'unknown';
 
 const MESSAGES: Record<GroupErrorCode, string> = {
@@ -50,6 +55,11 @@ const MESSAGES: Record<GroupErrorCode, string> = {
   poll_not_found: 'Ce sondage n’existe plus.',
   poll_closed: 'Ce sondage est clos.',
   invite_not_found: 'Cette invitation n’est plus valable.',
+  invalid_phone: 'Ce numéro de téléphone n’est pas valide.',
+  invalid_email: 'Cette adresse email n’est pas valide.',
+  too_many_groups: '10 groupes au maximum par invitation.',
+  too_many_invites: 'Tu as déjà 50 invitations en attente.',
+  friend_invite_not_found: 'Cette invitation n’existe plus.',
   unknown: 'Une erreur est survenue. Réessaie.',
 };
 

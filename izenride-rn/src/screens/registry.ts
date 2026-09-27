@@ -110,6 +110,11 @@ import EditeurDeRoleScreen from './groups/EditeurDeRoleScreen';
 import ProposerScreen from './groups/ProposerScreen';
 import SuggestionScreen from './groups/SuggestionScreen';
 import MesSuggestionsScreen from './groups/MesSuggestionsScreen';
+import InviterUnAmiScreen from './friends/InviterUnAmiScreen';
+import MesInvitationsScreen from './friends/MesInvitationsScreen';
+import BienvenueAmiScreen from './friends/BienvenueAmiScreen';
+import OnboardingInviteScreen from './friends/OnboardingInviteScreen';
+import ConversationDirecteScreen from './friends/ConversationDirecteScreen';
 import { DEMO_GROUP_ID } from '@/api/demoStore';
 export const REGISTRY: Record<string, React.ComponentType<any>> = {
   '000': SplashScreen,
@@ -229,4 +234,11 @@ export const REGISTRY: Record<string, React.ComponentType<any>> = {
   '112': () => React.createElement(ProposerScreen, { groupId: DEMO_GROUP_ID, type: 'poll' }),
   '113': () => React.createElement(ProposerScreen, { groupId: DEMO_GROUP_ID, type: 'ride', suggestionId: 's-vexin' }),
   '114': () => React.createElement(MesSuggestionsScreen, { groupId: DEMO_GROUP_ID }),
+  // Invitation d'amis (lot 3).
+  '115': () => React.createElement(InviterUnAmiScreen, {}),
+  '116': MesInvitationsScreen,
+  '117': () => React.createElement(BienvenueAmiScreen, { inviteId: 'f-yanis' }),
+  '118': () => React.createElement(OnboardingInviteScreen, { step: 'accueil', demoAs: 'u-yanis' }),
+  '119': () => React.createElement(OnboardingInviteScreen, { step: 'groupes', demoAs: 'u-yanis' }),
+  '120': () => React.createElement(ConversationDirecteScreen, { userId: 'u-yanis' }),
 };

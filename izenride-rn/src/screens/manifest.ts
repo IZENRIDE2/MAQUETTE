@@ -116,6 +116,12 @@ export const SCREENS: ScreenMeta[] = [
   { id: '112', title: 'Créer / proposer un sondage', catKey: 'groups', catLabel: 'Groupes', comp: 'ProposerScreen' },
   { id: '113', title: 'Modifier puis accepter une suggestion', catKey: 'groups', catLabel: 'Groupes', comp: 'ProposerScreen' },
   { id: '114', title: 'Mes suggestions', catKey: 'groups', catLabel: 'Groupes', comp: 'MesSuggestionsScreen' },
+  { id: '115', title: 'Inviter un ami (lien, QR code, groupes)', catKey: 'friends', catLabel: 'Invitations d’amis', comp: 'InviterUnAmiScreen' },
+  { id: '116', title: 'Mes invitations', catKey: 'friends', catLabel: 'Invitations d’amis', comp: 'MesInvitationsScreen' },
+  { id: '117', title: 'Souhaite la bienvenue à Yanis (inviteur)', catKey: 'friends', catLabel: 'Invitations d’amis', comp: 'BienvenueAmiScreen' },
+  { id: '118', title: 'Onboarding invité · Julie t’a invité', catKey: 'friends', catLabel: 'Invitations d’amis', comp: 'OnboardingInviteScreen' },
+  { id: '119', title: 'Onboarding invité · groupes ouverts', catKey: 'friends', catLabel: 'Invitations d’amis', comp: 'OnboardingInviteScreen' },
+  { id: '120', title: 'Conversation 1-1 (bienvenue)', catKey: 'friends', catLabel: 'Invitations d’amis', comp: 'ConversationDirecteScreen' },
 ];
 
 export const CATEGORIES: { key: string; label: string }[] = [
@@ -124,6 +130,7 @@ export const CATEGORIES: { key: string; label: string }[] = [
   { key: 'match', label: 'Rencontres' },
   { key: 'messages', label: 'Messages' },
   { key: 'groups', label: 'Groupes' },
+  { key: 'friends', label: 'Invitations d’amis' },
   { key: 'events', label: 'Agenda & Événements' },
   { key: 'market', label: 'Marketplace' },
   { key: 'profile', label: 'Profil' },

@@ -38,6 +38,9 @@ const PROFILES: Profile[] = [
   { id: 'u-ines', name: 'Inès', avatarUrl: null },
   { id: 'u-hugo', name: 'Hugo', avatarUrl: null },
   { id: 'u-nora', name: 'Nora', avatarUrl: null },
+  // Lot 3 : Yanis vient d'arriver, invité par Julie ; Tom s'inscrit en démo.
+  { id: 'u-yanis', name: 'Yanis', avatarUrl: null },
+  { id: 'u-tom', name: 'Tom', avatarUrl: null },
 ];
 
 export const DEMO_GROUP_ID = 'g-night-riders';

@@ -249,3 +249,45 @@ export type DirectMessage = {
   createdAt: string;
 };
 export type DirectThread = { other: Profile; last: DirectMessage; unread: number };
+
+// ---------------------------------------------------------------------------
+// Lot 4 : groupes pro (badge vérifié, sorties promues, stats)
+// ---------------------------------------------------------------------------
+export type VerificationStatus = 'pending' | 'approved' | 'rejected' | 'revoked';
+export type VerificationRequest = {
+  id: string;
+  groupId: string;
+  legalName: string;
+  siret: string;
+  website: string | null;
+  documentPath: string | null;
+  status: VerificationStatus;
+  reviewerNote: string | null;
+  createdAt: string;
+  decidedAt: string | null;
+};
+export type PendingVerification = VerificationRequest & { groupName: string; memberCount: number };
+
+/** Sortie d'un groupe pro promue dans l'onglet Événements. */
+export type PublicRide = {
+  id: string;
+  groupId: string;
+  groupName: string;
+  verifiedAt: string | null;
+  title: string;
+  startsAt: string;
+  meetingPoint: string;
+  route: string | null;
+  level: RideLevel;
+  participants: number;
+  going: boolean;
+  isMember: boolean;
+};
+
+export type GroupStats = {
+  members: { total: number; joined_30d: number; left_30d: number };
+  engagement: { active_7d: number; active_30d: number; messages_per_week: { week: string; count: number }[] };
+  rides: { upcoming: number; past_90d: number; avg_participants: number | null; outside_participants: number };
+  suggestions: { received_30d: number; accepted_30d: number; pending: number; median_decision_hours: number | null };
+  invites: { sent_30d: number; accepted_30d: number };
+};

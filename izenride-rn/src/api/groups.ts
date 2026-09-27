@@ -7,6 +7,7 @@ import * as demo from './demoStore';
 import * as demoFeed from './demoFeed';
 // Données de démo du lot 3 : chargées après celles des groupes.
 import './demoFriends';
+import './demoPro';
 import { GroupError, toGroupError } from './errors';
 import { PERMISSIONS, Permission } from './permissions';
 import { TYPE_META } from './payloads';

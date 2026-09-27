@@ -1,7 +1,8 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Inbox, Users, Shield, Pencil, History, ChevronRight, Lock } from 'lucide-react-native';
+import { Inbox, Users, Shield, Pencil, History, ChevronRight, Lock, BarChart3, BadgeCheck } from 'lucide-react-native';
+import { proRoutes } from '@/screens/pro/routes';
 import { Screen, AppBar, Panel } from '@/components';
 import { LoadState, DemoUserSwitcher, SectionTitle } from '@/components/groups';
 import { colors, fonts, radius } from '@/theme';
@@ -53,6 +54,14 @@ export function describeActivity(e: ActivityEntry, nameOf: (id: string | null | 
       return `Nouvelle annonce publiée (${nameOf(t.author_id)})`;
     case 'member.created':
       return `${nameOf(t.author_id)} a invité un nouveau membre`;
+    case 'verification.requested':
+      return `${who} a demandé le badge vérifié`;
+    case 'verification.approved':
+      return 'L’équipe IzenRide a vérifié l’organisation';
+    case 'verification.rejected':
+      return 'L’équipe IzenRide a refusé la demande de badge';
+    case 'verification.revoked':
+      return 'L’équipe IzenRide a retiré le badge vérifié';
     case 'founder.transferred':
       return `${who} a transmis le rôle de fondateur à ${nameOf(t.user_id)}`;
     default:
@@ -120,6 +129,30 @@ export default function GererLeGroupeScreen({ groupId }: { groupId: string }) {
       title: 'Infos du groupe',
       sub: 'Nom, description, règles, lieu de RDV',
       onPress: () => router.push(groupRoutes.home(groupId, 'infos')),
+    },
+    {
+      key: 'stats',
+      show: can(b, 'insights.view'),
+      Icon: BarChart3,
+      title: 'Statistiques',
+      sub: 'Membres, engagement, sorties, suggestions',
+      onPress: () => router.push(proRoutes.stats(groupId)),
+    },
+    {
+      key: 'journal',
+      show: can(b, 'insights.view'),
+      Icon: History,
+      title: 'Journal complet',
+      sub: 'Filtrable par type et par personne',
+      onPress: () => router.push(proRoutes.journal(groupId)),
+    },
+    {
+      key: 'badge',
+      show: b.group.kind === 'pro' && (b.me.role.isFounder || can(b, 'group.edit')),
+      Icon: BadgeCheck,
+      title: 'Badge vérifié',
+      sub: b.group.verifiedAt ? 'Organisation vérifiée' : 'Faire vérifier l’organisation',
+      onPress: () => router.push(proRoutes.verification(groupId)),
     },
   ].filter((t) => t.show);
 

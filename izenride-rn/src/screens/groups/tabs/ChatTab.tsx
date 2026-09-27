@@ -101,11 +101,12 @@ function Message({ ctx, m }: { ctx: GroupCtx; m: ChatMessage }) {
     case 'text': {
       const mine = m.authorId === b.me.userId;
       const name = ctx.nameOf(m.authorId);
+      const signature = ctx.signature(m.authorId);
       return (
         <View style={[styles.row, mine && { justifyContent: 'flex-end' }]}>
           {!mine && <Avatar label={name[0]} size={28} />}
           <View style={[styles.bubble, mine ? styles.mine : styles.other]}>
-            {!mine && <Text style={styles.who}>{name}</Text>}
+            {!mine && <Text style={styles.who}>{signature}</Text>}
             <Text style={styles.txt}>{m.body}</Text>
           </View>
         </View>

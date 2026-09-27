@@ -30,6 +30,11 @@ export type GroupErrorCode =
   | 'too_many_groups'
   | 'too_many_invites'
   | 'friend_invite_not_found'
+  | 'pro_only'
+  | 'already_verified'
+  | 'verification_pending'
+  | 'invalid_siret'
+  | 'verification_not_found'
   | 'unknown';
 
 const MESSAGES: Record<GroupErrorCode, string> = {
@@ -60,6 +65,11 @@ const MESSAGES: Record<GroupErrorCode, string> = {
   too_many_groups: '10 groupes au maximum par invitation.',
   too_many_invites: 'Tu as déjà 50 invitations en attente.',
   friend_invite_not_found: 'Cette invitation n’existe plus.',
+  pro_only: 'Réservé aux groupes pro.',
+  already_verified: 'Ce groupe est déjà vérifié.',
+  verification_pending: 'Une demande est déjà en cours d’examen.',
+  invalid_siret: 'Ce SIRET n’est pas valide (14 chiffres, clé de contrôle).',
+  verification_not_found: 'Cette demande n’existe plus.',
   unknown: 'Une erreur est survenue. Réessaie.',
 };
 

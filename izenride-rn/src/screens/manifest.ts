@@ -122,6 +122,11 @@ export const SCREENS: ScreenMeta[] = [
   { id: '118', title: 'Onboarding invité · Julie t’a invité', catKey: 'friends', catLabel: 'Invitations d’amis', comp: 'OnboardingInviteScreen' },
   { id: '119', title: 'Onboarding invité · groupes ouverts', catKey: 'friends', catLabel: 'Invitations d’amis', comp: 'OnboardingInviteScreen' },
   { id: '120', title: 'Conversation 1-1 (bienvenue)', catKey: 'friends', catLabel: 'Invitations d’amis', comp: 'ConversationDirecteScreen' },
+  { id: '121', title: 'Demande de badge vérifié', catKey: 'pro', catLabel: 'Groupes pro', comp: 'DemandeBadgeScreen' },
+  { id: '122', title: 'Modération · badges à vérifier', catKey: 'pro', catLabel: 'Groupes pro', comp: 'ModerationScreen' },
+  { id: '123', title: 'Statistiques du groupe', catKey: 'pro', catLabel: 'Groupes pro', comp: 'StatsScreen' },
+  { id: '124', title: 'Journal d’activité filtrable', catKey: 'pro', catLabel: 'Groupes pro', comp: 'JournalScreen' },
+  { id: '125', title: 'Sortie pro promue (fiche publique)', catKey: 'pro', catLabel: 'Groupes pro', comp: 'SortieProScreen' },
 ];
 
 export const CATEGORIES: { key: string; label: string }[] = [
@@ -131,6 +136,7 @@ export const CATEGORIES: { key: string; label: string }[] = [
   { key: 'messages', label: 'Messages' },
   { key: 'groups', label: 'Groupes' },
   { key: 'friends', label: 'Invitations d’amis' },
+  { key: 'pro', label: 'Groupes pro' },
   { key: 'events', label: 'Agenda & Événements' },
   { key: 'market', label: 'Marketplace' },
   { key: 'profile', label: 'Profil' },

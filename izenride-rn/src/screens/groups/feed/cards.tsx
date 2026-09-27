@@ -282,7 +282,11 @@ export function RideCard({ ctx, ride }: { ctx: GroupCtx; ride: Ride }) {
           </Pressable>
         )}
       </View>
-      {ride.fromSuggestionId ? <Text style={styles.origin}>Proposée par {ctx.nameOf(ride.createdBy)}</Text> : null}
+      {ride.fromSuggestionId ? (
+        <Text style={styles.origin}>Proposée par {ctx.nameOf(ride.createdBy)}</Text>
+      ) : ctx.b.group.kind === 'pro' ? (
+        <Text style={styles.origin}>Publiée par {ctx.signature(ride.createdBy)}</Text>
+      ) : null}
     </View>
   );
 }
@@ -338,7 +342,7 @@ export function AnnouncementBanner({ ctx, a }: { ctx: GroupCtx; a: Announcement 
       <Pin size={14} color={colors.warn} />
       <View style={{ flex: 1 }}>
         <Text style={styles.bannerTxt}>{a.body}</Text>
-        <Text style={styles.bannerBy}>Épinglée par {ctx.nameOf(a.authorId)}</Text>
+        <Text style={styles.bannerBy}>Épinglée par {ctx.signature(a.authorId)}</Text>
       </View>
     </View>
   );

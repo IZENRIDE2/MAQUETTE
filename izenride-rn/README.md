@@ -89,7 +89,8 @@ Rejoue la migration sur un Postgres local (schéma `auth` simulé) et vérifie R
 rangs, rôles par défaut, transfert du fondateur (lot 1), puis suggestions, décision en 1 clic,
 concurrence, invitations, sourdine, sondages, expiration et destinataires des push (lot 2),
 puis normalisation, empreintes, rattachement par code / téléphone / email, groupes mémorisés,
-« Ce n'est pas moi », messages 1-1 et expiration des invitations (lot 3).
+« Ce n'est pas moi », messages 1-1 et expiration des invitations (lot 3), puis badge vérifié
+et modération, sorties promues, statistiques, rétention du journal (lot 4).
 
 ### Écrans et routes
 
@@ -182,3 +183,37 @@ Le premier qui décide gagne (verrou de ligne) ; les suivants reçoivent `alread
 | Conversation 1-1 | `/dm/<userId>` | 120 |
 | Lien d'invitation ouvert dans l'app | `/i/<CODE>` | — |
 | Inscription avec « Code d'invitation » | `/s/006` | 006 |
+
+## Groupes pro (lot 4)
+
+- **Badge vérifié** : le fondateur d'un groupe pro envoie raison sociale, SIRET (clé de Luhn,
+  cas La Poste), site et justificatif (bucket Storage privé `verification-docs`, un dossier par
+  groupe). Les modérateurs IzenRide (table `app_moderators`) valident ou refusent avec motif depuis
+  Profil → Modération, et peuvent retirer le badge.
+- **Sorties promues** : une sortie pro non « réservée aux membres » apparaît dans Agenda →
+  « Sorties des pros ». Tout rider peut s'y inscrire (`join_public_ride`) sans entrer dans le groupe.
+- **Au nom de l'organisation** : dans un groupe pro, les messages, sorties et annonces des
+  gestionnaires sont signés « Moto-école Bastille · par Marc ».
+- **Statistiques** (`insights.view`) : membres, engagement, messages par semaine, sorties, inscrits
+  hors groupe, suggestions (taux d'acceptation, délai médian), invitations.
+- **Journal** filtrable par type et par personne, conservé 12 mois (`purge_group_activity`).
+- **Flag premium** : `has_feature` (SQL) / `hasFeature` (app) — tout reste ouvert en attendant l'offre.
+
+### Mise en service
+
+1. Appliquer `supabase/migrations/20260930000001_pro_groups.sql` (crée le bucket et ses règles si
+   Storage est présent).
+2. Ajouter les modérateurs : `insert into app_moderators (user_id) values ('<uuid>');`
+3. `pg_cron` : `select cron.schedule('purge-group-activity', '15 3 * * *', 'select public.purge_group_activity()');`
+
+| Écran | Route | Catalogue |
+| --- | --- | --- |
+| Demande de badge vérifié | `/groups/<id>/verification` | 121 |
+| Modération des badges | `/moderation` | 122 |
+| Statistiques | `/groups/<id>/stats` | 123 |
+| Journal filtrable | `/groups/<id>/journal` | 124 |
+| Sortie pro (fiche publique) | `/events/pro/<rideId>` | 125 |
+| Agenda → Sorties des pros | `/s/040` | 040 |
+
+Non couvert : la vérification automatique d'un SIRET radié (API INSEE) et la présence effective aux
+sorties (seuls les inscrits sont comptés).

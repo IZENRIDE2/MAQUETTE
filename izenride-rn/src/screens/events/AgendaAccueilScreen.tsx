@@ -4,6 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Search, Plus, Clock, MapPin, Check } from 'lucide-react-native';
 import { Screen, BottomTabBar } from '@/components';
 import { colors, fonts, radius } from '@/theme';
+import { SortiesProSection } from './SortiesProSection';
 
 const SEGMENTS = ['À venir', 'Mes events', 'Explorer'];
 
@@ -39,6 +40,9 @@ export default function AgendaAccueilScreen() {
       </View>
 
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+        {/* Sorties promues des groupes pro */}
+        <SortiesProSection />
+
         {/* Event 1 — inscrit */}
         <View style={styles.evCard}>
           <LinearGradient

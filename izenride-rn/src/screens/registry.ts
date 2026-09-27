@@ -115,6 +115,12 @@ import MesInvitationsScreen from './friends/MesInvitationsScreen';
 import BienvenueAmiScreen from './friends/BienvenueAmiScreen';
 import OnboardingInviteScreen from './friends/OnboardingInviteScreen';
 import ConversationDirecteScreen from './friends/ConversationDirecteScreen';
+import DemandeBadgeScreen from './pro/DemandeBadgeScreen';
+import StatsScreen from './pro/StatsScreen';
+import JournalScreen from './pro/JournalScreen';
+import ModerationScreen from './pro/ModerationScreen';
+import SortieProScreen from './pro/SortieProScreen';
+import { DEMO_PRO_GROUP_ID } from '@/api/demoPro';
 import { DEMO_GROUP_ID } from '@/api/demoStore';
 export const REGISTRY: Record<string, React.ComponentType<any>> = {
   '000': SplashScreen,
@@ -241,4 +247,10 @@ export const REGISTRY: Record<string, React.ComponentType<any>> = {
   '118': () => React.createElement(OnboardingInviteScreen, { step: 'accueil', demoAs: 'u-yanis' }),
   '119': () => React.createElement(OnboardingInviteScreen, { step: 'groupes', demoAs: 'u-yanis' }),
   '120': () => React.createElement(ConversationDirecteScreen, { userId: 'u-yanis' }),
+  // Groupes pro (lot 4).
+  '121': () => React.createElement(DemandeBadgeScreen, { groupId: DEMO_PRO_GROUP_ID }),
+  '122': ModerationScreen,
+  '123': () => React.createElement(StatsScreen, { groupId: DEMO_GROUP_ID }),
+  '124': () => React.createElement(JournalScreen, { groupId: DEMO_GROUP_ID }),
+  '125': () => React.createElement(SortieProScreen, { rideId: 'r-carole' }),
 };

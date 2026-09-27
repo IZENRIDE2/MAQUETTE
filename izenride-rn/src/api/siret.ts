@@ -18,3 +18,27 @@ export function isValidSiret(input: string): boolean {
 
 /** « 732 829 320 00074 » */
 export const formatSiret = (s: string) => s.replace(/\s/g, '').replace(/^(\d{3})(\d{3})(\d{3})(\d{5})$/, '$1 $2 $3 $4');
+
+const LEGAL_FORMS = /\b(sas|sasu|sarl|eurl|sa|sci|snc|ei|eirl|ste|societe|association|asso)\b/g;
+const simplify = (s: string) =>
+  s
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ')
+    .replace(LEGAL_FORMS, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+/**
+ * La raison sociale saisie correspond-elle au registre (dénomination ou
+ * enseigne) ? Sans accents, casse ni forme juridique ; l'un contient l'autre.
+ */
+export function nameMatchesRegistry(entered: string, registry: { legalName: string | null; tradeName: string | null }): boolean {
+  const a = simplify(entered);
+  if (!a) return false;
+  return [registry.legalName, registry.tradeName].some((n) => {
+    const b = n ? simplify(n) : '';
+    return !!b && (a.includes(b) || b.includes(a));
+  });
+}

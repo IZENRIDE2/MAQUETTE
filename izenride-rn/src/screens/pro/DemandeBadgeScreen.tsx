@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TextInput, Pressable } from 'react-native';
 import * as DocumentPicker from 'expo-document-picker';
 import { BadgeCheck, Clock, FileText, Paperclip, XCircle, Info } from 'lucide-react-native';
@@ -8,9 +8,11 @@ import { dialog } from '@/components/Dialog';
 import { colors, fonts } from '@/theme';
 import { useQuery } from '@/api/useQuery';
 import { getGroupBundle } from '@/api/groups';
-import { listVerificationRequests, requestVerification, subscribePro, uploadVerificationDocument } from '@/api/pro';
+import { listVerificationRequests, lookupSiret, requestVerification, subscribePro, uploadVerificationDocument } from '@/api/pro';
 import { formatSiret, isValidSiret } from '@/api/siret';
 import { formatRideDate } from '@/api/payloads';
+import type { RegistryLookup } from '@/api/types';
+import { RegistryCard, titleCase } from './RegistryCard';
 
 /**
  * Badge « Organisation vérifiée » : le fondateur d'un groupe pro envoie
@@ -99,6 +101,35 @@ function RequestForm({ groupId }: { groupId: string }) {
   const [doc, setDoc] = useState<{ uri: string; name: string; mimeType?: string | null } | null>(null);
   const [errors, setErrors] = useState<{ legalName?: string; siret?: string }>({});
   const [busy, setBusy] = useState(false);
+  // Registre des entreprises : consulté dès que le SIRET est complet et valide.
+  const [registry, setRegistry] = useState<{ siret: string; lookup: RegistryLookup | null } | null>(null);
+  const clean = siret.replace(/\s/g, '');
+  const complete = isValidSiret(clean);
+
+  useEffect(() => {
+    if (!complete) return setRegistry(null);
+    let live = true;
+    setRegistry({ siret: clean, lookup: null });
+    const t = setTimeout(() => {
+      lookupSiret(clean).then((lookup) => {
+        if (!live) return;
+        setRegistry({ siret: clean, lookup });
+        // Raison sociale vide : on la reprend du registre (enseigne d'abord).
+        if ('result' in lookup && lookup.result.status === 'active') {
+          const name = lookup.result.tradeName ?? lookup.result.legalName;
+          if (name) setLegalName((cur) => cur.trim() ? cur : titleCase(name));
+        }
+      });
+    }, 300);
+    return () => {
+      live = false;
+      clearTimeout(t);
+    };
+  }, [clean, complete]);
+
+  const lookup = registry?.siret === clean ? registry.lookup : null;
+  const checking = complete && !lookup;
+  const blocked = lookup && 'result' in lookup && lookup.result.status !== 'active';
 
   const pick = async () => {
     const r = await DocumentPicker.getDocumentAsync({ type: ['application/pdf', 'image/*'], copyToCacheDirectory: true });
@@ -110,7 +141,7 @@ function RequestForm({ groupId }: { groupId: string }) {
     if (legalName.trim().length < 2) e.legalName = 'Indique la raison sociale.';
     if (!isValidSiret(siret)) e.siret = 'SIRET invalide : 14 chiffres avec clé de contrôle.';
     setErrors(e);
-    if (Object.keys(e).length) return;
+    if (Object.keys(e).length || checking || blocked) return;
     setBusy(true);
     try {
       const path = doc ? await uploadVerificationDocument(groupId, doc) : null;
@@ -126,8 +157,6 @@ function RequestForm({ groupId }: { groupId: string }) {
   return (
     <>
       <SectionTitle style={{ marginTop: 22 }}>Ton organisation</SectionTitle>
-      <TextInput value={legalName} onChangeText={setLegalName} placeholder="Raison sociale · ex. Bercy Motos SAS" placeholderTextColor={colors.inkMute} style={form.input} />
-      {errors.legalName ? <Text style={styles.error}>{errors.legalName}</Text> : null}
       <TextInput
         value={siret}
         onChangeText={setSiret}
@@ -135,9 +164,22 @@ function RequestForm({ groupId }: { groupId: string }) {
         placeholderTextColor={colors.inkMute}
         keyboardType="number-pad"
         maxLength={17}
+        style={form.input}
+      />
+      {errors.siret ? (
+        <Text style={styles.error}>{errors.siret}</Text>
+      ) : /^\d{14}$/.test(clean) && !complete ? (
+        <Text style={styles.error}>Clé de contrôle incorrecte : vérifie les chiffres.</Text>
+      ) : null}
+      {complete ? <RegistryCard loading={checking} lookup={lookup} enteredName={legalName} /> : null}
+      <TextInput
+        value={legalName}
+        onChangeText={setLegalName}
+        placeholder="Raison sociale · ex. Bercy Motos SAS"
+        placeholderTextColor={colors.inkMute}
         style={[form.input, { marginTop: 10 }]}
       />
-      {errors.siret ? <Text style={styles.error}>{errors.siret}</Text> : null}
+      {errors.legalName ? <Text style={styles.error}>{errors.legalName}</Text> : null}
       <TextInput
         value={website}
         onChangeText={setWebsite}
@@ -157,7 +199,12 @@ function RequestForm({ groupId }: { groupId: string }) {
       </Pressable>
       <Text style={styles.hint}>Visible uniquement par l’équipe IzenRide et le fondateur du groupe.</Text>
 
-      <PrimaryButton label={busy ? 'Envoi…' : 'Demander le badge'} onPress={submit} disabled={busy} style={{ marginTop: 22 }} />
+      <PrimaryButton
+        label={busy ? 'Envoi…' : checking ? 'Vérification du SIRET…' : 'Demander le badge'}
+        onPress={submit}
+        disabled={busy || checking || !!blocked}
+        style={{ marginTop: 22 }}
+      />
     </>
   );
 }

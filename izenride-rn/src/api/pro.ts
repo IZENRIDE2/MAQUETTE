@@ -6,7 +6,7 @@ import { supabase, isDemo } from './supabase';
 import * as demo from './demoPro';
 import { toGroupError } from './errors';
 import { subscribeGroups } from './groups';
-import type { GroupStats, PendingVerification, PublicRide, VerificationRequest } from './types';
+import type { FlaggedGroup, GroupStats, PendingVerification, PublicRide, RegistryCheck, RegistryLookup, VerificationRequest } from './types';
 
 type Row = Record<string, any>;
 
@@ -84,7 +84,61 @@ export async function isModerator(): Promise<boolean> {
 export async function listPendingVerifications(): Promise<PendingVerification[]> {
   if (isDemo) return demo.pending();
   const rows = (await rpc<Row[]>(() => [], 'pending_verifications')) ?? [];
-  return rows.map((r) => ({ ...toRequest({ ...r, status: 'pending' }), groupName: r.group_name, memberCount: r.member_count }));
+  return rows.map((r) => ({ ...toRequest({ ...r, status: 'pending' }), groupName: r.group_name, memberCount: r.member_count, registry: toRegistry(r.registry) }));
+}
+
+// ---------------------------------------------------------------------------
+// Registre des entreprises (Pappers, via l'Edge Function `siret-check`)
+// ---------------------------------------------------------------------------
+const toRegistry = (r: Row | null | undefined): RegistryCheck | null =>
+  r
+    ? {
+        status: r.status,
+        siren: r.siren ?? null,
+        legalName: r.legal_name ?? null,
+        tradeName: r.trade_name ?? null,
+        legalForm: r.legal_form ?? null,
+        nafLabel: r.naf_label ?? null,
+        address: r.address ?? null,
+        createdOn: r.created_on ?? null,
+        closedOn: r.closed_on ?? null,
+        checkedAt: r.checked_at,
+      }
+    : null;
+
+/**
+ * Consulte le registre pour un SIRET. Ne lève pas d'erreur : un registre
+ * injoignable n'empêche pas la demande, le modérateur vérifiera à la main.
+ * `refresh` ignore le cache (modérateurs).
+ */
+export async function lookupSiret(siret: string, refresh = false): Promise<RegistryLookup> {
+  const clean = siret.replace(/\s/g, '');
+  if (isDemo) return demo.lookup(clean);
+  try {
+    const { data, error } = await supabase!.functions.invoke('siret-check', { body: { siret: clean, refresh } });
+    if (error) return { error: 'registry_unavailable' };
+    if (data?.result) {
+      listeners.forEach((fn) => fn());
+      return { result: toRegistry(data.result)!, stale: !!data.stale };
+    }
+    return { error: data?.error ?? 'registry_unavailable' };
+  } catch {
+    return { error: 'registry_unavailable' };
+  }
+}
+
+/** Badges accordés dont l'établissement a fermé depuis (modérateurs). */
+export async function listFlaggedGroups(): Promise<FlaggedGroup[]> {
+  if (isDemo) return demo.flagged();
+  const rows = (await rpc<Row[]>(() => [], 'flagged_verified_groups')) ?? [];
+  return rows.map((r) => ({
+    groupId: r.group_id,
+    groupName: r.group_name,
+    verifiedAt: r.verified_at,
+    legalName: r.legal_name,
+    siret: r.siret,
+    registry: toRegistry(r.registry)!,
+  }));
 }
 
 export const decideVerification = (id: string, approve: boolean, note?: string | null) =>

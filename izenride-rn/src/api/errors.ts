@@ -35,6 +35,8 @@ export type GroupErrorCode =
   | 'verification_pending'
   | 'invalid_siret'
   | 'verification_not_found'
+  | 'siret_closed'
+  | 'siret_not_found'
   | 'unknown';
 
 const MESSAGES: Record<GroupErrorCode, string> = {
@@ -70,6 +72,8 @@ const MESSAGES: Record<GroupErrorCode, string> = {
   verification_pending: 'Une demande est déjà en cours d’examen.',
   invalid_siret: 'Ce SIRET n’est pas valide (14 chiffres, clé de contrôle).',
   verification_not_found: 'Cette demande n’existe plus.',
+  siret_closed: 'Cet établissement est fermé au registre des entreprises.',
+  siret_not_found: 'Ce SIRET est introuvable au registre des entreprises.',
   unknown: 'Une erreur est survenue. Réessaie.',
 };
 

@@ -215,5 +215,55 @@ Le premier qui décide gagne (verrou de ligne) ; les suivants reçoivent `alread
 | Sortie pro (fiche publique) | `/events/pro/<rideId>` | 125 |
 | Agenda → Sorties des pros | `/s/040` | 040 |
 
-Non couvert : la vérification automatique d'un SIRET radié (API INSEE) et la présence effective aux
-sorties (seuls les inscrits sont comptés).
+Non couvert : la présence effective aux sorties (seuls les inscrits sont comptés).
+
+## Vérification des SIRET (Pappers)
+
+Le SIRET d'une demande de badge est vérifié au registre national des entreprises via
+[l'API Pappers](https://www.pappers.fr/api). La clé reste côté serveur, dans l'Edge Function
+`siret-check`.
+
+- **À la saisie** : dès que le SIRET est complet et valide, l'app affiche la fiche du registre
+  (dénomination, enseigne, forme juridique, activité, adresse, date de création). Elle préremplit la
+  raison sociale et signale un nom qui diffère du registre.
+- **Blocage** : un établissement fermé ou introuvable ne peut pas demander le badge. Le serveur fait
+  le même contrôle (`request_group_verification` lit `siret_checks`). Si le registre n'a pas répondu,
+  la demande passe et le modérateur voit « Pas encore consulté », avec un bouton pour vérifier.
+- **Modération** : chaque demande affiche la fiche du registre, avec un bouton « Revérifier » qui
+  ignore le cache.
+- **Revérification mensuelle** : les badges accordés sont revérifiés tous les 30 jours. Un
+  établissement fermé depuis remonte dans « Badges à revoir », avec le motif de retrait prérempli.
+  Le retrait reste une décision de modération.
+- **Crédits Pappers** :
+  - le résultat est gardé en cache 7 jours (1 jour pour un SIRET introuvable) ;
+  - la consultation est réservée aux fondateurs de groupes pro et aux modérateurs ;
+  - elle est plafonnée à 20 consultations par heure et par personne, sans plafond pour les
+    modérateurs.
+
+### Mise en service
+
+1. Appliquer `supabase/migrations/20261001000001_siret_registry.sql`.
+2. Créer une clé sur [pappers.fr/api](https://www.pappers.fr/api), puis :
+   ```bash
+   supabase secrets set PAPPERS_API_KEY=<clé> SIRET_CRON_SECRET=<chaîne aléatoire>
+   supabase functions deploy siret-check
+   ```
+3. Revérification mensuelle, lancée chaque nuit par lots de 50 (`pg_cron` et `pg_net`) :
+   ```sql
+   select cron.schedule('siret-recheck', '30 3 * * *', $$
+     select net.http_post(
+       url     := 'https://<projet>.supabase.co/functions/v1/siret-check',
+       headers := jsonb_build_object('Content-Type', 'application/json', 'x-cron-secret', '<SIRET_CRON_SECRET>'),
+       body    := '{"mode":"recheck","limit":50}'::jsonb)
+   $$);
+   ```
+
+Sans clé Pappers, l'app fonctionne : les demandes passent et arrivent en modération avec la mention
+« registre injoignable ». En mode démo, un registre fictif répond :
+
+| SIRET | Résultat |
+| --- | --- |
+| 884 019 260 00030 | Actif (Julie Moto Coaching) |
+| 842 157 630 00018 | Actif (Bercy Motos) |
+| 512 778 040 00018 | Fermé (Garage du Canal, badge à revoir) |
+| Autre SIRET valide | Introuvable |

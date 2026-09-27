@@ -266,7 +266,26 @@ export type VerificationRequest = {
   createdAt: string;
   decidedAt: string | null;
 };
-export type PendingVerification = VerificationRequest & { groupName: string; memberCount: number };
+export type PendingVerification = VerificationRequest & { groupName: string; memberCount: number; registry: RegistryCheck | null };
+
+/** Fiche du registre des entreprises (Pappers) pour un SIRET. */
+export type RegistryCheck = {
+  status: 'active' | 'closed' | 'not_found';
+  siren: string | null;
+  legalName: string | null;
+  tradeName: string | null;
+  legalForm: string | null;
+  nafLabel: string | null;
+  address: string | null;
+  createdOn: string | null;
+  closedOn: string | null;
+  checkedAt: string;
+};
+/** Consultation du registre : fiche, ou registre injoignable / plafond atteint. */
+export type RegistryLookup = { result: RegistryCheck; stale?: boolean } | { error: 'invalid_siret' | 'rate_limited' | 'registry_unavailable' | 'forbidden' };
+
+/** Groupe vérifié dont l'établissement n'est plus actif au registre. */
+export type FlaggedGroup = { groupId: string; groupName: string; verifiedAt: string; legalName: string; siret: string; registry: RegistryCheck };
 
 /** Sortie d'un groupe pro promue dans l'onglet Événements. */
 export type PublicRide = {

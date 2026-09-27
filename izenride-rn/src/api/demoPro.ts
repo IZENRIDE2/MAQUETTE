@@ -6,12 +6,44 @@
 import { _demo } from './demoStore';
 import { GroupError } from './errors';
 import { isValidSiret } from './siret';
-import type { GroupStats, PendingVerification, PublicRide, VerificationRequest } from './types';
+import type { FlaggedGroup, GroupStats, PendingVerification, PublicRide, RegistryCheck, RegistryLookup, VerificationRequest } from './types';
 
 const { state, assertPerm, roleOf, log, emit, uid, now, daysAgo } = _demo;
 
 const moderators = new Set(['u-julie']);
 const requests: VerificationRequest[] = [];
+
+// Registre des entreprises fictif (en production : Pappers via `siret-check`).
+// Un SIRET valide absent de cette liste est « introuvable ».
+const entry = (status: RegistryCheck['status'], legalName: string, extra: Partial<RegistryCheck> = {}): RegistryCheck => ({
+  status,
+  siren: null,
+  legalName,
+  tradeName: null,
+  legalForm: 'SAS, société par actions simplifiée',
+  nafLabel: 'Commerce et réparation de motocycles',
+  address: null,
+  createdOn: '2019-03-12',
+  closedOn: null,
+  checkedAt: daysAgo(3),
+  ...extra,
+});
+const REGISTRY: Record<string, RegistryCheck> = {
+  '84215763000018': entry('active', 'BERCY MOTOS', { siren: '842157630', tradeName: 'Concession Bercy Motos', address: '44 quai de Bercy, 75012 Paris' }),
+  '90133445000029': entry('active', 'MOTO-ECOLE BASTILLE', { siren: '901334450', legalForm: 'SARL, société à responsabilité limitée', nafLabel: 'Enseignement de la conduite', address: '12 rue de la Roquette, 75011 Paris' }),
+  '88401926000030': entry('active', 'JULIE MARTIN', { siren: '884019260', tradeName: 'Julie Moto Coaching', legalForm: 'Entrepreneur individuel', nafLabel: 'Enseignement de la conduite', address: '8 rue Oberkampf, 75011 Paris' }),
+  '51277804000018': entry('closed', 'GARAGE DU CANAL', { siren: '512778040', legalForm: 'SARL, société à responsabilité limitée', address: '3 quai de Jemmapes, 75010 Paris', createdOn: '2009-05-04', closedOn: '2026-08-31', checkedAt: daysAgo(1) }),
+};
+const checks = new Map<string, RegistryCheck>();
+
+export async function lookup(siret: string): Promise<RegistryLookup> {
+  if (!isValidSiret(siret)) return { error: 'invalid_siret' };
+  await new Promise((r) => setTimeout(r, 450));
+  const result = { ...(REGISTRY[siret] ?? entry('not_found', '', { legalName: null, legalForm: null, nafLabel: null, createdOn: null })), checkedAt: now() };
+  checks.set(siret, result);
+  return { result };
+}
+const checkOf = (siret: string) => checks.get(siret) ?? null;
 
 export const isModerator = () => moderators.has(state.me);
 
@@ -32,6 +64,9 @@ export function request(groupId: string, legalName: string, siret: string, websi
   if (requests.some((r) => r.groupId === groupId && r.status === 'pending')) throw new GroupError('verification_pending');
   const clean = siret.replace(/\s/g, '');
   if (!isValidSiret(clean)) throw new GroupError('invalid_siret');
+  const check = checkOf(clean);
+  if (check?.status === 'closed') throw new GroupError('siret_closed');
+  if (check?.status === 'not_found') throw new GroupError('siret_not_found');
   if (legalName.trim().length < 2 || legalName.trim().length > 120) throw new GroupError('invalid_payload');
   const id = uid('v');
   requests.push({
@@ -59,7 +94,19 @@ export function pending(): PendingVerification[] {
       ...r,
       groupName: state.groups.find((g) => g.id === r.groupId)?.name ?? '—',
       memberCount: state.members.filter((m) => m.groupId === r.groupId).length,
+      registry: checkOf(r.siret),
     }));
+}
+
+export function flagged(): FlaggedGroup[] {
+  if (!isModerator()) throw new GroupError('forbidden');
+  return state.groups.flatMap((g) => {
+    const r = g.verifiedAt ? requests.filter((x) => x.groupId === g.id && x.status === 'approved').sort((a, b) => (b.decidedAt ?? '').localeCompare(a.decidedAt ?? ''))[0] : undefined;
+    const registry = r && checkOf(r.siret);
+    return r && registry && registry.status !== 'active'
+      ? [{ groupId: g.id, groupName: g.name, verifiedAt: g.verifiedAt!, legalName: r.legalName, siret: r.siret, registry }]
+      : [];
+  });
 }
 
 export function decide(id: string, approve: boolean, note?: string | null) {
@@ -206,6 +253,8 @@ export function stats(groupId: string): GroupStats {
     say('u-marc', 'Nouveaux créneaux plateau le mercredi soir.', 16);
     say('u-marc', 'Bienvenue aux nouveaux élèves de septembre 👋', 30);
     pushLog(moto.id, 'member.left', 12);
+    requests.push({ id: 'v-moto', groupId: moto.id, legalName: 'Moto-école Bastille SARL', siret: '90133445000029', website: null, documentPath: null, status: 'approved', reviewerNote: null, createdAt: daysAgo(40), decidedAt: daysAgo(38) });
+    checks.set('90133445000029', REGISTRY['90133445000029']!);
   }
 
   // Historique de messages dans Night Riders : 8 semaines pour les statistiques.
@@ -233,7 +282,19 @@ export function stats(groupId: string): GroupStats {
   state.members.push({ groupId: bercy, userId: 'u-hugo', roleId: bercyFounder.id, joinedAt: daysAgo(60), mutedUntil: null });
   state.rides.push({ id: 'r-mt09', groupId: bercy, title: 'Balade découverte MT-09', startsAt: inDays(11, 10), meetingPoint: 'Quai de Bercy, Paris 12e', route: 'Vallée de Chevreuse, retour par Versailles', level: 'tous', membersOnly: false, createdBy: 'u-hugo', fromSuggestionId: null });
   state.rideParticipants.push({ rideId: 'r-mt09', userId: 'u-hugo' }, { rideId: 'r-mt09', userId: 'u-leo' });
-  requests.push({ id: 'v-bercy', groupId: bercy, legalName: 'Bercy Motos SAS', siret: '73282932000074', website: 'https://bercy-motos.fr', documentPath: `${bercy}/kbis-bercy.pdf`, status: 'pending', reviewerNote: null, createdAt: daysAgo(2), decidedAt: null });
+  requests.push({ id: 'v-bercy', groupId: bercy, legalName: 'Bercy Motos SAS', siret: '84215763000018', website: 'https://bercy-motos.fr', documentPath: `${bercy}/kbis-bercy.pdf`, status: 'pending', reviewerNote: null, createdAt: daysAgo(2), decidedAt: null });
+
+  checks.set('84215763000018', REGISTRY['84215763000018']!);
+
+  // Garage du Canal (Antoine, vérifié) : l'établissement a fermé depuis, le
+  // badge remonte dans « Badges à revoir ».
+  const canal = 'g-canal';
+  state.groups.push({ id: canal, kind: 'pro', name: 'Garage du Canal', photoUrl: null, description: 'Entretien et préparation moto.', rules: null, meetingPoint: null, plan: 'free', verifiedAt: daysAgo(200), createdAt: daysAgo(220) });
+  const canalFounder = role(canal, 'Fondateur', 100, { color: '#fbbf24', isFounder: true });
+  role(canal, 'Membre', 10, { isDefault: true });
+  state.members.push({ groupId: canal, userId: 'u-antoine', roleId: canalFounder.id, joinedAt: daysAgo(220), mutedUntil: null });
+  requests.push({ id: 'v-canal', groupId: canal, legalName: 'Garage du Canal SARL', siret: '51277804000018', website: null, documentPath: null, status: 'approved', reviewerNote: null, createdAt: daysAgo(205), decidedAt: daysAgo(200) });
+  checks.set('51277804000018', REGISTRY['51277804000018']!);
 
   // Julie Moto Coaching (Julie, pro non vérifiée) : pour l'écran de demande de badge.
   const coaching = 'g-coaching';

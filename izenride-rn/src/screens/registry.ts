@@ -102,6 +102,12 @@ import ForceUpdateVersionTropAncienneScreen from './system/ForceUpdateVersionTro
 import RateLimitQuotaDepasseScreen from './system/RateLimitQuotaDepasseScreen';
 import PaiementEchoueScreen from './system/PaiementEchoueScreen';
 
+import CreerUnGroupeScreen from './groups/CreerUnGroupeScreen';
+import GroupeAccueilScreen from './groups/GroupeAccueilScreen';
+import GererLeGroupeScreen from './groups/GererLeGroupeScreen';
+import RolesDuGroupeScreen from './groups/RolesDuGroupeScreen';
+import EditeurDeRoleScreen from './groups/EditeurDeRoleScreen';
+import { DEMO_GROUP_ID } from '@/api/demoStore';
 export const REGISTRY: Record<string, React.ComponentType<any>> = {
   '000': SplashScreen,
   '001': Onboarding1BienvenueScreen,
@@ -204,4 +210,13 @@ export const REGISTRY: Record<string, React.ComponentType<any>> = {
   '098': ForceUpdateVersionTropAncienneScreen,
   '099': RateLimitQuotaDepasseScreen,
   '100': PaiementEchoueScreen,
+  // Groupes (lot 1) — rendus sur le groupe de démo.
+  '101': CreerUnGroupeScreen,
+  '102': () => React.createElement(GroupeAccueilScreen, { groupId: DEMO_GROUP_ID, initialTab: 'chat' }),
+  '103': () => React.createElement(GroupeAccueilScreen, { groupId: DEMO_GROUP_ID, initialTab: 'sorties' }),
+  '104': () => React.createElement(GroupeAccueilScreen, { groupId: DEMO_GROUP_ID, initialTab: 'membres' }),
+  '105': () => React.createElement(GroupeAccueilScreen, { groupId: DEMO_GROUP_ID, initialTab: 'infos' }),
+  '106': () => React.createElement(GererLeGroupeScreen, { groupId: DEMO_GROUP_ID }),
+  '107': () => React.createElement(RolesDuGroupeScreen, { groupId: DEMO_GROUP_ID }),
+  '108': () => React.createElement(EditeurDeRoleScreen, { groupId: DEMO_GROUP_ID, roleId: 'new' }),
 };

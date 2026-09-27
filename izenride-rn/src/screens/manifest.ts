@@ -102,6 +102,14 @@ export const SCREENS: ScreenMeta[] = [
   { id: '098', title: 'Force update version trop ancienne', catKey: 'system', catLabel: 'États & Erreurs', comp: 'ForceUpdateVersionTropAncienneScreen' },
   { id: '099', title: 'Rate limit quota dépassé', catKey: 'system', catLabel: 'États & Erreurs', comp: 'RateLimitQuotaDepasseScreen' },
   { id: '100', title: 'Paiement échoué', catKey: 'system', catLabel: 'États & Erreurs', comp: 'PaiementEchoueScreen' },
+  { id: '101', title: 'Créer un groupe', catKey: 'groups', catLabel: 'Groupes', comp: 'CreerUnGroupeScreen' },
+  { id: '102', title: 'Groupe · Chat', catKey: 'groups', catLabel: 'Groupes', comp: 'GroupeAccueilScreen' },
+  { id: '103', title: 'Groupe · Sorties', catKey: 'groups', catLabel: 'Groupes', comp: 'GroupeAccueilScreen' },
+  { id: '104', title: 'Groupe · Membres et actions par rôle', catKey: 'groups', catLabel: 'Groupes', comp: 'GroupeAccueilScreen' },
+  { id: '105', title: 'Groupe · Infos', catKey: 'groups', catLabel: 'Groupes', comp: 'GroupeAccueilScreen' },
+  { id: '106', title: 'Gérer le groupe', catKey: 'groups', catLabel: 'Groupes', comp: 'GererLeGroupeScreen' },
+  { id: '107', title: 'Rôles et permissions', catKey: 'groups', catLabel: 'Groupes', comp: 'RolesDuGroupeScreen' },
+  { id: '108', title: 'Éditeur de rôle', catKey: 'groups', catLabel: 'Groupes', comp: 'EditeurDeRoleScreen' },
 ];
 
 export const CATEGORIES: { key: string; label: string }[] = [
@@ -109,6 +117,7 @@ export const CATEGORIES: { key: string; label: string }[] = [
   { key: 'map', label: 'Carte & GPS' },
   { key: 'match', label: 'Rencontres' },
   { key: 'messages', label: 'Messages' },
+  { key: 'groups', label: 'Groupes' },
   { key: 'events', label: 'Agenda & Événements' },
   { key: 'market', label: 'Marketplace' },
   { key: 'profile', label: 'Profil' },

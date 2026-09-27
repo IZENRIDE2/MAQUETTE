@@ -107,6 +107,9 @@ import GroupeAccueilScreen from './groups/GroupeAccueilScreen';
 import GererLeGroupeScreen from './groups/GererLeGroupeScreen';
 import RolesDuGroupeScreen from './groups/RolesDuGroupeScreen';
 import EditeurDeRoleScreen from './groups/EditeurDeRoleScreen';
+import ProposerScreen from './groups/ProposerScreen';
+import SuggestionScreen from './groups/SuggestionScreen';
+import MesSuggestionsScreen from './groups/MesSuggestionsScreen';
 import { DEMO_GROUP_ID } from '@/api/demoStore';
 export const REGISTRY: Record<string, React.ComponentType<any>> = {
   '000': SplashScreen,
@@ -219,4 +222,11 @@ export const REGISTRY: Record<string, React.ComponentType<any>> = {
   '106': () => React.createElement(GererLeGroupeScreen, { groupId: DEMO_GROUP_ID }),
   '107': () => React.createElement(RolesDuGroupeScreen, { groupId: DEMO_GROUP_ID }),
   '108': () => React.createElement(EditeurDeRoleScreen, { groupId: DEMO_GROUP_ID, roleId: 'new' }),
+  // Groupes (lot 2) — suggestions 1 clic.
+  '109': () => React.createElement(GroupeAccueilScreen, { groupId: DEMO_GROUP_ID, initialTab: 'valider' }),
+  '110': () => React.createElement(SuggestionScreen, { groupId: DEMO_GROUP_ID, suggestionId: 's-vexin' }),
+  '111': () => React.createElement(ProposerScreen, { groupId: DEMO_GROUP_ID, type: 'ride' }),
+  '112': () => React.createElement(ProposerScreen, { groupId: DEMO_GROUP_ID, type: 'poll' }),
+  '113': () => React.createElement(ProposerScreen, { groupId: DEMO_GROUP_ID, type: 'ride', suggestionId: 's-vexin' }),
+  '114': () => React.createElement(MesSuggestionsScreen, { groupId: DEMO_GROUP_ID }),
 };

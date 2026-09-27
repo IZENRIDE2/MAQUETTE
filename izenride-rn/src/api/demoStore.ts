@@ -7,6 +7,9 @@ import { GroupError } from './errors';
 import { PERMISSIONS, Permission } from './permissions';
 import type {
   ActivityEntry,
+  Announcement,
+  ChatMessage,
+  Suggestion,
   Group,
   GroupBundle,
   GroupKind,
@@ -19,6 +22,10 @@ import type {
 } from './types';
 
 type MemberRow = Omit<GroupMember, 'profile'>;
+type RideRow = { id: string; groupId: string; title: string; startsAt: string; meetingPoint: string; route: string | null; level: 'tous' | 'intermediaire' | 'confirme'; membersOnly: boolean; createdBy: string | null; fromSuggestionId: string | null };
+type PollRow = { id: string; groupId: string; question: string; options: string[]; endsAt: string | null; createdBy: string | null };
+type InviteRow = { id: string; groupId: string; inviteeId: string; invitedBy: string | null; intro: string | null; status: 'pending' | 'accepted' | 'declined'; viaSuggestionId: string | null; createdAt: string };
+type SuggestionRow = Omit<Suggestion, 'votes' | 'votedByMe'>;
 
 const PROFILES: Profile[] = [
   { id: 'u-julie', name: 'Julie', avatarUrl: null },
@@ -27,6 +34,10 @@ const PROFILES: Profile[] = [
   { id: 'u-leo', name: 'Léo', avatarUrl: null },
   { id: 'u-camille', name: 'Camille', avatarUrl: null },
   { id: 'u-antoine', name: 'Antoine', avatarUrl: null },
+  // Riders IzenRide hors du groupe de démo (suggestions de membre, invitations).
+  { id: 'u-ines', name: 'Inès', avatarUrl: null },
+  { id: 'u-hugo', name: 'Hugo', avatarUrl: null },
+  { id: 'u-nora', name: 'Nora', avatarUrl: null },
 ];
 
 export const DEMO_GROUP_ID = 'g-night-riders';
@@ -42,6 +53,17 @@ const state = {
   roles: [] as GroupRole[],
   members: [] as MemberRow[],
   log: [] as (ActivityEntry & { groupId: string })[],
+  // Lot 2
+  messages: [] as ChatMessage[],
+  suggestions: [] as SuggestionRow[],
+  suggestionVotes: [] as { suggestionId: string; userId: string }[],
+  rides: [] as RideRow[],
+  rideParticipants: [] as { rideId: string; userId: string }[],
+  polls: [] as PollRow[],
+  pollVotes: [] as { pollId: string; userId: string; option: number }[],
+  announcements: [] as Announcement[],
+  invites: [] as InviteRow[],
+  prefs: [] as { userId: string; groupId: string | null; suggestions: boolean; outcome: boolean }[],
 };
 
 // ---------------------------------------------------------------------------
@@ -82,6 +104,8 @@ function assertPerm(groupId: string, perm: Permission | null): number {
   return role.rank;
 }
 
+const ACCEPT_PERM = { ride: 'accept.ride', member: 'accept.member', announcement: 'accept.content', poll: 'accept.poll' } as const;
+
 const log = (groupId: string, action: string, target: Record<string, unknown> = {}) => {
   state.log.unshift({ id: state.log.length + 1, groupId, actorId: state.me, action, target, createdAt: now() });
 };
@@ -106,6 +130,9 @@ export function myGroups(): GroupSummary[] {
         memberCount: state.members.filter((x) => x.groupId === g.id).length,
         myRole: { id: r.id, name: r.name, rank: r.rank, color: r.color },
         myPermissions: effectivePerms(r),
+        toValidate: state.suggestions.filter(
+          (x) => x.groupId === g.id && x.status === 'pending' && Date.parse(x.expiresAt) > Date.now() && effectivePerms(r).includes(ACCEPT_PERM[x.type]),
+        ).length,
       };
     });
 }
@@ -194,6 +221,9 @@ function removeGroupData(groupId: string) {
   state.roles = state.roles.filter((r) => r.groupId !== groupId);
   state.members = state.members.filter((m) => m.groupId !== groupId);
   state.log = state.log.filter((e) => e.groupId !== groupId);
+  for (const k of ['messages', 'suggestions', 'rides', 'polls', 'announcements', 'invites'] as const) {
+    (state[k] as { groupId: string }[]) = (state[k] as { groupId: string }[]).filter((x) => x.groupId !== groupId);
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -350,3 +380,7 @@ export function transferFounder(groupId: string, newFounderId: string) {
     { id: 2, groupId: g, actorId: 'u-julie', action: 'group.created', target: { name: 'Night Riders Paris' }, createdAt: daysAgo(120) },
   );
 })();
+
+/** Accès internes pour le mode démo du lot 2 (demoFeed.ts). Ne pas utiliser ailleurs. */
+export const _demo = { state, assertPerm, roleOf, effectivePerms, log, emit, uid, now, daysAgo, profiles: PROFILES };
+export type { RideRow, PollRow, InviteRow, SuggestionRow };

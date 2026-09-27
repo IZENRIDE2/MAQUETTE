@@ -26,3 +26,5 @@ export const isDemo = supabase === null;
 
 /** Table et colonnes des profils existants (à confirmer sur le projet). */
 export const PROFILES_TABLE = process.env.EXPO_PUBLIC_SUPABASE_PROFILES_TABLE ?? 'profiles';
+/** Colonne de nom utilisée pour chercher un rider (suggestion de membre). */
+export const PROFILES_NAME_COLUMN = process.env.EXPO_PUBLIC_SUPABASE_PROFILES_NAME_COLUMN ?? 'display_name';

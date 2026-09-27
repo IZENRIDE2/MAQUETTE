@@ -86,7 +86,8 @@ qui vérifient permissions et rangs ; les tables sont en lecture seule pour les 
 PGHOST=localhost PGUSER=postgres ./supabase/tests/run.sh
 ```
 Rejoue la migration sur un Postgres local (schéma `auth` simulé) et vérifie RLS, permissions,
-rangs, rôles par défaut, transfert du fondateur.
+rangs, rôles par défaut, transfert du fondateur (lot 1), puis suggestions, décision en 1 clic,
+concurrence, invitations, sourdine, sondages, expiration et destinataires des push (lot 2).
 
 ### Écrans et routes
 
@@ -99,4 +100,47 @@ rangs, rôles par défaut, transfert du fondateur.
 | Rôles et permissions | `/groups/<id>/roles` | 107 |
 | Éditeur de rôle | `/groups/<id>/roles/<roleId|new>` | 108 |
 
-Chat, sorties, suggestions et invitations sont affichés avec des données de démo : ils arrivent aux lots 2 et 3.
+## Groupes (lot 2) — suggestions en 1 clic
+
+Chaque action d'un groupe (sortie, sondage, annonce, invitation d'un membre) passe par une seule RPC,
+`group_action` : si le rôle a la permission directe, c'est publié ; sinon ça devient une **suggestion**
+qu'un membre habilité accepte en 1 clic (`decide_suggestion`), éventuellement après l'avoir modifiée.
+Le premier qui décide gagne (verrou de ligne) ; les suivants reçoivent `already_decided`.
+
+- **Où valider** : carte dans le chat, onglet « Valider » du groupe (glisser à droite = accepter,
+  à gauche = refuser, « Tout accepter » par type), notification push avec boutons Accepter / Refuser…
+- **Garde-fous** : 5 suggestions en attente max par membre et par groupe, expiration à 14 jours
+  (ou à la date de la sortie), motif obligatoire pour refuser, 👍 indicatifs sans valeur de vote.
+- **Invitations** : une suggestion « Membre » acceptée crée une invitation ; l'invité la voit dans
+  Messages → Invitations et rejoint en 1 tap avec le rôle par défaut.
+- **Réglages** : Notifications → Groupes (global, par groupe, issue de mes suggestions).
+
+### Mise en service Supabase
+
+1. Appliquer `supabase/migrations/20260928000001_groups_suggestions.sql` (après celle du lot 1).
+2. Déployer l'Edge Function des push :
+   ```bash
+   supabase functions deploy notify --no-verify-jwt
+   supabase secrets set NOTIFY_WEBHOOK_SECRET=<secret> PROFILES_TABLE=profiles
+   ```
+3. Dashboard → Database → Webhooks : sur `public.group_suggestions` (INSERT, UPDATE), appeler
+   la fonction `notify` avec l'en-tête `x-webhook-secret: <secret>`.
+4. Expiration automatique (extension `pg_cron` activée) :
+   ```sql
+   select cron.schedule('expire-group-suggestions', '*/15 * * * *', 'select public.expire_group_suggestions()');
+   ```
+5. Push côté app : renseigner `extra.eas.projectId` dans `app.json` (projet EAS) pour obtenir un
+   jeton Expo ; il est enregistré par `register_push_token` au démarrage. Inactif sur le web et en démo.
+
+### Nouveaux écrans
+
+| Écran | Route | Catalogue |
+| --- | --- | --- |
+| Boîte « Valider » (glisser pour accepter) | `/groups/<id>?tab=valider` | 109 |
+| Détail d'une suggestion | `/groups/<id>/suggestions/<sid>` | 110 |
+| Créer / proposer (sortie, sondage, annonce, membre) | `/groups/<id>/propose/<type>` | 111, 112 |
+| Modifier puis accepter | `/groups/<id>/propose/<type>?suggestion=<sid>` | 113 |
+| Mes suggestions | `/groups/<id>/mine` | 114 |
+| Messages → Invitations, Réglages → Notifications → Groupes | `/s/035`, `/s/071` | — |
+
+Les invitations par lien / QR code et l'onboarding de l'ami invité arrivent au lot 3.

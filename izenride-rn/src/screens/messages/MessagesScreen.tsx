@@ -6,10 +6,10 @@ import {
   Calendar, Check, CheckCheck, Plus,
 } from 'lucide-react-native';
 import { Screen, BottomTabBar } from '@/components';
-import { MyGroupsStrip, GroupConversations } from './MessagesGroups';
+import { MyGroupsStrip, GroupConversations, ReceivedInvites } from './MessagesGroups';
 import { colors, fonts, radius } from '@/theme';
 import { useQuery } from '@/api/useQuery';
-import { listMyGroups } from '@/api/groups';
+import { listMyGroups, listMyGroupInvites } from '@/api/groups';
 import { groupRoutes } from '@/screens/groups/routes';
 
 const FILTERS = [
@@ -32,6 +32,7 @@ export default function MessagesScreen() {
   const router = useRouter();
   const [active, setActive] = useState('Tout');
   const { data: groups = [] } = useQuery(listMyGroups, []);
+  const { data: invites = [] } = useQuery(listMyGroupInvites, []);
   const filters = [
     FILTERS[0]!,
     { label: 'Groupes', count: String(groups.length), dot: false },
@@ -85,7 +86,8 @@ export default function MessagesScreen() {
       </ScrollView>
 
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-        {/* Mes groupes */}
+        {/* Invitations reçues + Mes groupes */}
+        <ReceivedInvites invites={invites} />
         <MyGroupsStrip groups={groups} />
 
         {active === 'Groupes' ? (

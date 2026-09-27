@@ -13,6 +13,18 @@ export type GroupErrorCode =
   | 'member_not_found'
   | 'default_role_locked'
   | 'transfer_founder_first'
+  | 'invalid_payload'
+  | 'already_member'
+  | 'already_invited'
+  | 'too_many_pending'
+  | 'already_decided'
+  | 'suggestion_not_found'
+  | 'reason_required'
+  | 'muted'
+  | 'ride_not_found'
+  | 'poll_not_found'
+  | 'poll_closed'
+  | 'invite_not_found'
   | 'unknown';
 
 const MESSAGES: Record<GroupErrorCode, string> = {
@@ -26,6 +38,18 @@ const MESSAGES: Record<GroupErrorCode, string> = {
   member_not_found: 'Ce membre n’est plus dans le groupe.',
   default_role_locked: 'Le rôle attribué aux nouveaux membres ne peut pas être supprimé.',
   transfer_founder_first: 'Transfère d’abord ton rôle de fondateur à un autre membre.',
+  invalid_payload: 'Certains champs sont incomplets ou invalides.',
+  already_member: 'Cette personne fait déjà partie du groupe.',
+  already_invited: 'Cette personne a déjà une invitation en attente.',
+  too_many_pending: 'Tu as déjà 5 suggestions en attente dans ce groupe. Attends qu’elles soient traitées.',
+  already_decided: 'Cette suggestion a déjà été traitée.',
+  suggestion_not_found: 'Cette suggestion n’existe plus.',
+  reason_required: 'Indique un motif de refus.',
+  muted: 'Tu es en sourdine dans ce groupe.',
+  ride_not_found: 'Cette sortie n’existe plus.',
+  poll_not_found: 'Ce sondage n’existe plus.',
+  poll_closed: 'Ce sondage est clos.',
+  invite_not_found: 'Cette invitation n’est plus valable.',
   unknown: 'Une erreur est survenue. Réessaie.',
 };
 

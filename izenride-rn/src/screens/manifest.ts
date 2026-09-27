@@ -110,6 +110,12 @@ export const SCREENS: ScreenMeta[] = [
   { id: '106', title: 'Gérer le groupe', catKey: 'groups', catLabel: 'Groupes', comp: 'GererLeGroupeScreen' },
   { id: '107', title: 'Rôles et permissions', catKey: 'groups', catLabel: 'Groupes', comp: 'RolesDuGroupeScreen' },
   { id: '108', title: 'Éditeur de rôle', catKey: 'groups', catLabel: 'Groupes', comp: 'EditeurDeRoleScreen' },
+  { id: '109', title: 'Boîte « À valider » (glisser pour accepter)', catKey: 'groups', catLabel: 'Groupes', comp: 'GroupeAccueilScreen' },
+  { id: '110', title: 'Détail d’une suggestion', catKey: 'groups', catLabel: 'Groupes', comp: 'SuggestionScreen' },
+  { id: '111', title: 'Créer / proposer une sortie', catKey: 'groups', catLabel: 'Groupes', comp: 'ProposerScreen' },
+  { id: '112', title: 'Créer / proposer un sondage', catKey: 'groups', catLabel: 'Groupes', comp: 'ProposerScreen' },
+  { id: '113', title: 'Modifier puis accepter une suggestion', catKey: 'groups', catLabel: 'Groupes', comp: 'ProposerScreen' },
+  { id: '114', title: 'Mes suggestions', catKey: 'groups', catLabel: 'Groupes', comp: 'MesSuggestionsScreen' },
 ];
 
 export const CATEGORIES: { key: string; label: string }[] = [

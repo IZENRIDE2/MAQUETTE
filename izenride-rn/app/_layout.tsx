@@ -3,6 +3,7 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import * as SplashScreen from 'expo-splash-screen';
 import {
   useFonts,
@@ -14,6 +15,7 @@ import {
 import { GeistMono_500Medium, GeistMono_700Bold } from '@expo-google-fonts/geist-mono';
 import { colors } from '@/theme';
 import { DialogHost } from '@/components/Dialog';
+import { initNotifications } from '@/notifications';
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
@@ -31,22 +33,33 @@ export default function RootLayout() {
     if (loaded) SplashScreen.hideAsync().catch(() => {});
   }, [loaded]);
 
+  // Push des suggestions de groupe (inactif sur le web et en mode démo).
+  useEffect(() => {
+    let cleanup: (() => void) | undefined;
+    initNotifications()
+      .then((c) => (cleanup = c))
+      .catch(() => {});
+    return () => cleanup?.();
+  }, []);
+
   if (!loaded) return <View style={{ flex: 1, backgroundColor: colors.bg }} />;
 
   return (
-    <SafeAreaProvider>
-      <StatusBar style="light" />
-      <Stack
-        screenOptions={{
-          headerShown: false,
-          contentStyle: { backgroundColor: colors.bg },
-          animation: 'slide_from_right',
-        }}
-      >
-        <Stack.Screen name="index" />
-        <Stack.Screen name="s/[id]" />
-      </Stack>
-      <DialogHost />
-    </SafeAreaProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SafeAreaProvider>
+        <StatusBar style="light" />
+        <Stack
+          screenOptions={{
+            headerShown: false,
+            contentStyle: { backgroundColor: colors.bg },
+            animation: 'slide_from_right',
+          }}
+        >
+          <Stack.Screen name="index" />
+          <Stack.Screen name="s/[id]" />
+        </Stack>
+        <DialogHost />
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   );
 }

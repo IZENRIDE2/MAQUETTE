@@ -6,7 +6,7 @@ import { Screen, AppBar, Panel } from '@/components';
 import { LoadState, DemoUserSwitcher, SectionTitle } from '@/components/groups';
 import { colors, fonts, radius } from '@/theme';
 import { useQuery } from '@/api/useQuery';
-import { getGroupBundle, listActivity, can } from '@/api/groups';
+import { getGroupBundle, listActivity, listMyGroups, can } from '@/api/groups';
 import type { ActivityEntry, GroupBundle } from '@/api/types';
 import { groupRoutes } from './routes';
 
@@ -37,6 +37,22 @@ export function describeActivity(e: ActivityEntry, nameOf: (id: string | null | 
       return `${who} a réactivé ${nameOf(t.user_id)}`;
     case 'member.left':
       return `${who} a quitté le groupe`;
+    case 'member.joined':
+      return `${nameOf(t.user_id)} a rejoint le groupe`;
+    case 'suggestion.accepted':
+      return `${who} a accepté une suggestion de ${nameOf(t.author_id)}`;
+    case 'suggestion.accepted_edited':
+      return `${who} a modifié puis accepté une suggestion de ${nameOf(t.author_id)}`;
+    case 'suggestion.refused':
+      return `${who} a refusé une suggestion de ${nameOf(t.author_id)}`;
+    case 'ride.created':
+      return `Nouvelle sortie publiée (${nameOf(t.author_id)})`;
+    case 'poll.created':
+      return `Nouveau sondage lancé (${nameOf(t.author_id)})`;
+    case 'announcement.created':
+      return `Nouvelle annonce publiée (${nameOf(t.author_id)})`;
+    case 'member.created':
+      return `${nameOf(t.author_id)} a invité un nouveau membre`;
     case 'founder.transferred':
       return `${who} a transmis le rôle de fondateur à ${nameOf(t.user_id)}`;
     default:
@@ -55,6 +71,7 @@ const ago = (iso: string) => {
 export default function GererLeGroupeScreen({ groupId }: { groupId: string }) {
   const router = useRouter();
   const { data: b, error, loading, reload } = useQuery(() => getGroupBundle(groupId), [groupId]);
+  const { data: groups } = useQuery(listMyGroups, []);
 
   if (!b) {
     return (
@@ -69,6 +86,7 @@ export default function GererLeGroupeScreen({ groupId }: { groupId: string }) {
   const roleNameOf = (userId: string) => b.roles.find((r) => r.id === b.members.find((m) => m.userId === userId)?.roleId)?.name ?? '—';
   const recent = [...b.members].sort((x, y) => y.joinedAt.localeCompare(x.joinedAt)).slice(0, 3);
   const canValidate = b.me.permissions.some((p) => p.startsWith('accept.'));
+  const toValidate = groups?.find((g) => g.id === groupId)?.toValidate ?? 0;
 
   const tiles = [
     {
@@ -76,8 +94,8 @@ export default function GererLeGroupeScreen({ groupId }: { groupId: string }) {
       show: canValidate,
       Icon: Inbox,
       title: 'À valider',
-      sub: 'Suggestions des membres · bientôt disponible',
-      onPress: undefined as (() => void) | undefined,
+      sub: toValidate ? `${toValidate} suggestion${toValidate > 1 ? 's' : ''} en attente` : 'Rien en attente',
+      onPress: (() => router.push(groupRoutes.home(groupId, 'valider'))) as (() => void) | undefined,
     },
     {
       key: 'members',

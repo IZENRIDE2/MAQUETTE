@@ -2,8 +2,8 @@ import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Inbox, Users, Shield, Pencil, History, ChevronRight, Lock } from 'lucide-react-native';
-import { Screen, AppBar, Panel, SectionLabel } from '@/components';
-import { LoadState, DemoUserSwitcher } from '@/components/groups';
+import { Screen, AppBar, Panel } from '@/components';
+import { LoadState, DemoUserSwitcher, SectionTitle } from '@/components/groups';
 import { colors, fonts, radius } from '@/theme';
 import { useQuery } from '@/api/useQuery';
 import { getGroupBundle, listActivity, can } from '@/api/groups';
@@ -133,7 +133,7 @@ export default function GererLeGroupeScreen({ groupId }: { groupId: string }) {
         ))}
       </Panel>
 
-      <SectionLabel style={{ marginTop: 22 }}>Journal d’activité</SectionLabel>
+      <SectionTitle style={{ marginTop: 22 }}>Journal d’activité</SectionTitle>
       {can(b, 'insights.view') ? <ActivityList b={b} nameOf={nameOf} /> : <LockedLog />}
     </Screen>
   );

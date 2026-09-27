@@ -296,7 +296,7 @@ begin
   returning id into v_founder;
 
   insert into public.group_roles (group_id, name, color, rank, permissions)
-  values (v_group, 'Admin', '#b884e6', 80,
+  values (v_group, 'Admin', '#7eb0ff', 80,
           array_remove(public.group_permission_catalog(), 'roles.manage'));
 
   if p_kind = 'pro' then

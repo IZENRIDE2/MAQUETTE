@@ -151,7 +151,7 @@ function insertGroup(kind: GroupKind, name: string, description: string | null, 
     return r;
   };
   const founder = role('Fondateur', '#fbbf24', 100, [], { isFounder: true });
-  role('Admin', '#b884e6', 80, PERMISSIONS.filter((p) => p !== 'roles.manage'));
+  role('Admin', '#7eb0ff', 80, PERMISSIONS.filter((p) => p !== 'roles.manage'));
   if (kind === 'pro') {
     role('Gestionnaire', '#22d3ee', 50, PERMISSIONS.filter((p) => p !== 'roles.manage' && p !== 'member.remove'));
   } else {

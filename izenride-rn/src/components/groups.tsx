@@ -3,7 +3,7 @@
  * feuille d'actions, états vide / erreur, sélecteur d'utilisateur (démo).
  */
 import React from 'react';
-import { View, Text, Pressable, StyleSheet, Modal, ViewStyle, ActivityIndicator } from 'react-native';
+import { View, Text, Pressable, StyleSheet, Modal, ViewStyle, TextStyle, ActivityIndicator } from 'react-native';
 import { BadgeCheck, Building2, Users, AlertTriangle, Eye } from 'lucide-react-native';
 import { colors, fonts, radius } from '@/theme';
 import { isDemo } from '@/api/supabase';
@@ -17,6 +17,56 @@ const initials = (name: string) =>
     .slice(0, 2)
     .map((w) => w[0]!.toUpperCase())
     .join('');
+
+/** Titre de section, au style des écrans existants (Réglages, Signalement…). */
+export function SectionTitle({ children, style }: { children: React.ReactNode; style?: TextStyle }) {
+  return <Text style={[form.sectionTitle, style]}>{children}</Text>;
+}
+
+/** Styles de formulaire partagés, alignés sur Inscription / Paramètres du compte. */
+export const form = StyleSheet.create({
+  sectionTitle: {
+    fontFamily: fonts.bold,
+    fontSize: 11,
+    color: colors.inkMute,
+    textTransform: 'uppercase',
+    letterSpacing: 1.2,
+    marginBottom: 10,
+    paddingHorizontal: 4,
+  },
+  fieldLabel: {
+    fontFamily: fonts.semibold,
+    fontSize: 11,
+    color: colors.inkMute,
+    textTransform: 'uppercase',
+    letterSpacing: 0.8,
+  },
+  input: {
+    backgroundColor: colors.panelSoft,
+    borderWidth: 1,
+    borderColor: colors.line,
+    borderRadius: 14,
+    paddingHorizontal: 14,
+    paddingVertical: 13,
+    fontFamily: fonts.regular,
+    fontSize: 15,
+    color: colors.ink,
+  },
+  textarea: { minHeight: 88, textAlignVertical: 'top', lineHeight: 20 },
+  search: {
+    flex: 1,
+    height: 38,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: colors.panelSoft,
+    borderWidth: 1,
+    borderColor: colors.line,
+    borderRadius: 11,
+    paddingHorizontal: 14,
+  },
+  searchInput: { flex: 1, fontFamily: fonts.regular, fontSize: 13, color: colors.ink },
+});
 
 /** Avatar carré arrondi d'un groupe : initiales + icône du type. */
 export function GroupAvatar({
@@ -105,7 +155,8 @@ export function ActionSheet({
             key={a.label}
             onPress={() => {
               onClose();
-              a.onPress();
+              // Laisse la feuille se fermer : iOS n'empile pas deux Modal en transition.
+              setTimeout(a.onPress, 320);
             }}
             style={({ pressed }) => [styles.sheetRow, pressed && { backgroundColor: 'rgba(255,255,255,0.05)' }]}
           >

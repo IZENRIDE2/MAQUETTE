@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Pressable, TextInput, Alert } from 'react-native';
+import { View, Text, StyleSheet, Pressable, TextInput } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Check, Trash2 } from 'lucide-react-native';
-import { Screen, AppBar, Panel, PrimaryButton, SectionLabel, Switch } from '@/components';
-import { LoadState, RoleBadge } from '@/components/groups';
+import { Screen, AppBar, Panel, PrimaryButton, Switch } from '@/components';
+import { LoadState, RoleBadge, SectionTitle, form } from '@/components/groups';
+import { dialog } from '@/components/Dialog';
 import { colors, fonts, radius } from '@/theme';
 import { useQuery } from '@/api/useQuery';
 import { getGroupBundle, upsertRole, deleteRole, can } from '@/api/groups';
@@ -76,31 +77,26 @@ export default function EditeurDeRoleScreen({ groupId, roleId }: { groupId: stri
       await upsertRole(groupId, { id: role?.id, name, color, rank: role?.rank ?? newRank(), permissions: perms });
       router.back();
     } catch (e) {
-      Alert.alert('Enregistrement impossible', (e as Error).message);
+      dialog.error('Enregistrement impossible')(e);
     } finally {
       setBusy(false);
     }
   };
 
-  const remove = () => {
+  const remove = async () => {
     if (!role) return;
     const count = b.members.filter((m) => m.roleId === role.id).length;
     const def = b.roles.find((r) => r.isDefault);
-    Alert.alert(
-      `Supprimer « ${role.name} » ?`,
-      count ? `${count} membre${count > 1 ? 's' : ''} passeront en « ${def?.name} ».` : undefined,
-      [
-        { text: 'Annuler', style: 'cancel' },
-        {
-          text: 'Supprimer',
-          style: 'destructive',
-          onPress: () =>
-            deleteRole(role.id)
-              .then(() => router.back())
-              .catch((e) => Alert.alert('Suppression impossible', (e as Error).message)),
-        },
-      ],
-    );
+    const ok = await dialog.confirm({
+      title: `Supprimer « ${role.name} » ?`,
+      message: count ? `${count} membre${count > 1 ? 's' : ''} passeront en « ${def?.name} ».` : undefined,
+      confirmLabel: 'Supprimer',
+      destructive: true,
+    });
+    if (!ok) return;
+    deleteRole(role.id)
+      .then(() => router.back())
+      .catch(dialog.error('Suppression impossible'));
   };
 
   const valid = name.trim().length > 0;
@@ -113,10 +109,10 @@ export default function EditeurDeRoleScreen({ groupId, roleId }: { groupId: stri
         <RoleBadge name={name.trim() || 'Nom du rôle'} color={color} />
       </View>
 
-      <SectionLabel>Nom</SectionLabel>
-      <TextInput value={name} onChangeText={setName} maxLength={30} placeholder="Ex. Mécano, Photographe…" placeholderTextColor={colors.inkMute} style={styles.input} />
+      <SectionTitle>Nom</SectionTitle>
+      <TextInput value={name} onChangeText={setName} maxLength={30} placeholder="Ex. Mécano, Photographe…" placeholderTextColor={colors.inkMute} style={form.input} />
 
-      <SectionLabel style={{ marginTop: 18 }}>Couleur</SectionLabel>
+      <SectionTitle style={{ marginTop: 18 }}>Couleur</SectionTitle>
       <View style={styles.colors}>
         {ROLE_COLORS.map((c) => (
           <Pressable key={c} onPress={() => setColor(c)} style={[styles.color, { backgroundColor: c }, c === color && styles.colorOn]}>
@@ -127,7 +123,7 @@ export default function EditeurDeRoleScreen({ groupId, roleId }: { groupId: stri
 
       {PERMISSION_BLOCKS.map(({ key, label }) => (
         <View key={key} style={{ marginTop: 20 }}>
-          <SectionLabel style={{ marginBottom: 4 }}>{label}</SectionLabel>
+          <SectionTitle style={{ marginBottom: 4 }}>{label}</SectionTitle>
           <Text style={styles.blockSummary}>{describeBlock(key, perms)}</Text>
           <Panel pad={4}>
             {permissionsOfBlock(key).map((p, i) => (
@@ -163,17 +159,6 @@ export default function EditeurDeRoleScreen({ groupId, roleId }: { groupId: stri
 
 const styles = StyleSheet.create({
   preview: { alignItems: 'center', paddingVertical: 12, marginBottom: 8 },
-  input: {
-    backgroundColor: colors.panelSoft,
-    borderWidth: 1,
-    borderColor: colors.line,
-    borderRadius: radius.md,
-    paddingHorizontal: 14,
-    paddingVertical: 13,
-    fontFamily: fonts.medium,
-    fontSize: 15,
-    color: colors.ink,
-  },
   colors: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
   color: { width: 34, height: 34, borderRadius: 17, alignItems: 'center', justifyContent: 'center' },
   colorOn: { borderWidth: 3, borderColor: colors.ink },

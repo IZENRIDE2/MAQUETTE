@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { View, Text, StyleSheet, Pressable, TextInput, Alert, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Pressable, TextInput, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import {
   Settings2,
@@ -21,8 +21,9 @@ import {
   Send,
   Megaphone,
 } from 'lucide-react-native';
-import { Screen, AppBar, Panel, Avatar, PrimaryButton, GhostButton, SectionLabel } from '@/components';
-import { GroupAvatar, RoleBadge, VerifiedBadge, ActionSheet, SheetAction, EmptyState, LoadState, DemoUserSwitcher } from '@/components/groups';
+import { Screen, AppBar, Panel, Avatar, PrimaryButton, GhostButton } from '@/components';
+import { GroupAvatar, RoleBadge, VerifiedBadge, ActionSheet, SheetAction, EmptyState, LoadState, DemoUserSwitcher, SectionTitle, form } from '@/components/groups';
+import { dialog } from '@/components/Dialog';
 import { colors, fonts, radius } from '@/theme';
 import { useQuery } from '@/api/useQuery';
 import {
@@ -60,7 +61,7 @@ const since = (iso: string) => {
   return m < 12 ? `il y a ${m} mois` : `il y a ${Math.floor(m / 12)} an${m >= 24 ? 's' : ''}`;
 };
 const isMuted = (m: GroupMember) => !!m.mutedUntil && Date.parse(m.mutedUntil) > Date.now();
-const fail = (title: string) => (e: unknown) => Alert.alert(title, (e as Error).message);
+const fail = dialog.error;
 
 /** Accueil d'un groupe : en-tête + onglets Chat, Sorties, Membres, Infos. */
 export default function GroupeAccueilScreen({ groupId, initialTab = 'chat' }: { groupId: string; initialTab?: GroupTab }) {
@@ -184,7 +185,7 @@ function SortiesTab({ b }: { b: GroupBundle }) {
   const direct = can(b, 'ride.create');
   const cta = direct ? 'Créer une sortie' : 'Proposer une sortie';
   const soon = () =>
-    Alert.alert(
+    dialog.info(
       cta,
       direct
         ? 'La création de sorties arrive avec la prochaine version.'
@@ -200,7 +201,7 @@ function SortiesTab({ b }: { b: GroupBundle }) {
           <Text style={styles.proNoteTxt}>Les sorties de l’organisation sont aussi promues dans Événements, sauf si « Réservée aux membres ».</Text>
         </View>
       )}
-      <SectionLabel style={{ marginTop: 20 }}>À venir</SectionLabel>
+      <SectionTitle style={{ marginTop: 20 }}>À venir</SectionTitle>
       {isDemo ? (
         DEMO_RIDES.map((r) => (
           <Panel key={r.title} pad={14} style={{ marginBottom: 10 }}>
@@ -263,11 +264,15 @@ function MembresTab({ b }: { b: GroupBundle }) {
         label: 'Retirer du groupe',
         destructive: true,
         icon: <UserMinus size={18} color={colors.danger} />,
-        onPress: () =>
-          Alert.alert(`Retirer ${m.profile.name} ?`, 'Il ne verra plus le groupe. Tu pourras le réinviter.', [
-            { text: 'Annuler', style: 'cancel' },
-            { text: 'Retirer', style: 'destructive', onPress: () => removeMember(gid, m.userId).catch(fail('Retrait impossible')) },
-          ]),
+        onPress: async () => {
+          const ok = await dialog.confirm({
+            title: `Retirer ${m.profile.name} ?`,
+            message: 'Il ne verra plus le groupe. Tu pourras le réinviter.',
+            confirmLabel: 'Retirer',
+            destructive: true,
+          });
+          if (ok) removeMember(gid, m.userId).catch(fail('Retrait impossible'));
+        },
       });
     }
     if (b.me.role.isFounder && m.userId !== b.me.userId) {
@@ -275,11 +280,14 @@ function MembresTab({ b }: { b: GroupBundle }) {
         label: 'Transférer le rôle de fondateur',
         hint: 'Tu deviendras le rôle juste en dessous',
         icon: <Crown size={18} color={colors.warn} />,
-        onPress: () =>
-          Alert.alert(`Faire de ${m.profile.name} le fondateur ?`, 'Il aura tous les droits, et toi ceux du rôle juste en dessous.', [
-            { text: 'Annuler', style: 'cancel' },
-            { text: 'Transférer', onPress: () => transferFounder(gid, m.userId).catch(fail('Transfert impossible')) },
-          ]),
+        onPress: async () => {
+          const ok = await dialog.confirm({
+            title: `Faire de ${m.profile.name} le fondateur ?`,
+            message: 'Il aura tous les droits, et toi ceux du rôle juste en dessous.',
+            confirmLabel: 'Transférer',
+          });
+          if (ok) transferFounder(gid, m.userId).catch(fail('Transfert impossible'));
+        },
       });
     }
     return acts;
@@ -287,7 +295,7 @@ function MembresTab({ b }: { b: GroupBundle }) {
 
   const inviteDirect = can(b, 'member.invite');
   const invite = () =>
-    Alert.alert(
+    dialog.info(
       inviteDirect ? 'Inviter' : 'Proposer un membre',
       inviteDirect
         ? 'Les invitations (ami IzenRide, lien, QR code) arrivent avec la prochaine version.'
@@ -299,9 +307,9 @@ function MembresTab({ b }: { b: GroupBundle }) {
   return (
     <View>
       <View style={styles.memberTools}>
-        <View style={styles.search}>
+        <View style={form.search}>
           <Search size={14} color={colors.inkMute} />
-          <TextInput value={q} onChangeText={setQ} placeholder="Rechercher un membre" placeholderTextColor={colors.inkMute} style={styles.searchInput} />
+          <TextInput value={q} onChangeText={setQ} placeholder="Rechercher un membre" placeholderTextColor={colors.inkMute} style={form.searchInput} />
         </View>
         <Pressable onPress={invite} style={styles.inviteBtn}>
           <UserPlus size={16} color="#fff" />
@@ -389,18 +397,15 @@ function InfosTab({ b, onManage, onLeft }: { b: GroupBundle; onManage: () => voi
     }
   };
 
-  const leave = () =>
-    Alert.alert('Quitter le groupe ?', b.me.role.isFounder && b.members.length === 1 ? 'Tu es seul : le groupe sera supprimé.' : undefined, [
-      { text: 'Annuler', style: 'cancel' },
-      {
-        text: 'Quitter',
-        style: 'destructive',
-        onPress: () =>
-          leaveGroup(b.group.id)
-            .then(onLeft)
-            .catch(fail('Impossible de quitter')),
-      },
-    ]);
+  const leave = async () => {
+    const ok = await dialog.confirm({
+      title: 'Quitter le groupe ?',
+      message: b.me.role.isFounder && b.members.length === 1 ? 'Tu es seul : le groupe sera supprimé.' : undefined,
+      confirmLabel: 'Quitter',
+      destructive: true,
+    });
+    if (ok) leaveGroup(b.group.id).then(onLeft).catch(fail('Impossible de quitter'));
+  };
 
   const field = (key: keyof typeof draft, label: string, Icon: typeof Info, placeholder: string, multiline = false) => (
     <View style={{ marginBottom: 14 }}>
@@ -415,7 +420,7 @@ function InfosTab({ b, onManage, onLeft }: { b: GroupBundle; onManage: () => voi
           placeholder={placeholder}
           placeholderTextColor={colors.inkMute}
           multiline={multiline}
-          style={[styles.input, multiline && { minHeight: 80, textAlignVertical: 'top' }]}
+          style={[form.input, multiline && form.textarea]}
         />
       ) : (
         <Text style={[styles.fieldVal, !b.group[key] && { color: colors.inkMute }]}>{(b.group[key] as string | null) || placeholder}</Text>
@@ -461,7 +466,7 @@ const styles = StyleSheet.create({
   },
   hero: { flexDirection: 'row', alignItems: 'center', gap: 14, marginBottom: 16 },
   heroMeta: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  heroKind: { fontFamily: fonts.monoBold, fontSize: 11, color: colors.inkDim, textTransform: 'uppercase', letterSpacing: 1 },
+  heroKind: { fontFamily: fonts.bold, fontSize: 11, color: colors.inkMute, textTransform: 'uppercase', letterSpacing: 1.2 },
   heroCount: { fontFamily: fonts.medium, fontSize: 13, color: colors.inkDim },
   tabs: {
     flexDirection: 'row',
@@ -511,19 +516,7 @@ const styles = StyleSheet.create({
   rideTitle: { fontFamily: fonts.bold, fontSize: 15, color: colors.ink },
   rideMeta: { fontFamily: fonts.regular, fontSize: 12, color: colors.inkDim, marginTop: 4 },
   memberTools: { flexDirection: 'row', gap: 10, alignItems: 'center' },
-  search: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    paddingHorizontal: 12,
-    borderRadius: radius.md,
-    backgroundColor: colors.panelSoft,
-    borderWidth: 1,
-    borderColor: colors.line,
-  },
-  searchInput: { flex: 1, paddingVertical: 10, fontFamily: fonts.regular, fontSize: 14, color: colors.ink },
-  inviteBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 14, height: 42, borderRadius: radius.md, backgroundColor: colors.neon },
+  inviteBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 14, height: 38, borderRadius: 11, backgroundColor: colors.neon },
   inviteTxt: { fontFamily: fonts.bold, fontSize: 13, color: '#fff' },
   roleHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 },
   roleCount: { fontFamily: fonts.monoBold, fontSize: 12, color: colors.inkMute },
@@ -535,19 +528,8 @@ const styles = StyleSheet.create({
   more: { fontFamily: fonts.bold, fontSize: 14, color: colors.inkMute, letterSpacing: 1, paddingHorizontal: 4 },
   swatch: { width: 14, height: 14, borderRadius: 7 },
   fieldHead: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 6 },
-  fieldLbl: { fontFamily: fonts.monoBold, fontSize: 11, color: colors.inkDim, textTransform: 'uppercase', letterSpacing: 1 },
+  fieldLbl: { fontFamily: fonts.semibold, fontSize: 11, color: colors.inkMute, textTransform: 'uppercase', letterSpacing: 0.8 },
   fieldVal: { fontFamily: fonts.regular, fontSize: 14, color: colors.ink, lineHeight: 20 },
-  input: {
-    backgroundColor: 'rgba(255,255,255,0.04)',
-    borderWidth: 1,
-    borderColor: colors.line,
-    borderRadius: radius.md,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    fontFamily: fonts.regular,
-    fontSize: 14,
-    color: colors.ink,
-  },
   leave: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 16, marginTop: 8 },
   leaveTxt: { fontFamily: fonts.semibold, fontSize: 14, color: colors.danger },
 });

@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Pressable, TextInput, Alert } from 'react-native';
+import { View, Text, StyleSheet, Pressable, TextInput } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Users, Building2, Check, Lock } from 'lucide-react-native';
-import { Screen, AppBar, Panel, PrimaryButton, SectionLabel } from '@/components';
+import { Screen, AppBar, Panel, PrimaryButton } from '@/components';
+import { SectionTitle, form } from '@/components/groups';
+import { dialog } from '@/components/Dialog';
 import { colors, fonts, radius } from '@/theme';
 import { createGroup } from '@/api/groups';
 import type { GroupKind } from '@/api/types';
@@ -38,7 +40,7 @@ export default function CreerUnGroupeScreen() {
       const id = await createGroup(kind, name, description);
       router.replace(groupRoutes.home(id, 'membres'));
     } catch (e) {
-      Alert.alert('Création impossible', (e as Error).message);
+      dialog.error('Création impossible')(e);
     } finally {
       setBusy(false);
     }
@@ -48,7 +50,7 @@ export default function CreerUnGroupeScreen() {
     <Screen>
       <AppBar title="Nouveau groupe" />
 
-      <SectionLabel>Type de groupe</SectionLabel>
+      <SectionTitle>Type de groupe</SectionTitle>
       {KINDS.map(({ kind: k, title, text, Icon }) => {
         const on = k === kind;
         return (
@@ -67,17 +69,17 @@ export default function CreerUnGroupeScreen() {
         );
       })}
 
-      <SectionLabel style={{ marginTop: 18 }}>Nom</SectionLabel>
+      <SectionTitle style={{ marginTop: 18 }}>Nom</SectionTitle>
       <TextInput
         value={name}
         onChangeText={setName}
         placeholder={kind === 'pro' ? 'Ex. Moto-école Bastille' : 'Ex. Night Riders Paris'}
         placeholderTextColor={colors.inkMute}
         maxLength={60}
-        style={styles.input}
+        style={form.input}
       />
 
-      <SectionLabel style={{ marginTop: 18 }}>Description (optionnel)</SectionLabel>
+      <SectionTitle style={{ marginTop: 18 }}>Description (optionnel)</SectionTitle>
       <TextInput
         value={description}
         onChangeText={setDescription}
@@ -85,7 +87,7 @@ export default function CreerUnGroupeScreen() {
         placeholderTextColor={colors.inkMute}
         maxLength={1000}
         multiline
-        style={[styles.input, { minHeight: 96, textAlignVertical: 'top' }]}
+        style={[form.input, form.textarea]}
       />
 
       <View style={styles.privacy}>
@@ -120,17 +122,6 @@ const styles = StyleSheet.create({
   kindText: { fontFamily: fonts.regular, fontSize: 12, color: colors.inkDim, marginTop: 2, lineHeight: 17 },
   radio: { width: 22, height: 22, borderRadius: 11, borderWidth: 1.5, borderColor: colors.lineStrong, alignItems: 'center', justifyContent: 'center' },
   radioOn: { backgroundColor: colors.neon, borderColor: colors.neon },
-  input: {
-    backgroundColor: colors.panelSoft,
-    borderWidth: 1,
-    borderColor: colors.line,
-    borderRadius: radius.md,
-    paddingHorizontal: 14,
-    paddingVertical: 13,
-    fontFamily: fonts.medium,
-    fontSize: 15,
-    color: colors.ink,
-  },
   privacy: {
     flexDirection: 'row',
     gap: 8,

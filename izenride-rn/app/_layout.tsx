@@ -13,6 +13,7 @@ import {
 } from '@expo-google-fonts/geist';
 import { GeistMono_500Medium, GeistMono_700Bold } from '@expo-google-fonts/geist-mono';
 import { colors } from '@/theme';
+import { DialogHost } from '@/components/Dialog';
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
@@ -45,6 +46,7 @@ export default function RootLayout() {
         <Stack.Screen name="index" />
         <Stack.Screen name="s/[id]" />
       </Stack>
+      <DialogHost />
     </SafeAreaProvider>
   );
 }

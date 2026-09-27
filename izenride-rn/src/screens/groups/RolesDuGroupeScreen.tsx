@@ -1,9 +1,10 @@
 import React from 'react';
-import { View, Text, StyleSheet, Pressable, Alert } from 'react-native';
+import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { useRouter } from 'expo-router';
 import { ChevronUp, ChevronDown, ChevronRight, Plus, Lock, Crown, UserCheck } from 'lucide-react-native';
 import { Screen, AppBar, Panel, PrimaryButton } from '@/components';
 import { LoadState, DemoUserSwitcher } from '@/components/groups';
+import { dialog } from '@/components/Dialog';
 import { colors, fonts, radius } from '@/theme';
 import { useQuery } from '@/api/useQuery';
 import { getGroupBundle, can, reorderRoles } from '@/api/groups';
@@ -38,7 +39,7 @@ export default function RolesDuGroupeScreen({ groupId }: { groupId: string }) {
     const j = i + dir;
     if (j < 0 || j >= ids.length) return;
     [ids[i], ids[j]] = [ids[j]!, ids[i]!];
-    reorderRoles(groupId, ids).catch((e) => Alert.alert('Réordonnancement impossible', (e as Error).message));
+    reorderRoles(groupId, ids).catch(dialog.error('Réordonnancement impossible'));
   };
 
   return (

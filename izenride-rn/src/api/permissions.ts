@@ -73,5 +73,8 @@ export function describeBlock(block: PermissionBlock, perms: readonly Permission
   }
 }
 
-/** Nuancier proposé dans l'éditeur de rôle (couleurs du thème). */
-export const ROLE_COLORS = ['#fbbf24', '#b884e6', '#22d3ee', '#4ade80', '#ff5c7a', '#4d8fff', '#7a92b8', '#f59e0b'];
+/**
+ * Nuancier de l'éditeur de rôle, tiré des tokens du thème. Exclut le violet
+ * (réservé au premium) et le rouge (réservé à la sécurité) de la charte.
+ */
+export const ROLE_COLORS = ['#fbbf24', '#7eb0ff', '#22d3ee', '#4ade80', '#4d8fff', '#67e8f9', '#b8c5dd', '#7a92b8'];

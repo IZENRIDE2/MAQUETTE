@@ -19,43 +19,40 @@
       'menu.meta': 'FR — iOS & Android · gratuit',
       'hero.kicker': "dispo sur iOS & Android — l'app des motards, made in France",
       'hero.role': 'La route vous croise. <em>IZENRIDE</em> vous connecte.',
-      'hero.tagline': "Rencontres entre motards, croisements GPS au mètre près, night rides et marketplace — tout dans votre poche, à 21h47, quelque part sur une départementale.",
+      'hero.tagline': "Rencontres entre motards, croisements GPS, sorties de groupe et guidage moto — tout dans votre poche, à 21h47, quelque part sur une départementale.",
       'hero.cta.dl': "Télécharger l'app", 'hero.cta.features': 'Voir les features', 'hero.cta.live': 'Ride Live en direct',
       'hero.meta.est': 'EN ROUTE DEPUIS 2024 →',
       'app.index': "01 / L'APP",
       'app.title': 'Croisez, roulez <em>&</em> connectez',
-      'app.note': "Cinq features, un seul réflexe — les écrans ci-dessous sont l'app réelle.",
+      'app.note': "Cinq features, un seul réflexe — les écrans ci-dessous illustrent l'interface.",
       'row.match.name': 'Rencontre',
       'row.match.desc': "Vos trajets se croisent déjà — IZENRIDE transforme ces croisements en rencontres. Un match basé sur vos affinités de conduite, une messagerie temps réel pensée pour la route, un prochain ride.",
       'row.match.meta': 'GRATUIT — iOS & ANDROID · « Croisez des motards, pas des profils »',
       'row.map.name': 'Carte & GPS',
-      'row.map.desc': "Notre système de localisation propriétaire détecte les motards que vous croisez — au mètre près, à la seconde près. Navigation pensée moto et itinéraires ZEN taillés pour les virages.",
+      'row.map.desc': "Notre système de localisation détecte les motards que vous croisez sur votre trajet. Navigation pensée moto, guidage vocal, et itinéraires taillés pour les virages.",
       'row.map.meta': "TEMPS RÉEL — la carte s'illumine là où la communauté roule",
       'row.events.name': 'Événements',
       'row.events.desc': "Créez un ride, fixez le départ, partagez l'itinéraire. Le suivi live garde le groupe soudé du premier au dernier virage — night rides, balades du dimanche, track days.",
-      'row.events.meta': '1 250 RIDES ORGANISÉS — seul on roule vite, ensemble on roule loin',
+      'row.events.meta': 'SORTIES DE GROUPE — seul on roule vite, ensemble on roule loin',
       'row.safety.name': 'Sécurité',
-      'row.safety.desc': "Une Safety Zone de 2 km vous entoure en permanence. Position partagée en temps réel, chiffrée de bout en bout, jamais revendue. Alerte chute automatique. Roulez libre — vos proches savent.",
+      'row.safety.desc': "Un SOS à portée de pouce : appui long, décompte, et vos contacts d'urgence reçoivent votre position. Partagez un trajet par lien, le temps d'une route. Et votre Safety Zone vous rend invisible sur la carte à moins de 2 km de chez vous.",
       'row.safety.meta': 'SÉRIEUX — la route veille sur vous',
-      'row.market.name': 'Marketplace',
-      'row.market.desc': "Casques, cuirs, machines. Achetez et vendez au sein de la communauté — annonces vérifiées avant publication, vendeurs notés, modération humaine. Entre passionnés, rien ne se perd.",
-      'row.market.meta': 'ENTRE RIDERS — remise en main propre ou envoi suivi',
       'premium.index': '02 / PREMIUM', 'premium.title': 'Passez en pleins phares',
       'premium.coming': '— ABONNEMENT —',
-      'premium.pitch': "Croisements illimités, mode fantôme, stats de ride avancées.<br>L'expérience complète, <em>sans limites</em>.",
-      'premium.hint': '4,99 € / MOIS · 49,99 € / AN (2 MOIS OFFERTS) · SANS ENGAGEMENT',
+      'premium.pitch': "Voyez qui vous a liké, qui vous avez croisé, et les motards autour de vous sur la carte. Créez vos propres sorties.<br>L'expérience complète, <em>sans limites</em>.",
+      'premium.hint': '9,99 € / MOIS · 49,99 € / 6 MOIS · 79,99 € / AN · SANS ENGAGEMENT',
       'premium.cta': 'Essayer Premium',
       'tech.index': '03 / TECH', 'tech.title': 'Sous le réservoir, <em>du lourd</em>',
-      'tech.loc': 'Système GPS propriétaire · croisements détectés < 5 m · Safety Zone 2 km · géo-temps réel',
+      'tech.loc': 'Système GPS propriétaire · détection des croisements · Safety Zone autour du domicile · géo-temps réel',
       'tech.rt': 'Messagerie instantanée · suivi live des rides · positions du groupe · WebSockets',
       'tech.map': "Navigation pensée moto · itinéraires ZEN (virages d'abord) · cartes nuit natives",
-      'tech.sec': 'Chiffrement de bout en bout · alerte chute (capteurs) · SOS appui long · données jamais revendues',
+      "tech.sec": "Chiffrement en transit · SOS appui long · contacts d'urgence · données jamais revendues",
       'tech.com': 'Matching par affinités · événements & groupes · modération humaine · profils vérifiés',
       'tech.plat': "iOS & Android natifs · mode hors-ligne · batterie maîtrisée · FR aujourd'hui, EN demain",
       'process.index': '04 / EN ROUTE', 'process.title': 'De la poche <em>au</em> bitume',
       'process.1.name': 'Téléchargez', 'process.1.desc': 'Gratuit sur iOS et Android. Deux minutes, casque encore sur la tête.',
       'process.2.name': 'Votre bécane', 'process.2.desc': 'Profil, machine, style de conduite. Roadtrips, twisties ou night rides — dites qui vous êtes.',
-      'process.3.name': 'Roulez', 'process.3.desc': 'Rien à faire de plus. Chaque trajet détecte les motards que vous croisez, au mètre près.',
+      'process.3.name': 'Roulez', 'process.3.desc': 'Rien à faire de plus. Chaque trajet détecte les motards que vous croisez.',
       'process.4.name': 'Matchez', 'process.4.desc': '« Croisée 3× cette semaine. » Un match, un message, un point de rendez-vous.',
       'process.5.name': 'Ensemble', 'process.5.desc': 'Night ride vendredi 21h30. Le suivi live garde le groupe soudé. La boucle est bouclée.',
       'about.index': '05 / À PROPOS', 'about.title': 'Nés sur la route',
@@ -66,8 +63,8 @@
       'contact.l1': 'Prêt à croiser', 'contact.l2': 'la <em>route ?</em>',
       'contact.appstore': 'App Store', 'contact.play': 'Google Play',
       'footer.built': '© 2026 IZEN RIDE SAS', 'footer.top': 'RETOUR EN HAUT ↑',
-      'dock.online': 'riders en ligne',
-      'panel.head': 'EN DIRECT DE LA COMMUNAUTÉ', 'panel.online': 'riders en ligne',
+      'dock.online': "APERÇU DE L'APP — CROISEMENTS & SORTIES",
+      'panel.head': "UN APERÇU DE L'APPLICATION", 'panel.online': "Ce que l'app affiche quand vous roulez",
       'panel.next': 'PROCHAIN RIDE — NIGHT RIDE CORNICHE'
     },
     en: {
@@ -76,43 +73,40 @@
       'menu.meta': 'FR — iOS & Android · free',
       'hero.kicker': 'available on iOS & Android — the riders app, made in France',
       'hero.role': 'The road crosses you. <em>IZENRIDE</em> connects you.',
-      'hero.tagline': 'Rider matching, metre-accurate GPS path-crossings, night rides and a marketplace — all in your pocket, at 9:47pm, somewhere on a back road.',
+      'hero.tagline': 'Rider matching, GPS path-crossings, group rides and motorcycle navigation — all in your pocket, at 9:47pm, somewhere on a back road.',
       'hero.cta.dl': 'Download the app', 'hero.cta.features': 'See the features', 'hero.cta.live': 'Ride Live feed',
       'hero.meta.est': 'ON THE ROAD SINCE 2024 →',
       'app.index': '01 / THE APP',
       'app.title': 'Cross, ride <em>&</em> connect',
-      'app.note': 'Five features, one reflex — the screens below are the real app.',
+      'app.note': 'Five features, one reflex — the screens below illustrate the interface.',
       'row.match.name': 'Matching',
       'row.match.desc': 'Your routes already cross — IZENRIDE turns those crossings into encounters. A match based on how you ride, realtime messaging built for the road, a next ride.',
       'row.match.meta': 'FREE — iOS & ANDROID · "Cross riders, not profiles"',
       'row.map.name': 'Map & GPS',
-      'row.map.desc': 'Our proprietary location engine detects the riders you cross — to the metre, to the second. Motorcycle-first navigation and ZEN routes carved for corners.',
+      'row.map.desc': 'Our location engine detects the riders you cross along your route. Motorcycle-first navigation, voice guidance, and routes carved for corners.',
       'row.map.meta': 'REALTIME — the map lights up where the community rides',
       'row.events.name': 'Events',
       'row.events.desc': 'Create a ride, set the start, share the route. Live tracking keeps the group tight from first to last corner — night rides, Sunday cruises, track days.',
-      'row.events.meta': '1,250 RIDES HOSTED — alone you ride fast, together you ride far',
+      'row.events.meta': 'GROUP RIDES — alone you ride fast, together you ride far',
       'row.safety.name': 'Safety',
-      'row.safety.desc': 'A 2 km Safety Zone surrounds you at all times. Position shared in realtime, end-to-end encrypted, never sold. Automatic crash alert. Ride free — your people know.',
+      "row.safety.desc": "SOS within thumb's reach: long-press, countdown, and your emergency contacts receive your position. Share a trip by link, for the length of a ride. And your Safety Zone makes you invisible on the map within 2 km of home.",
       'row.safety.meta': 'SERIOUS — the road watches over you',
-      'row.market.name': 'Marketplace',
-      'row.market.desc': 'Helmets, leathers, machines. Buy and sell within the community — listings verified before publication, rated sellers, human moderation.',
-      'row.market.meta': 'BETWEEN RIDERS — hand-to-hand or tracked shipping',
       'premium.index': '02 / PREMIUM', 'premium.title': 'Switch to high beams',
       'premium.coming': '— SUBSCRIPTION —',
-      'premium.pitch': 'Unlimited crossings, ghost mode, advanced ride stats.<br>The full experience, <em>no limits</em>.',
-      'premium.hint': '€4.99 / MO · €49.99 / YR (2 MONTHS FREE) · CANCEL ANYTIME',
+      'premium.pitch': 'See who liked you, who you crossed, and the riders around you on the map. Create your own rides.<br>The full experience, <em>no limits</em>.',
+      'premium.hint': '€9.99 / MONTH · €49.99 / 6 MONTHS · €79.99 / YEAR · NO COMMITMENT',
       'premium.cta': 'Try Premium',
       'tech.index': '03 / TECH', 'tech.title': 'Under the tank, <em>heavy duty</em>',
-      'tech.loc': 'Proprietary GPS engine · crossings detected < 5 m · 2 km Safety Zone · realtime geo',
+      'tech.loc': 'Proprietary GPS engine · path-crossing detection · Safety Zone around home · realtime geo',
       'tech.rt': 'Instant messaging · live ride tracking · group positions · WebSockets',
       'tech.map': 'Motorcycle-first navigation · ZEN routes (corners first) · native night maps',
-      'tech.sec': 'End-to-end encryption · crash detection (sensors) · long-press SOS · data never sold',
+      'tech.sec': 'Encryption in transit · long-press SOS · emergency contacts · data never sold',
       'tech.com': 'Affinity matching · events & groups · human moderation · verified profiles',
       'tech.plat': 'Native iOS & Android · offline mode · battery friendly · FR today, EN next',
       'process.index': '04 / ON THE ROAD', 'process.title': 'From pocket <em>to</em> tarmac',
       'process.1.name': 'Download', 'process.1.desc': 'Free on iOS and Android. Two minutes, helmet still on.',
       'process.2.name': 'Your bike', 'process.2.desc': 'Profile, machine, riding style. Roadtrips, twisties or night rides — say who you are.',
-      'process.3.name': 'Ride', 'process.3.desc': 'Nothing else to do. Every trip detects the riders you cross, to the metre.',
+      'process.3.name': 'Ride', 'process.3.desc': 'Nothing else to do. Every trip detects the riders you cross.',
       'process.4.name': 'Match', 'process.4.desc': '"Crossed 3× this week." A match, a message, a meeting point.',
       'process.5.name': 'Together', 'process.5.desc': 'Night ride, Friday 9:30pm. Live tracking keeps the group tight. Full circle.',
       'about.index': '05 / ABOUT', 'about.title': 'Born on the road',
@@ -123,13 +117,13 @@
       'contact.l1': 'Ready to cross', 'contact.l2': 'the <em>road?</em>',
       'contact.appstore': 'App Store', 'contact.play': 'Google Play',
       'footer.built': '© 2026 IZEN RIDE SAS', 'footer.top': 'BACK TO TOP ↑',
-      'dock.online': 'riders online',
-      'panel.head': 'LIVE FROM THE COMMUNITY', 'panel.online': 'riders online',
+      'dock.online': 'APP PREVIEW — CROSSINGS & GROUP RIDES',
+      'panel.head': 'A GLIMPSE OF THE APP', 'panel.online': 'What the app shows while you ride',
       'panel.next': 'NEXT RIDE — CORNICHE NIGHT RIDE'
     }
   };
 
-  function applyLang(lang) {
+  function applyLang(lang, persister) {
     var dict = I18N[lang] || I18N.fr;
     document.documentElement.lang = lang;
     document.querySelectorAll('[data-i18n]').forEach(function (el) {
@@ -143,14 +137,21 @@
     document.querySelectorAll('.lang-switch button').forEach(function (b) {
       b.classList.toggle('is-active', b.getAttribute('data-lang') === lang);
     });
-    try { localStorage.setItem('izen-lang', lang); } catch (e) {}
+    /* ⚠️ NE PERSISTE QUE SUR CHOIX EXPLICITE. Cette ligne écrivait à CHAQUE
+       appel — y compris celui du démarrage, qui passait 'fr' par défaut. Le
+       site s'inventait donc une préférence dès la première visite, et toute
+       détection de la langue de l'appareil devenait inerte : elle relisait ce
+       que le site venait d'écrire. Voir le script en ligne d'index.html. */
+    if (persister) {
+      try { localStorage.setItem('izen-langue-choisie', lang); } catch (e) {}
+    }
   }
   document.querySelectorAll('.lang-switch button').forEach(function (b) {
-    b.addEventListener('click', function () { applyLang(b.getAttribute('data-lang')); });
+    b.addEventListener('click', function () { applyLang(b.getAttribute('data-lang'), true); });
   });
-  var savedLang = 'fr';
-  try { savedLang = localStorage.getItem('izen-lang') || 'fr'; } catch (e) {}
-  applyLang(savedLang);
+  /* La décision a déjà été prise dans <head>, avant le premier paint : choix
+     explicite s'il existe, sinon la langue de l'appareil. On l'applique. */
+  applyLang(window.__izenLangue === 'en' ? 'en' : 'fr', false);
 
   /* ----------------------------------------------------------
      Écrans de l'app : lazy-load + mise à l'échelle (390 × 844)
@@ -215,15 +216,16 @@
   /* ----------------------------------------------------------
      Dock RIDE LIVE : compteur, barres canvas, countdown, panneau
      ---------------------------------------------------------- */
-  var riders = 1248;
-  var dockRiders = document.getElementById('dock-riders');
-  var panelRiders = document.getElementById('panel-riders');
-  setInterval(function () {
-    riders = Math.max(900, riders + Math.round((Math.random() - 0.45) * 14));
-    var s = riders.toLocaleString('fr-FR');
-    if (dockRiders) dockRiders.textContent = s;
-    if (panelRiders) panelRiders.textContent = s;
-  }, 2400);
+  // ⚠️ RETIRÉ LE 2026-08-04 — un compteur qui partait de 1 248 et marchait
+  // AU HASARD toutes les 2,4 secondes, présenté sous le titre « EN DIRECT DE
+  // LA COMMUNAUTÉ ». Aucune de ces valeurs n'a jamais existé.
+  //
+  // C'est la même faute que l'application a corrigée de son côté en supprimant
+  // un bloc de navigation qui affichait « A7 sud · 110 km/h » en dur.
+  //
+  // Le brancher sur du vrai n'est PAS une option : il n'existe aucun point
+  // d'accès public, et publier les croisements réels de motards sur un site
+  // ouvert poserait un problème de vie privée bien plus grave que le mensonge.
 
   // Countdown vers le prochain vendredi 21:30
   var panelCount = document.getElementById('panel-count');

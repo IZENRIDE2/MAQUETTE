@@ -1,4 +1,28 @@
-# IZEN RIDE — Site vitrine immersif « Inside the phone »
+> # 🔴 ARRÊT — LIRE AVANT DE TOUCHER UN FICHIER
+>
+> **La source unique du site est `GIT SITE/izenride-vr/`.** Décision Florian,
+> 2026-08-06.
+>
+> Tout ce qui se trouve **à la racine de ce dépôt** — `index.html`, `css/`,
+> `js/`, `screens/`, `mentions-legales/`, `politique-de-confidentialite/`,
+> `conditions-generales-*/` — est une **version morte**. Elle ne sera pas
+> publiée.
+>
+> Le 2026-08-06, une après-midi entière de corrections (rapatriement des
+> polices, alignement des prix, suppression de 18 affirmations fausses) a été
+> passée sur cette version racine avant qu'on s'aperçoive qu'une version plus
+> aboutie existait dans `GIT SITE/izenride-vr/`. Ne pas refaire l'erreur :
+> **ouvrir `GIT SITE/izenride-vr/index.html`, pas celui d'à côté.**
+>
+> Le dossier `C:\Izen-ride\site-a-publier\` est une **sortie jetable** —
+> régénérée, jamais éditée à la main. Ce qui y est aujourd'hui vient de la
+> version morte et a été téléversé sur OVH par erreur : à réécraser avant que
+> le domaine ne pointe dessus.
+>
+> État des lieux et liste des corrections en cours :
+> `GIT SITE/izenride-vr/docs/mise-en-correlation-site-app.md`
+
+# IZEN RIDE — Site vitrine immersif « Inside the phone » (version racine — ARCHIVÉE)
 
 Site one-page ultra haut de gamme de l'application **IZEN RIDE**, la communauté des motards et motardes.
 Concept : le visiteur ne regarde pas l'app — **il est propulsé à l'intérieur du téléphone**. Le scroll est le moteur de l'expérience.
